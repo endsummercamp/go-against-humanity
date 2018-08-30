@@ -1,5 +1,8 @@
-.PHONY: ita
+.PHONY: build-card ita-original
 
-ita:
-	mkdir -p cards/json-against-humanity/src/ita-original
-	python cards/italian/parser.py cards/italian/source/cah-ita-originale-federico.tex cards/json-against-humanity/src/ita-original
+build-card:
+	mkdir -p cards/json-against-humanity/src/${DECK}
+	python cards/italian/parser.py cards/italian/source/${DECK}/main.tex cards/json-against-humanity/src/$1
+
+ita-original: 
+	@$(MAKE) build-card DECK=ita-original
