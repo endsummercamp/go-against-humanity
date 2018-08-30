@@ -1,0 +1,3 @@
+[submodule "cards/json-against-humanity"]
+	path = cards/json-against-humanity
+	url = https://github.com/ESCah/json-against-humanity
