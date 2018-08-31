@@ -61,6 +61,11 @@ func NewCard(color CardColor, text string) Card {
 	return c
 }
 
+func RemoveCard(cards *[]Card, index int){
+	(*cards)[len(*cards)-1], (*cards)[index] = (*cards)[index], (*cards)[len(*cards)-1]
+	*cards = (*cards)[:len(*cards)-1]
+}
+
 func NewRandomCardFromDeck(color CardColor, deck *Deck) *Card {
 	rand.Seed(time.Now().Unix())
 
@@ -73,7 +78,9 @@ func NewRandomCardFromDeck(color CardColor, deck *Deck) *Card {
 		}
 		i := rand.Intn(len(deck.Black_cards))
 		card = &deck.Black_cards[i]
-		deck.Black_cards = append(deck.Black_cards[:i], deck.Black_cards[i+1:]...)
+		log.Printf("Len before B: %d\n", len(deck.Black_cards))
+		RemoveCard(&deck.Black_cards, i)
+		log.Printf("Len before B: %d\n", len(deck.Black_cards))
 		return card
 	case WHITE_CARD:
 		if len(deck.White_cards) == 0 {
@@ -81,8 +88,9 @@ func NewRandomCardFromDeck(color CardColor, deck *Deck) *Card {
 		}
 		i := rand.Intn(len(deck.White_cards))
 		card = &deck.White_cards[i]
-		log.Printf("%#v\n", card)
-		deck.White_cards = append(deck.White_cards[:i], deck.White_cards[i+1:]...)
+		log.Printf("Len before W: %d\n", len(deck.White_cards))
+		RemoveCard(&deck.White_cards, i)
+		log.Printf("Len after W: %d\n", len(deck.White_cards))
 		return card
 	default:
 		return nil
