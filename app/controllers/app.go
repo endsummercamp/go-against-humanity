@@ -6,7 +6,17 @@ import (
 	"github.com/revel/revel"
 	"log"
 	"os"
+	"crypto/sha256"
+	"encoding/hex"
+	"fmt"
+	"io"
 )
+
+func hashPassword(password string) string {
+	hasher := sha256.New()
+	io.WriteString(hasher, password)
+	return hex.EncodeToString(hasher.Sum(nil))
+}
 
 var deck *game.Deck
 
@@ -24,7 +34,52 @@ func (c App) Index() revel.Result {
 }
 
 func (c App) Login() revel.Result {
+	c.ViewArgs["failed"] = c.Params.Get("failed") != ""
+	c.ViewArgs["registered"] = c.Params.Get("registered") != ""
 	return c.Render()
+}
+
+func (c App) PostLogin() revel.Result {
+	username := c.Params.Form.Get("username")
+	password := c.Params.Form.Get("password")
+	user := User{}
+	pwhash := hashPassword(password)
+	err := DbMap.SelectOne(&user, "SELECT * FROM users WHERE username=? AND pwhash=?", username, pwhash)
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			return c.Redirect("/login?failed=1")
+		} else {
+			panic(err)
+		}
+	}
+	fmt.Printf("%#v\n", user)
+	return c.Redirect("/")
+}
+
+func (c App) Register() revel.Result {
+	return c.Render()
+}
+
+func (c App) PostRegister() revel.Result {
+	username := c.Params.Form.Get("username")
+	password := c.Params.Form.Get("password")
+	count, err := DbMap.SelectInt("SELECT COUNT(*) FROM users WHERE username=?", username)
+	if err != nil {
+		panic(err)
+	}
+	if count != 0 {
+		c.ViewArgs["error"] = "Another user with that username already exists."
+		c.Render()
+	}
+	user := User{
+		Username: username,
+		PwHash:   hashPassword(password),
+	}
+	err = DbMap.Insert(&user)
+	if err != nil {
+		panic(err)
+	}
+	return c.Redirect("/login?registered=1")
 }
 
 func (c App) NewRound() revel.Result {

@@ -1,13 +1,10 @@
-{{set . "title" "Login"}}
+{{set . "title" "Register"}}
 {{template "header.html" .}}
 
-<h1>Login to continue</h1>
-<form method="POST" action="/login">
-    {{if .failed}}
-        <strong>Login failed.</strong>
-    {{end}}
-    {{if .registered}}
-        <strong>You registered successfully! You may now log in.</strong>
+<h1>Registration</h1>
+<form method="POST" action="/register">
+    {{if .error}}
+        <strong>{{ .error }}</strong>
     {{end}}
     <div>
         <label for="inputUsername">Username</label><br>
@@ -17,5 +14,5 @@
         <label for="inputPassword">Password</label><br>
         <input type="password" id="inputPassword" name="password">
     </div>
-    <button type="submit">Log in</button>
+    <button type="submit">Sign up</button>
 </form>
