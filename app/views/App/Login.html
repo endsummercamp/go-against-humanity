@@ -2,7 +2,7 @@
 {{template "header.html" .}}
 
 <h1>Login to continue</h1>
-<form method="POST" action="/login">
+<form method="POST" action="/login" class="form">
     {{if .failed}}
         <strong>Login failed.</strong>
     {{end}}

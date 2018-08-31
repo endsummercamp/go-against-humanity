@@ -1,0 +1,11 @@
+{{set . "title" "Matches"}} 
+{{template "header.html" .}}
+
+<h1>Current Matches</h1>
+<ul>
+    {{ range $element := .matches }}
+        <li><a href="/match/join/{{ $element.Id }}">Match {{ $element.Id }}</a></li>
+    {{ end }}
+</ul>
+
+{{template "footer.html" .}}

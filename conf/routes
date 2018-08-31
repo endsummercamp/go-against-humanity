@@ -9,10 +9,13 @@ module:testrunner
 
 GET     /                                       App.Index
 GET     /login                                  App.Login
+GET     /logout                                 App.Logout
 GET     /register                               App.Register
 GET     /card                                   App.Card
-GET     /round/new                              App.NewRound
 GET     /deck                                   App.GetDeck
+GET     /matches                                App.Matches
+GET     /admin                                  App.Admin
+GET     /admin/match/new                        App.NewMatch
 
 POST    /login                                  App.PostLogin
 POST    /register                               App.PostRegister

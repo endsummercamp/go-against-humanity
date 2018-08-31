@@ -1,7 +1,6 @@
-package game
+package models
 
 type Deck struct {
-	Name              			string
 	Black_cards             	[]Card
 	White_cards             	[]Card
 	LastExtractedCard 			*Card
