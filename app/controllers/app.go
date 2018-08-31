@@ -28,6 +28,38 @@ func (c App) Login() revel.Result {
 }
 
 func (c App) NewRound() revel.Result {
+	generateDeck()
+
+	return c.RenderJSON(deck)
+}
+
+func (c App) Card() revel.Result {
+	generateDeck()
+
+	c.ViewArgs["deck_name"] = deck.Name
+	black_card := (*game.NewRandomCardFromDeck(game.BLACK_CARD, deck)).(game.BlackCard)
+	white_card := (*game.NewRandomCardFromDeck(game.WHITE_CARD, deck)).(game.WhiteCard)
+
+	c.ViewArgs["cards"] = []game.Card{white_card, black_card}
+
+	return c.Render()
+}
+
+func deck_allowed(deck_name string) bool {
+	switch deck_name {
+	case "ita-original-sfoltita":
+	case "ita-espansione":
+	case "ita-HACK":
+		return true
+	}
+	return false
+}
+
+func generateDeck() {
+	if deck != nil {
+		return
+	}
+
 	f, err := os.OpenFile("./cards/json-against-humanity/full.md.json", os.O_RDONLY, 755)
 	if err != nil {
 		log.Fatal(err)
@@ -43,11 +75,15 @@ func (c App) NewRound() revel.Result {
 	blackcards := []game.Card{}
 
 	for _, card := range v.White {
-		whitecards = append(whitecards, card)
+		if deck_allowed(card.Deck) {
+			whitecards = append(whitecards, card)
+		}
 	}
 
 	for _, card := range v.Black {
-		blackcards = append(blackcards, card.WhiteCard)
+		if deck_allowed(card.Deck) {
+			blackcards = append(blackcards, card)
+		}
 	}
 
 	deck = &game.Deck{
@@ -56,16 +92,4 @@ func (c App) NewRound() revel.Result {
 		whitecards,
 		nil,
 	}
-
-	return c.RenderJSON(v)
-}
-
-func (c App) Card() revel.Result {
-
-	c.ViewArgs["deck_name"] = deck.Name
-	card := game.NewRandomCardFromDeck(game.BLACK_CARD, deck)
-
-	c.ViewArgs["cards"] = []game.Card{*card}
-
-	return c.Render()
 }

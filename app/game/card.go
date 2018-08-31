@@ -1,6 +1,7 @@
 package game
 
 import (
+	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -12,7 +13,9 @@ type Card interface {
 }
 
 type BlackCard struct {
-	WhiteCard
+	Deck	string	`json:"deck"`
+	Icon	string	`json:"icon"`
+	Text	string	`json:"text"`
 	Pick int	`json:"pick"`
 }
 
@@ -30,11 +33,11 @@ func (c WhiteCard) GetColor() CardColor {
 	return WHITE_CARD
 }
 
-func (c *BlackCard) GetText() string {
-	return c.WhiteCard.Text
+func (c BlackCard) GetText() string {
+	return c.Text
 }
 
-func (c *BlackCard) GetColor() CardColor {
+func (c BlackCard) GetColor() CardColor {
 	return BLACK_CARD
 }
 
@@ -43,12 +46,10 @@ func NewCard(color CardColor, text string) Card {
 	switch color {
 	case BLACK_CARD:
 		c = &BlackCard{
-			WhiteCard{
-				Deck: "hello",
-				Icon: "default",
-				Text: text,
-			},
-			strings.Count(text, "_"),
+			Deck: "hello",
+			Icon: "default",
+			Text: text,
+			Pick: strings.Count(text, "_"),
 		}
 	case WHITE_CARD:
 		c = &WhiteCard{
@@ -73,14 +74,17 @@ func NewRandomCardFromDeck(color CardColor, deck *Deck) *Card {
 		i := rand.Intn(len(deck.Black_cards))
 		card = &deck.Black_cards[i]
 		deck.Black_cards = append(deck.Black_cards[:i], deck.Black_cards[i+1:]...)
+		return card
 	case WHITE_CARD:
 		if len(deck.White_cards) == 0 {
 			return nil
 		}
 		i := rand.Intn(len(deck.White_cards))
 		card = &deck.White_cards[i]
+		log.Printf("%#v\n", card)
 		deck.White_cards = append(deck.White_cards[:i], deck.White_cards[i+1:]...)
+		return card
+	default:
+		return nil
 	}
-
-	return card
 }
