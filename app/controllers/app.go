@@ -8,13 +8,15 @@ import (
 	"os"
 )
 
+var deck *game.Deck
+
 type App struct {
 	*revel.Controller
 	deck *game.Deck
 }
 
 func (c App) initDeck() {
-	c.deck = new(game.Deck)
+	deck = new(game.Deck)
 }
 
 func (c App) Index() revel.Result {
@@ -48,7 +50,7 @@ func (c App) NewRound() revel.Result {
 		blackcards = append(blackcards, card.WhiteCard)
 	}
 
-	c.deck = &game.Deck{
+	deck = &game.Deck{
 		"test",
 		blackcards,
 		whitecards,
@@ -60,12 +62,10 @@ func (c App) NewRound() revel.Result {
 
 func (c App) Card() revel.Result {
 
-	c.ViewArgs["cards"] = []game.Card{game.NewCard(game.BLACK_CARD,
-		"aaa")}
+	c.ViewArgs["deck_name"] = deck.Name
+	card := game.NewRandomCardFromDeck(game.BLACK_CARD, deck)
 
-	c.ViewArgs["deck_name"] = c.deck.Name
-
-	//game.NewRandomCardFromDeck(game.BLACK_CARD, c.deck)
+	c.ViewArgs["cards"] = []game.Card{*card}
 
 	return c.Render()
 }

@@ -1,6 +1,5 @@
 {{set . "title" "Login"}}
 {{template "header.html" .}}
-        Deck name: {{ .deck_name }}
 {{ range $element := .cards }}
     {{ if card_black $element }}
 <div class="card card-black">

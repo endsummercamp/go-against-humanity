@@ -36,7 +36,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					21: []string{ 
+					23: []string{ 
 					},
 				},
 			},
@@ -45,7 +45,7 @@ func main() {
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					25: []string{ 
+					27: []string{ 
 					},
 				},
 			},
