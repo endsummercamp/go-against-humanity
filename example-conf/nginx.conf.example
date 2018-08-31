@@ -1,0 +1,22 @@
+server {
+    # Listening on IP Address.
+    # This is the website iptables redirects to
+    listen       80 default_server;
+    root         /usr/share/nginx/html;
+
+    # For others
+    location / {
+        return 302 http://escah.local/;
+    }
+ }
+
+server {
+     listen       80;
+     server_name  escah.local;
+     root         /usr/share/nginx/html;
+
+     location / {
+         proxy_pass http://localhost:9000;
+     }
+
+}
