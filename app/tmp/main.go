@@ -57,11 +57,18 @@ func main() {
 				},
 			},
 			&revel.MethodType{
+				Name: "GetDeck",
+				Args: []*revel.MethodArg{ 
+				},
+				RenderArgNames: map[int][]string{ 
+				},
+			},
+			&revel.MethodType{
 				Name: "Card",
 				Args: []*revel.MethodArg{ 
 				},
 				RenderArgNames: map[int][]string{ 
-					45: []string{ 
+					49: []string{ 
 					},
 				},
 			},

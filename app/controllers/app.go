@@ -33,8 +33,12 @@ func (c App) NewRound() revel.Result {
 	return c.RenderJSON(deck)
 }
 
+func (c App) GetDeck() revel.Result {
+	return c.RenderJSON(deck)
+}
+
 func (c App) Card() revel.Result {
-	generateDeck()
+	//generateDeck()
 
 	c.ViewArgs["deck_name"] = deck.Name
 	black_card := (*game.NewRandomCardFromDeck(game.BLACK_CARD, deck)).(game.BlackCard)
@@ -45,8 +49,8 @@ func (c App) Card() revel.Result {
 	return c.Render()
 }
 
-func deck_allowed(deck_name string) bool {
-	switch deck_name {
+func deckAllowed(deckName string) bool {
+	switch deckName {
 	case "ita-original-sfoltita":
 	case "ita-espansione":
 	case "ita-HACK":
@@ -71,17 +75,17 @@ func generateDeck() {
 		log.Fatal(err)
 	}
 
-	whitecards := []game.Card{}
-	blackcards := []game.Card{}
+	var whitecards []game.Card
+	var blackcards []game.Card
 
 	for _, card := range v.White {
-		if deck_allowed(card.Deck) {
+		if deckAllowed(card.Deck) {
 			whitecards = append(whitecards, card)
 		}
 	}
 
 	for _, card := range v.Black {
-		if deck_allowed(card.Deck) {
+		if deckAllowed(card.Deck) {
 			blackcards = append(blackcards, card)
 		}
 	}

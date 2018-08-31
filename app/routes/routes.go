@@ -29,6 +29,13 @@ func (_ tApp) NewRound(
 	return revel.MainRouter.Reverse("App.NewRound", args).URL
 }
 
+func (_ tApp) GetDeck(
+		) string {
+	args := make(map[string]string)
+	
+	return revel.MainRouter.Reverse("App.GetDeck", args).URL
+}
+
 func (_ tApp) Card(
 		) string {
 	args := make(map[string]string)

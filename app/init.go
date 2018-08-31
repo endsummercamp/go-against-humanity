@@ -43,6 +43,10 @@ func init() {
 		return input.GetColor() == game.BLACK_CARD
 	}
 
+	revel.TemplateFuncs["long_text"] = func(input string) bool {
+		return len(input) > 100
+	}
+
 	// Register startup functions with OnAppStart
 	// revel.DevMode and revel.RunMode only work inside of OnAppStart. See Example Startup Script
 	// ( order dependent )

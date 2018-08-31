@@ -1,4 +1,4 @@
-{{set . "title" "Login"}}
+{{set . "title" "Card"}}
 {{template "header.html" .}}
 {{ range $element := .cards }}
     {{ if card_black $element }}
@@ -6,7 +6,7 @@
     {{ else }}
  <div class="card card-white">
     {{ end }}
-    <div class="card-top">
+    <div class="card-top{{ if long_text $element.Text }} small-text{{end}}">
         <div class="card-content">
             {{ card_dash $element.Text | raw }}
         </div>
