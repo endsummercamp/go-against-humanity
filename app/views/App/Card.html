@@ -1,0 +1,20 @@
+{{set . "title" "Login"}}
+{{template "header.html" .}}
+        Deck name: {{ .deck_name }}
+{{ range $element := .cards }}
+    {{ if card_black $element }}
+<div class="card card-black">
+    {{ else }}
+ <div class="card card-white">
+    {{ end }}
+    <div class="card-top">
+        <div class="card-content">
+            {{ card_dash $element.Text | raw }}
+        </div>
+    </div>
+
+    <div class="card-bottom">
+        Cards Against Humanity
+    </div>
+</div>
+{{ end }}
