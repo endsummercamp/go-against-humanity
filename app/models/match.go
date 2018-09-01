@@ -106,22 +106,22 @@ func (m *Match) GetRound() *Round {
 	return &m.Rounds[len(m.Rounds)-1]
 }
 
-func (m *Match) NewBlackCard() bool {
+func (m *Match) NewBlackCard() *BlackCard {
 
 	if m.State != MATCH_SHOW_RESULTS && m.State != MATCH_WAIT_USERS {
-		return false
+		return nil
 	}
 
 	m.State = MATCH_PLAYBALE
 
-	black_card := m.Deck.NewRandomBlackCard()
-	if black_card == nil {
-		return false
+	blackCard := m.Deck.NewRandomBlackCard()
+	if blackCard == nil {
+		return nil
 	}
 	m.Rounds = append(m.Rounds, Round{
-		black_card,
+		blackCard,
 		map[*WhiteCard][]*Juror{},
 	})
 
-	return true
+	return blackCard
 }

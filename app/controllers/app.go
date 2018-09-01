@@ -340,14 +340,23 @@ func (c App) MatchNewBlackCard() revel.Result {
 		return c.NotFound("Invalid MatchId")
 	}
 
-	log.Fatal(matchId)
-
 	match := mm.GetMatchByID(matchId)
 
 	if match == nil {
 		return c.NotFound("Match not found")
 	}
 
-	match.NewBlackCard()
-	return c.Result
+	card := match.NewBlackCard()
+	if card == nil {
+		/* ... */
+	}
+
+	msg := Event{
+		Name:    "new_black",
+		NewCard: card,
+	}
+	for _, conn := range ws.rooms[matchId] {
+		conn.WriteJSON(msg)
+	}
+	return c.RenderJSON(true)
 }

@@ -24,8 +24,11 @@ class Card extends React.Component {
             const percentage = this.props.total / this.props.sum;
             style.height = percentage * 100 + "%";
         };
-        console.log(this.props, style);
-        return <div className={"card card-" + (this.props.black ? "black" : "white")} onClick={this.props.onClick}>
+        let classes = "card ";
+        classes += "card-" + (this.props.black ? "black" : "white") + " ";
+        if (this.props.text.length > 40)
+            classes += "small-text";
+        return <div className={classes} onClick={this.props.onClick}>
             <div className="card-top">
                 <div className="card-content">
                     {this.props.text}
@@ -75,6 +78,10 @@ class AnswersRow extends React.Component {
 
 class MyCardsRow extends React.Component {
     submitCard(id) {
+        if (!canVote) {
+            alert("You cannot vote at this time!");
+            return;
+        }
         const req = new XMLHttpRequest();
         req.open("PUT", `/match/${MATCH_ID}/pick_card/${id}`);
         req.send();
@@ -119,6 +126,7 @@ function getCardTotals(data) {
 
 let answers = [];
 let totals = [];
+let canVote = false;
 socket.onmessage = function (e) {
     console.log("Received", e.data);
     const data = JSON.parse(e.data);
@@ -143,6 +151,9 @@ socket.onmessage = function (e) {
         }
         break;
     case "new_black":
+        canVote = true;
+        // Todo: make cuter?
+        // setTimeout(() => {canVote = false;}, data.duration * 1000);
         ReactDOM.render(<BlackRow card={<Card text={data.NewCard.text} black />}/>, blackrowDiv);
         break;
     case "new_white":
