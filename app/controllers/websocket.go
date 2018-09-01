@@ -2,12 +2,12 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/ESCah/go-against-humanity/app/game"
 	"github.com/ESCah/go-against-humanity/app/models"
-	"math/rand"
-	"net/http"
-	"time"
-
 	"github.com/gorilla/websocket"
+	"log"
+	"net/http"
+	"strconv"
 )
 
 type Card struct {
@@ -27,55 +27,23 @@ type Event struct {
 }
 
 type SocketServer struct {
-
+	mm	*game.MatchManager
+	rooms map[int][]*websocket.Conn
 }
 
-func (s *SocketServer) onConnect(conn *websocket.Conn, matchID string) {
-	m := Event{
-		Name: "new_game",
-	}
-	// time.Sleep(time.Second)
-	conn.WriteJSON(m)
-
-	m = Event{
-		Name: "new_black",
-		NewCard: models.BlackCard{
-			Deck: "",
-			Icon: "",
-			Text: "Lorem ipsum?",
-			Pick: 1,
-			Id: 1,
-		},
-	}
-	conn.WriteJSON(m)
-
-	var totals []Total
-
-	for i := 0; i < 5; i++ {
-		m = Event{
-			Name: "new_white",
-			NewCard: models.WhiteCard{
-				Deck: "",
-				Icon: "",
-				Text: "Answer 1",
-				Id: i,
-			},
-		}
-		totals = append(totals, Total{
-			ID: i,
-			Votes: 0,
+func (s *SocketServer) onConnect(conn *websocket.Conn, matchID int) {
+	log.Printf("MatchID: %d\n", matchID)
+	if !mm.IsJoinable(matchID) {
+		conn.WriteJSON(Event {
+			Name: "cannot_join",
 		})
-		time.Sleep(time.Second)
-		conn.WriteJSON(m)
-	}
-
-	for i := 0; i < 20; i++ {
-		totals[rand.Intn(5)].Votes++
-		time.Sleep(time.Second / 2)
+		return
+	} else {
 		conn.WriteJSON(Event{
-			Name: "totals",
-			Totals: totals,
+			Name: "join_successful",
 		})
+		s.rooms[matchID] = append(s.rooms[matchID], conn)
+		return
 	}
 }
 
@@ -85,12 +53,19 @@ func (s *SocketServer) wsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "The 'match' parameter is required", http.StatusBadRequest)
 		return
 	}
+
+	matchIDInt, err := strconv.Atoi(matchID)
+	if err != nil {
+		http.Error(w, "Invalid 'match' parameter", http.StatusBadRequest)
+		return
+	}
+
 	conn, err := websocket.Upgrade(w, r, w.Header(), 1024, 1024)
 	if err != nil {
 		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
 		return
 	}
-	go s.onConnect(conn, matchID)
+	go s.onConnect(conn, matchIDInt)
 }
 
 func (s *SocketServer) Start() int {
@@ -103,5 +78,5 @@ func (s *SocketServer) Start() int {
 			panic(err)
 		}
 	}()
-	return 0 // So that it can be used as "var _ = s.Start()"
+	return 0
 }

@@ -76,7 +76,7 @@ ReactDOM.render(<WhiteRow answers={[]} />, whiterowDiv);
 
 const whiteRow = document.getElementById("whiterow");
 // TODO: cambiare URL e numero match
-const socket = new WebSocket("ws://192.168.43.34:8080/ws?match=0");
+const socket = new WebSocket(`ws://${document.location.hostname}:8080/ws?match=${MATCH_ID}`);
 socket.onopen = function() {
     console.log("Opened socket.");
 };
@@ -99,7 +99,7 @@ socket.onmessage = function (e) {
     const { Name: eventName } = data 
     let cardText;
     switch (eventName) {
-    case "new_game":
+    case "join_successful":
         answers = [];
         ReactDOM.render(<BlackRow />, blackrowDiv);
         ReactDOM.render(<WhiteRow answers={[]}/>, whiterowDiv);

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/ESCah/go-against-humanity/app/game"
 	"github.com/ESCah/go-against-humanity/app/models"
+	"github.com/gorilla/websocket"
 	"github.com/revel/revel"
 	"io"
 	"log"
@@ -19,7 +20,7 @@ func hashPassword(password string) string {
 
 var deck *models.Deck
 var mm = &game.MatchManager{}
-var ws SocketServer
+var ws = SocketServer{mm, map[int][]*websocket.Conn{}}
 var _ = ws.Start()
 
 type App struct {
@@ -111,7 +112,7 @@ func (c App) Logout() revel.Result {
 		return c.Redirect(App.Login)
 	}
 
-	c.Flash.Success("Logged out succesfully")
+	c.Flash.Success("Logged out successfully")
 	c.Session = make(revel.Session)
 	return c.Redirect(App.Login)
 }
@@ -209,10 +210,6 @@ func (c App) AdminUsers() revel.Result {
 
 	c.ViewArgs["users"] = userlist
 
-	return c.Render()
-}
-
-func (c App) Game() revel.Result {
 	return c.Render()
 }
 
