@@ -34,7 +34,6 @@ func (s *SocketServer) onConnect(conn *websocket.Conn, matchID string) {
 	m := Event{
 		Name: "new_game",
 	}
-	// time.Sleep(time.Second)
 	conn.WriteJSON(m)
 
 	m = Event{
@@ -48,6 +47,9 @@ func (s *SocketServer) onConnect(conn *websocket.Conn, matchID string) {
 		},
 	}
 	conn.WriteJSON(m)
+
+	return
+	time.Sleep(5 * time.Second)
 
 	var totals []Total
 
