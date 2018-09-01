@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"time"
+	"sort"
+)
 
 type Round struct {
 	BlackCard *BlackCard
@@ -15,4 +18,15 @@ func (r *Round) AddCard(card *WhiteCard) bool {
 
 	r.wcs[card] = []*Juror{}
 	return true
+}
+
+func (r *Round) GetChoices() []*WhiteCard {
+	var ret []*WhiteCard
+	for card := range r.wcs {
+		ret = append(ret, card)
+	}
+	sort.Slice(ret, func(i, j int) bool {
+		return ret[i].Text < ret[j].Text
+	})
+	return ret
 }

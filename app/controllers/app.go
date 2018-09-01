@@ -362,7 +362,8 @@ func (c App) MatchNewBlackCard() revel.Result {
 		Duration: 20, // Timeout in seconds
 	}
 
-	match.GetRound().TimeFinishPick = time.Now()
+	round := match.GetRound()
+	round.TimeFinishPick = time.Now()
 
 	go func(){
 		time.Sleep(time.Duration(msg.Duration) * time.Second)
@@ -372,6 +373,17 @@ func (c App) MatchNewBlackCard() revel.Result {
 		}
 		for _, conn := range ws.rooms[matchId] {
 			conn.WriteJSON(msg)
+		}
+
+		for _, card := range round.GetChoices() {
+			msg := Event {
+				Name: "new_white",
+				NewCard: card,
+			}
+			for _, conn := range ws.rooms[matchId] {
+				conn.WriteJSON(msg)
+			}
+			time.Sleep(time.Second)
 		}
 	}()
 
