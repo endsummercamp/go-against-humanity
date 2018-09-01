@@ -2,21 +2,38 @@ server {
     # Listening on IP Address.
     # This is the website iptables redirects to
     listen       80 default_server;
+    listen       [::]:80 default_server;
     root         /usr/share/nginx/html;
 
     # For others
     location / {
-        return 302 http://escah.local/;
+        return 301 http://escah.local/;
     }
  }
 
 server {
-     listen       80;
-     server_name  escah.local;
-     root         /usr/share/nginx/html;
+    listen       80;
+    listen       [::]:80;
+    server_name  escah.local;
 
-     location / {
-         proxy_pass http://localhost:9000;
-     }
+    gzip on;
 
+    location /public {
+        root /escah;
+        sendfile on;
+        tcp_nopush on;
+        expires 1h;
+        add_header Cache-Control "public";
+    }
+
+    location = /favicon.ico {
+        root /escah/public;
+        access_log off;
+        expires 1y;
+        add_header Cache-Control "public";
+    }
+
+    location / {
+        proxy_pass http://127.0.0.1:9000;
+    }
 }
