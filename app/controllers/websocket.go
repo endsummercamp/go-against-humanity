@@ -25,6 +25,7 @@ type Event struct {
 	Name    string
 	NewCard models.Card
 	Totals  []Total
+	Duration int
 }
 
 type SocketServer struct {

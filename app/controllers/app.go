@@ -320,7 +320,11 @@ func (c App) PickCard() revel.Result {
 
 	player.Cards = append(player.Cards[:foundId], player.Cards[foundId+1:]...)
 
-	round.AddCard(card)
+	result := round.AddCard(card)
+
+	if !result {
+		return c.Forbidden("Already played")
+	}
 
 	return c.RenderJSON(nil)
 }
@@ -354,6 +358,7 @@ func (c App) MatchNewBlackCard() revel.Result {
 	msg := Event{
 		Name:    "new_black",
 		NewCard: card,
+		Duration: 120, // Timeout in seconds
 	}
 	for _, conn := range ws.rooms[matchId] {
 		conn.WriteJSON(msg)

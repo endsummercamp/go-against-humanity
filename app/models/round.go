@@ -5,10 +5,11 @@ type Round struct {
 	wcs map[*WhiteCard][]*Juror
 }
 
-func (r *Round) AddCard(card *WhiteCard){
+func (r *Round) AddCard(card *WhiteCard) bool {
 	if _, ok := r.wcs[card]; ok {
-		return
+		return false
 	}
 
 	r.wcs[card] = []*Juror{}
+	return true
 }

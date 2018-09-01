@@ -21,6 +21,8 @@
 @errorColor: #c62828;
 @successColor: #9CCC65;
 
+@darkGray: #607D8B;
+
 html{
     background-color: @bodybgColor;
 }
@@ -380,4 +382,13 @@ div.match-admin-panel {
             .BoxShadowHelper(1);
         }
     }
+}
+
+div.match-timer {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    color: @white;
+    background-color: @darkGray;
 }

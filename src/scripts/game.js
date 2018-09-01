@@ -78,8 +78,8 @@ class AnswersRow extends React.Component {
 
 class MyCardsRow extends React.Component {
     submitCard(id) {
-        if (!canVote) {
-            alert("You cannot vote at this time!");
+        if (!canPickCard) {
+            alert("You cannot pick a card at this time!");
             return;
         }
         const req = new XMLHttpRequest();
@@ -126,7 +126,10 @@ function getCardTotals(data) {
 
 let answers = [];
 let totals = [];
-let canVote = false;
+let canPickCard = false;
+let timer = document.getElementsByClassName("match-timer")[0];
+let timer_interval;
+let seconds_left;
 socket.onmessage = function (e) {
     console.log("Received", e.data);
     const data = JSON.parse(e.data);
@@ -151,9 +154,17 @@ socket.onmessage = function (e) {
         }
         break;
     case "new_black":
-        canVote = true;
-        // Todo: make cuter?
-        // setTimeout(() => {canVote = false;}, data.duration * 1000);
+        canPickCard = true;
+        seconds_left = data.Duration;
+        timer_interval = setInterval(() => {
+            minutes = Math.floor(seconds_left / 60);
+            seconds = seconds_left % 60;
+            timer.textContent = minutes + ":" + seconds;
+        }, 100);
+        setTimeout(() => {
+            clearInterval(timer_interval);
+            canPickCard = false;
+        }, data.Duration * 1000);
         ReactDOM.render(<BlackRow card={<Card text={data.NewCard.text} black />}/>, blackrowDiv);
         break;
     case "new_white":
