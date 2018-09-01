@@ -5,19 +5,22 @@ import (
 	"log"
 	"os"
 	gc_log "github.com/denysvitali/gc_log"
+	"time"
 )
 
 type Match struct {
 	Id	int
-	Players []User
+	Players []Player
+	CreatedOn time.Time
 	deck 	*Deck
 }
 
-func NewMatch(id int, players []User) *Match {
+func NewMatch(id int, players []Player) *Match {
 	m := new(Match)
 	m.deck = new(Deck)
 	m.Id = id
 	m.Players = players
+	m.CreatedOn = time.Now()
 	return m
 }
 

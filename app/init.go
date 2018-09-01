@@ -57,6 +57,10 @@ func init() {
 		return user.UserType == models.PlayerType
 	}
 
+	revel.TemplateFuncs["format_date"] = func(date time.Time) string {
+		return date.Format("2 Jan 2006, 15:04:01")
+	}
+
 	rand.Seed(time.Now().Unix())
 
 	// Register startup functions with OnAppStart

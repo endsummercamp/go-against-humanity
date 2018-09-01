@@ -3,12 +3,7 @@
 
 <h1>Login to continue</h1>
 <form method="POST" action="/login" class="form">
-    {{if .failed}}
-        <strong>Login failed.</strong>
-    {{end}}
-    {{if .registered}}
-        <strong>You registered successfully! You may now log in.</strong>
-    {{end}}
+    {{template "flash.html" .}}
     <div>
         <label for="inputUsername">Username</label><br>
         <input type="text" id="inputUsername" name="username">
@@ -16,6 +11,9 @@
     <div>
         <label for="inputPassword">Password</label><br>
         <input type="password" id="inputPassword" name="password">
+    </div>
+    <div>
+        <a href="/register">Need an account? Register here!</a>
     </div>
     <button type="submit">Log in</button>
 </form>

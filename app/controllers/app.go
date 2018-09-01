@@ -8,6 +8,7 @@ import (
 	"github.com/ESCah/go-against-humanity/app/models"
 	"github.com/revel/revel"
 	"io"
+	"log"
 )
 
 func hashPassword(password string) string {
@@ -52,7 +53,7 @@ func (c App) getUser(username string) *models.User {
 func (c App) Index() revel.Result {
 	user := c.connected()
 	if user == nil {
-		return c.Redirect("/login")
+		return c.Redirect(App.Login)
 	}
 
 	c.ViewArgs["user"] = user
@@ -62,10 +63,8 @@ func (c App) Index() revel.Result {
 
 func (c App) Login() revel.Result {
 	if c.connected() != nil {
-		return c.Redirect("/")
+		return c.Redirect(App.Index)
 	}
-	c.ViewArgs["failed"] = c.Params.Get("failed") != ""
-	c.ViewArgs["registered"] = c.Params.Get("registered") != ""
 	return c.Render()
 }
 
@@ -86,31 +85,48 @@ func (c App) PostLogin() revel.Result {
 	err := DbMap.SelectOne(&user, "SELECT * FROM users WHERE username=? AND pwhash=?", username, pwhash)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			return c.Redirect("/login?failed=1")
+			c.Flash.Error("Invalid username or password")
+			c.FlashParams()
+			return c.Redirect(App.Login)
 		} else {
 			panic(err)
 		}
 	}
 	c.Session["user"] = string(user.Username)
 	fmt.Printf("%#v\n", user)
-	return c.Redirect("/")
+	return c.Redirect(App.Login)
 }
 
 func (c App) Register() revel.Result {
 	if c.connected() != nil {
-		return c.Redirect("/")
+		return c.Redirect(App.Index)
 	}
 	return c.Render()
 }
 
 func (c App) Logout() revel.Result {
 	if c.connected() == nil {
-		return c.Redirect("/login")
+		return c.Redirect(App.Login)
 	}
 
 	c.Flash.Success("Logged out succesfully")
 	c.Session = make(revel.Session)
-	return c.Redirect("/login")
+	return c.Redirect(App.Login)
+}
+
+func (c App) JoinMatch(id int) revel.Result {
+	user := c.connected()
+
+	if user == nil {
+		return c.Redirect(App.Login)
+	}
+
+	if !mm.IsJoinable(id){
+		c.Flash.Error(fmt.Sprintf("Unable to join %d. The match doesn't exists or already ended.", id))
+	}
+
+	mm.JoinMatch(id, user)
+	return c.Redirect(fmt.Sprintf("/match/%d"))
 }
 
 func (c App) PostRegister() revel.Result {
@@ -131,17 +147,20 @@ func (c App) PostRegister() revel.Result {
 
 	count, err := DbMap.SelectInt("SELECT COUNT(*) FROM users WHERE username=?", username)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
 	if count != 0 {
-		c.ViewArgs["error"] = "Another user with that username already exists."
-		c.Render()
+		c.Flash.Error("Another user with that username already exists.")
+		c.FlashParams()
+		return c.Redirect(App.Login)
 	}
 	err = DbMap.Insert(&user)
 	if err != nil {
 		panic(err)
 	}
-	return c.Redirect("/login?registered=1")
+	c.Flash.Success("Registration completed! You may now login.")
+	c.FlashParams()
+	return c.Redirect(App.Login)
 }
 
 func (c App) NewMatch() revel.Result {
@@ -150,10 +169,23 @@ func (c App) NewMatch() revel.Result {
 	}
 	mm.NewMatch().NewDeck()
 
-	return c.Redirect("/admin")
+	return c.Redirect(App.Admin)
 }
 
 func (c App) Admin() revel.Result {
+	return c.Render()
+}
+
+func (c App) AdminUsers() revel.Result {
+	user := models.User{}
+	userlist, err := DbMap.Select(&user, "SELECT * FROM users")
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Printf("Users: (%d) %v\n", len(userlist), userlist)
+
 	return c.Render()
 }
 
