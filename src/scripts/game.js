@@ -57,7 +57,22 @@ class BlackRow extends React.PureComponent {
     }
 }
 
+let canVote = false;
+
 class AnswersRow extends React.Component {
+    tryVote(id) {
+        if (IS_PLAYER) {
+            alert("You're a player, you cannot vote!");
+            return;
+        }
+        if (!canVote)
+            return;
+        const req = new XMLHttpRequest();
+        req.open("PUT", `/match/${MATCH_ID}/vote_card/${id}`);
+        req.send();
+        canVote = false;
+        return true;
+    }
     render() {
         /* Expects:
            * a prop "answers", containing an array of {text, ID};
@@ -69,7 +84,12 @@ class AnswersRow extends React.Component {
         }
         return <div className="flex" id="blackrow">
             {
-                this.props.answers.map((answer, i) => <Card text={answer.text} id={answer.ID} total={answer.total} sum={sum} key={i} />)
+                this.props.answers.map((answer, i) => <Card text={answer.text} id={answer.ID} total={answer.total} sum={sum} onClick={(evt) => {
+                    console.log("Voted!");
+                    const success = this.tryVote(answer.ID);
+                    if (!success) return;
+                    evt.target.parentNode.classList.add("voted");
+                }} key={i} />)
             }
         </div>;
     }
@@ -160,7 +180,7 @@ socket.onmessage = function (e) {
         }
         break;
     case "new_black":
-        console.log("new_black", data.Duration, data.NewCard.text);
+        mycardsDiv.style.display = "flex";
         ShowBlackCard(data.Duration, data.NewCard.text);
         break;
     case "new_white":
@@ -177,6 +197,8 @@ socket.onmessage = function (e) {
         break;
     case "voting":
         stopTimer();
+        mycardsDiv.style.display = "none";
+        canVote = true;
         break;
     default:
         alert("Unknown event " + eventName);
