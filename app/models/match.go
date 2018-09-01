@@ -2,21 +2,22 @@ package models
 
 import (
 	"encoding/json"
-	gc_log "github.com/denysvitali/gc_log"
 	"log"
 	"os"
-	"time"
 	"sync"
+	"time"
+
+	gc_log "github.com/denysvitali/gc_log"
 )
 
 type Match struct {
-	Id           int
-	Players      []Player
-	Jury         []Juror
-	CreatedOn    time.Time
-	Rounds       []Round
-	State		 MatchState
-	Deck         *Deck
+	Id        int
+	Players   []Player
+	Jury      []Juror
+	CreatedOn time.Time
+	Rounds    []Round
+	State     MatchState
+	Deck      *Deck
 }
 
 type MatchState int
@@ -50,7 +51,7 @@ func deckAllowed(deckName string) bool {
 	return false
 }
 
-func(m *Match) NewDeck(){
+func (m *Match) NewDeck() {
 	if m.Deck != nil {
 		return
 	}
@@ -127,7 +128,9 @@ func (m *Match) NewBlackCard() *BlackCard {
 	}
 	m.Rounds = append(m.Rounds, Round{
 		BlackCard: blackCard,
-		Wcs:       sync.Map{},
+		Wcs:       map[*WhiteCard][]Juror{},
+		Mutex: 		sync.Mutex{},
+		Voters: 	[]Juror{},
 	})
 
 	return blackCard
@@ -143,10 +146,8 @@ func (m *Match) EndVote() bool {
 }
 func (m *Match) RemoveVote(round *Round, card *WhiteCard, juror *Juror) {
 	found := -1
-	_arr, _ := round.Wcs.Load(card)
-	arr := _arr.([]*Juror)
-	for i, j := range arr {
-		if j == juror {
+	for i, j := range round.Wcs[card] {
+		if j.User.Id == juror.User.Id {
 			found = i
 			break
 		}
@@ -156,5 +157,6 @@ func (m *Match) RemoveVote(round *Round, card *WhiteCard, juror *Juror) {
 		return
 	}
 
-	round.Wcs.Store(card, append(arr[:found], arr[found+1:]...))
+	round.Wcs[card] = append(round.Wcs[card][:found], round.Wcs[card][found+1:]...)
+
 }
