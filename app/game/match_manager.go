@@ -37,6 +37,12 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 			}
 		}
 
+		var cards []models.Card
+
+		for i := 0; i < 10; i++ {
+			cards = append(cards, NewRandomCardFromDeck(models.WHITE_CARD, match.Deck))
+		}
+
 		player := models.Player{
 			User:  user,
 			Cards: []models.Card{},

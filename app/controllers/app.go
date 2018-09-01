@@ -9,6 +9,7 @@ import (
 	"github.com/revel/revel"
 	"io"
 	"log"
+	"strconv"
 )
 
 func hashPassword(password string) string {
@@ -238,55 +239,25 @@ func (c App) Card() revel.Result {
 }
 
 func (c App) MyCards() revel.Result {
-	ret := []models.WhiteCard{
-		{
-			Id:   1,
-			Deck: "deck",
-			Icon: "icon",
-			Text: "Uso",
-		},
-		{
-			Id:   2,
-			Deck: "deck",
-			Icon: "icon",
-			Text: "il",
-		},
-		{
-			Id:   3,
-			Deck: "deck",
-			Icon: "icon",
-			Text: "mio",
-		},
-		{
-			Id:   4,
-			Deck: "deck",
-			Icon: "icon",
-			Text: "iphone",
-		},
-		{
-			Id:   5,
-			Deck: "deck",
-			Icon: "icon",
-			Text: "Uso",
-		},
-		{
-			Id:   6,
-			Deck: "deck",
-			Icon: "icon",
-			Text: "il",
-		},
-		{
-			Id:   7,
-			Deck: "deck",
-			Icon: "icon",
-			Text: "mio",
-		},
-		{
-			Id:   8,
-			Deck: "deck",
-			Icon: "icon",
-			Text: "iphone",
-		},
+	user := c.connected()
+
+	if user == nil {
+		return c.Redirect(App.Login)
 	}
-	return c.RenderJSON(ret)
+
+	matchIdStr := c.Params.Query.Get("match_id")
+	if matchIdStr == "" {
+		return c.NotFound("The 'match_id' parameter is required.")
+	}
+	matchId, err := strconv.Atoi(matchIdStr)
+	if err != nil {
+		// Todo: implement
+		panic(err)
+	}
+	if !mm.UserJoined(matchId, user) {
+		return c.Redirect(App.Matches)
+	}
+	match := mm.GetMatchByID(matchId)
+	cards := match.Players[user.Id].Cards
+	return c.RenderJSON(cards)
 }

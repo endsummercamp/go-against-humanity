@@ -9,18 +9,18 @@ import (
 )
 
 type Match struct {
-	Id	int
-	Players []Player
-	Jury []Juror
-	CreatedOn time.Time
-	Rounds []Round
-	current_rount int
-	deck 	*Deck
+	Id           int
+	Players      []Player
+	Jury         []Juror
+	CreatedOn    time.Time
+	Rounds       []Round
+	currentRound int
+	Deck         *Deck
 }
 
 func NewMatch(id int, players []Player) *Match {
 	m := new(Match)
-	m.deck = new(Deck)
+	m.Deck = new(Deck)
 	m.Id = id
 	m.Players = players
 	m.CreatedOn = time.Now()
@@ -39,7 +39,7 @@ func deckAllowed(deckName string) bool {
 }
 
 func(m *Match) NewDeck(){
-	if m.deck != nil {
+	if m.Deck != nil {
 		return
 	}
 
@@ -71,7 +71,7 @@ func(m *Match) NewDeck(){
 		}
 	}
 
-	m.deck = &Deck{
+	m.Deck = &Deck{
 		blackcards,
 		whitecards,
 		nil,

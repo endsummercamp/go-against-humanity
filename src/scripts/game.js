@@ -83,11 +83,11 @@ class MyCardsRow extends React.Component {
         /* Expects:
            * a prop "cards", containing an array of {text, ID};
          */
-        return <div className="flex" id="blackrow">
+        return <>
             {
                 this.props.cards.map((answer, i) => <Card text={answer.text} id={answer.ID} onClick={() => this.submitCard(answer.ID)} key={i} />)
             }
-        </div>;
+        </>;
     }
 }
 
@@ -97,7 +97,7 @@ const whiterowDiv = document.getElementById("react-whiterow");
 ReactDOM.render(<AnswersRow answers={[]} />, whiterowDiv);
 const mycardsDiv = document.getElementById("react-mycards");
 if (IS_PLAYER) {
-    mycardsDiv.style.display = "block";
+    mycardsDiv.style.display = "flex";
 }
 
 const whiteRow = document.getElementById("whiterow");
@@ -132,12 +132,13 @@ socket.onmessage = function (e) {
         if (IS_PLAYER) {
             const req = new XMLHttpRequest();
             req.addEventListener("load", () => {
+                console.log(req.responseText);
                 const resp = JSON.parse(req.responseText);
                 const cards = resp.map(item => ({text: item.text, ID: item.Id}));
                 console.log("My cards:", cards);
                 ReactDOM.render(<MyCardsRow cards={cards} />, mycardsDiv);
             });
-            req.open("GET", "/mycards");
+            req.open("GET", `/mycards?match_id=${0}`);
             req.send();
         }
         break;
