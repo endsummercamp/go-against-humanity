@@ -12,6 +12,7 @@ import (
 	"log"
 	"strconv"
 	"time"
+	"sync"
 )
 
 func hashPassword(password string) string {
@@ -22,7 +23,7 @@ func hashPassword(password string) string {
 
 var deck *models.Deck
 var mm = &game.MatchManager{}
-var ws = SocketServer{mm, map[int][]*websocket.Conn{}}
+var ws = SocketServer{sync.Mutex{}, mm, map[int][]*websocket.Conn{}}
 var _ = ws.Start()
 
 type App struct {
