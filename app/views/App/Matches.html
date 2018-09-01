@@ -2,6 +2,7 @@
 {{template "header.html" .}}
 
 <h1>Current Matches</h1>
+{{template "flash.html" .}}
 <div class="matches-container">
     {{ if eq (len .matches) 0 }}
     <p>No matches available</p>

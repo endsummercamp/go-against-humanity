@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/ESCah/go-against-humanity/app/models"
+	gc_log "github.com/denysvitali/gc_log"
 	"github.com/revel/revel"
 	"math/rand"
 	"strings"
@@ -62,6 +63,8 @@ func init() {
 	}
 
 	rand.Seed(time.Now().Unix())
+
+	gc_log.SetDebug(true)
 
 	// Register startup functions with OnAppStart
 	// revel.DevMode and revel.RunMode only work inside of OnAppStart. See Example Startup Script

@@ -76,7 +76,7 @@ class AnswersRow extends React.Component {
 class MyCardsRow extends React.Component {
     submitCard(id) {
         const req = new XMLHttpRequest();
-        req.open("POST", `/pick_card?card_id=${id}&match_id=${0}`);
+        req.open("POST", `/pick_card?card_id=${id}&match_id=${MATCH_ID}`);
         req.send();
     }
     render() {
@@ -138,7 +138,7 @@ socket.onmessage = function (e) {
                 console.log("My cards:", cards);
                 ReactDOM.render(<MyCardsRow cards={cards} />, mycardsDiv);
             });
-            req.open("GET", `/mycards?match_id=${0}`);
+            req.open("GET", `/mycards?match_id=${MATCH_ID}`);
             req.send();
         }
         break;

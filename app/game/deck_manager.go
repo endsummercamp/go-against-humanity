@@ -4,6 +4,7 @@ import (
 	"github.com/ESCah/go-against-humanity/app/models"
 	"log"
 	"math/rand"
+	"fmt"
 )
 
 func RemoveCard(cards []models.Card, index int) []models.Card {
@@ -16,6 +17,7 @@ func RemoveCard(cards []models.Card, index int) []models.Card {
 func NewRandomCardFromDeck(color models.CardColor, deck *models.Deck) models.Card {
 	var card models.Card
 
+	fmt.Printf("%#v\n", *deck)
 	switch color {
 	case models.BLACK_CARD:
 		if len(deck.Black_cards) == 0 {
@@ -28,6 +30,7 @@ func NewRandomCardFromDeck(color models.CardColor, deck *models.Deck) models.Car
 		return card
 	case models.WHITE_CARD:
 		if len(deck.White_cards) == 0 {
+			panic("Picking from no cards!")
 			return nil
 		}
 		i := rand.Intn(len(deck.White_cards))

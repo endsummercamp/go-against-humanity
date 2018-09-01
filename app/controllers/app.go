@@ -189,7 +189,6 @@ func (c App) NewMatch() revel.Result {
 		return c.Forbidden("Unauthorized.")
 	}
 	match := mm.NewMatch()
-	match.NewDeck()
 
 	c.Flash.Success(fmt.Sprintf("New Match created succesfully! (ID: %d)", match.Id))
 	c.FlashParams()
@@ -255,6 +254,11 @@ func (c App) MyCards() revel.Result {
 		return c.Redirect(App.Matches)
 	}
 	match := mm.GetMatchByID(matchId)
-	cards := match.Players[user.Id].Cards
-	return c.RenderJSON(cards)
+	matchPlayer := match.GetPlayerByID(user.Id)
+	if matchPlayer == nil {
+		c.Flash.Error("No such player")
+		c.FlashParams()
+		return c.Redirect(App.Matches)
+	}
+	return c.RenderJSON(matchPlayer.Cards)
 }

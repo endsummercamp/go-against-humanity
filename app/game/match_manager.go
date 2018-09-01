@@ -1,6 +1,9 @@
 package game
 
-import "github.com/ESCah/go-against-humanity/app/models"
+import (
+	"github.com/ESCah/go-against-humanity/app/models"
+	"fmt"
+)
 
 type MatchManager struct {
 	matches []*models.Match
@@ -15,6 +18,8 @@ func(mm *MatchManager) NewMatch() *models.Match {
 	mm.counter++
 
 	new_match := models.NewMatch(mm.counter, []models.Player{})
+	new_match.NewDeck()
+	fmt.Printf("NewMatch: deck is %#v\n", new_match.Deck)
 	mm.matches = append(mm.matches, new_match)
 	return new_match
 }
@@ -40,12 +45,16 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 		var cards []models.Card
 
 		for i := 0; i < 10; i++ {
-			cards = append(cards, NewRandomCardFromDeck(models.WHITE_CARD, match.Deck))
+			card := NewRandomCardFromDeck(models.WHITE_CARD, match.Deck)
+			if card == nil {
+				panic("No such card!")
+			}
+			cards = append(cards, card)
 		}
 
 		player := models.Player{
 			User:  user,
-			Cards: []models.Card{},
+			Cards: cards,
 		}
 
 		match.Players = append(match.Players, player)

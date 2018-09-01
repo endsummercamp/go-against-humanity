@@ -6,6 +6,7 @@ import (
 	"os"
 	gc_log "github.com/denysvitali/gc_log"
 	"time"
+	"fmt"
 )
 
 type Match struct {
@@ -20,7 +21,7 @@ type Match struct {
 
 func NewMatch(id int, players []Player) *Match {
 	m := new(Match)
-	m.Deck = new(Deck)
+	m.Deck = nil
 	m.Id = id
 	m.Players = players
 	m.CreatedOn = time.Now()
@@ -40,6 +41,8 @@ func deckAllowed(deckName string) bool {
 
 func(m *Match) NewDeck(){
 	if m.Deck != nil {
+		fmt.Printf("%#v\n", m.Deck)
+		panic("NewDeck() on already initialized deck")
 		return
 	}
 
@@ -76,4 +79,13 @@ func(m *Match) NewDeck(){
 		whitecards,
 		nil,
 	}
+}
+
+func (m *Match) GetPlayerByID(id int64) *Player {
+	for _, player := range m.Players {
+		if player.User.Id == id {
+			return &player
+		}
+	}
+	return nil
 }
