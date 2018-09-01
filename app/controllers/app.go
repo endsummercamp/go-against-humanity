@@ -262,3 +262,52 @@ func (c App) MyCards() revel.Result {
 	}
 	return c.RenderJSON(matchPlayer.Cards)
 }
+
+func (c App) PickCard(matchId int, cardId int) revel.Result {
+	user := c.connected()
+
+	if user == nil {
+		return c.Redirect(App.Login)
+	}
+
+	if !mm.UserJoined(matchId, user) {
+		return c.Forbidden("Vbb.")
+	}
+
+	match := mm.GetMatchByID(matchId)
+	if match == nil {
+		return c.NotFound("Match not found.")
+	}
+
+	round := match.GetRound()
+
+	if round == nil {
+		return c.Forbidden("Can't play this card right now (no rounds available).")
+	}
+
+	if match.State != models.MATCH_PLAYBALE {
+		return c.Forbidden("Can't play this card at this time.")
+	}
+
+	player := match.GetPlayerByID(user.Id)
+
+	foundId := -1
+	var card *models.WhiteCard = nil
+	for i, c := range player.Cards {
+		if c.Id == cardId {
+			card = &c
+			foundId = i
+			break
+		}
+	}
+
+	if foundId == -1 {
+		return c.NotFound("Card not found.")
+	}
+
+	player.Cards = append(player.Cards[:foundId], player.Cards[foundId+1:]...)
+
+	round.AddCard(card)
+
+	return c.RenderJSON(nil)
+}

@@ -14,9 +14,19 @@ type Match struct {
 	Jury         []Juror
 	CreatedOn    time.Time
 	Rounds       []Round
-	currentRound int
+	State		 MatchState
 	Deck         *Deck
 }
+
+type MatchState int
+
+const (
+	MATCH_WAIT_USERS MatchState = iota
+	MATCH_PLAYBALE
+	MATCH_VOTING
+	MATCH_SHOW_RESULTS
+	MATCH_END
+)
 
 func NewMatch(id int, players []Player) *Match {
 	m := new(Match)
@@ -24,6 +34,7 @@ func NewMatch(id int, players []Player) *Match {
 	m.Id = id
 	m.Players = players
 	m.CreatedOn = time.Now()
+	m.State = MATCH_WAIT_USERS
 	return m
 }
 
@@ -85,4 +96,12 @@ func (m *Match) GetPlayerByID(id int64) *Player {
 		}
 	}
 	return nil
+}
+
+func (m *Match) GetRound() *Round {
+	if len(m.Rounds) == 0 {
+		return nil
+	}
+
+	return &m.Rounds[len(m.Rounds)-1]
 }

@@ -19,6 +19,7 @@ GET     /admin                                  App.Admin
 GET     /admin/match/new                        App.NewMatch
 GET     /admin/users                            App.AdminUsers
 GET     /mycards                                App.MyCards
+PUT     /match/*matchId/pick_card/*cardId       App.PickCard
 
 GET     /matches/join/*id                       App.JoinMatch
 

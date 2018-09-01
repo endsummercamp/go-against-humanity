@@ -23,6 +23,7 @@ type WhiteCard struct {
 	Deck	string	`json:"deck"`
 	Icon	string	`json:"icon"`
 	Text	string	`json:"text"`
+	Owner	*Player
 }
 
 func (c WhiteCard) GetText() string {

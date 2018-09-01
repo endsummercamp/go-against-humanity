@@ -58,6 +58,10 @@ func init() {
 		return user.UserType == models.PlayerType
 	}
 
+	revel.TemplateFuncs["is_admin"] = func(user models.User) bool {
+		return user.IsAdmin()
+	}
+
 	revel.TemplateFuncs["format_date"] = func(date time.Time) string {
 		return date.Format("2 Jan 2006, 15:04:01")
 	}

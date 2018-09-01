@@ -8,6 +8,7 @@
 {{template "flash.html" .}}
 
 <ul>
+  {{ if is_admin .user }} <li><a href="/admin">Admin</a></li> {{ end }}
   <li><a href="/matches">Matches</a></li>
   <li><a href="/logout">Log out</a></li>
 </ul>
