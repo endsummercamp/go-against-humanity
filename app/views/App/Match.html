@@ -41,6 +41,7 @@
 
 <script type="text/javascript">
     const MATCH_ID = {{ .match_id }};
+    const IS_PLAYER = {{ if is_player .user }} true {{ else }} false {{ end }};
 </script>
 
 <script src="/public/scripts/react.development.js"></script>
