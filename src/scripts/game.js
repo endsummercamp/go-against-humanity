@@ -5,6 +5,11 @@ if (!window.WebSocket) {
 // TODO: uncomment
 // const IS_PLAYER = !!window.IS_PLAYER;
 const IS_PLAYER = 1;
+var selected = true;
+
+function dashFix(content){
+    return content.replace(/_/g, '<div class="long-dash"></div>')
+}
 
 class Card extends React.Component {
     render() {
@@ -30,8 +35,7 @@ class Card extends React.Component {
             classes += "small-text";
         return <div className={classes} onClick={this.props.onClick}>
             <div className="card-top">
-                <div className="card-content">
-                    {this.props.text}
+                <div className="card-content" dangerouslySetInnerHTML={{__html:dashFix(this.props.text)}}>
                 </div>
             </div>
             <div className="card-middle">
@@ -97,7 +101,7 @@ class MyCardsRow extends React.Component {
                 this.props.cards.map((answer, i) => <Card text={answer.text} id={answer.ID} onClick={(evt) => {
                     const success = this.submitCard(answer.ID);
                     if (!success) return;
-                    evt.target.classList.add("inverted");
+                    evt.target.parentNode.classList.add("inverted");
                 }} key={i} />)
             }
         </>;

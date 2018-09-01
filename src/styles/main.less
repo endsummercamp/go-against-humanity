@@ -24,6 +24,8 @@
 @darkGray: #607D8B;
 @endVotingColor: #673AB7;
 
+@selectedCard: #f44336;
+
 html{
     background-color: @bodybgColor;
 }
@@ -227,7 +229,7 @@ div.card {
     flex-direction: column;
     justify-content: space-around;
 
-    .BoxShadowHelper(2);
+    .BoxShadowHelper(3);
     border-radius: 5px;
     /*
     width: 20rem;
@@ -245,11 +247,6 @@ div.card {
         color: #FFF;
         background-color: #000;
 
-        &.inverted {
-            color: #000;
-            background-color: #FFF;
-        }
-
         div.card-top {
             div.long-dash{
                 border-bottom: 3px solid #FFF;
@@ -259,6 +256,10 @@ div.card {
         div.card-bottom {
             color: #777;
         }
+    }
+
+    &.inverted {
+        border: 2px solid @selectedCard;
     }
 
     div.card-top {
