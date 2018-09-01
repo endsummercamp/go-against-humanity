@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"time"
+	"sync"
 )
 
 type Match struct {
@@ -126,7 +127,7 @@ func (m *Match) NewBlackCard() *BlackCard {
 	}
 	m.Rounds = append(m.Rounds, Round{
 		BlackCard: blackCard,
-		Wcs:       map[*WhiteCard][]*Juror{},
+		Wcs:       sync.Map{},
 	})
 
 	return blackCard
@@ -142,7 +143,9 @@ func (m *Match) EndVote() bool {
 }
 func (m *Match) RemoveVote(round *Round, card *WhiteCard, juror *Juror) {
 	found := -1
-	for i, j := range round.Wcs[card] {
+	_arr, _ := round.Wcs.Load(card)
+	arr := _arr.(WcsVal)
+	for i, j := range arr {
 		if j == juror {
 			found = i
 			break
@@ -153,6 +156,5 @@ func (m *Match) RemoveVote(round *Round, card *WhiteCard, juror *Juror) {
 		return
 	}
 
-	round.Wcs[card] = append(round.Wcs[card][:found], round.Wcs[card][found+1:]...)
-
+	round.Wcs.Store(card, append(arr[:found], arr[found+1:]...))
 }

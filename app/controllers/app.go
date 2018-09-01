@@ -481,15 +481,18 @@ func (c App) VoteCard() revel.Result {
 		return c.Forbidden("Voting disallowed")
 	}
 
-	for c, jury := range round.Wcs {
+	round.Wcs.Range(func(_c, _jury interface{}) bool {
+		c := _c.(models.WcsKey)
+		jury := _jury.(models.WcsVal)
 		for _, j := range jury {
 			if j.User.Id == user.Id {
 				match.RemoveVote(round, c, j)
 			}
 		}
-	}
+		return true
+	})
 
-	var juror *models.Juror = nil;
+	var juror *models.Juror
 
 	for _, j := range match.Jury {
 		if j.User.Id == user.Id {
@@ -502,16 +505,21 @@ func (c App) VoteCard() revel.Result {
 	}
 
 	// Cast vote
-	round.Wcs[card] = append(round.Wcs[card], juror)
+	_val, _ := round.Wcs.Load(card)
+	val := _val.(models.WcsVal)
+	round.Wcs.Store(card, append(val, juror))
 
-	totals := []Total{}
+	var totals []Total
 
-	for card, jury := range round.Wcs {
+	round.Wcs.Range(func(_card, _jury interface{}) bool {
+		card := _card.(models.WcsKey)
+		jury := _jury.(models.WcsVal)
 		totals = append(totals, Total{
 			ID: card.Id,
 			Votes: len(jury),
 		})
-	}
+		return true
+	})
 
 	for _, c := range ws.rooms[matchId] {
 		c.WriteJSON(Event{

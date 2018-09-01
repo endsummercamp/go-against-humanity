@@ -3,28 +3,34 @@ package models
 import (
 	"time"
 	"sort"
+	"sync"
 )
 
 type Round struct {
 	BlackCard      *BlackCard
 	TimeFinishPick time.Time
-	Wcs            map[*WhiteCard][]*Juror
+	Wcs            sync.Map // map[*WhiteCard][]*Juror
 }
 
+type WcsKey *WhiteCard
+type WcsVal []*Juror
+
 func (r *Round) AddCard(card *WhiteCard) bool {
-	if _, ok := r.Wcs[card]; ok {
+	if _, ok := r.Wcs.Load(card); ok {
 		return false
 	}
 
-	r.Wcs[card] = []*Juror{}
+	r.Wcs.Store(card, []*Juror{})
 	return true
 }
 
 func (r *Round) GetChoices() []*WhiteCard {
 	var ret []*WhiteCard
-	for card := range r.Wcs {
+	r.Wcs.Range(func(_card, _ interface{}) bool {
+		card := _card.(WcsKey)
 		ret = append(ret, card)
-	}
+		return true
+	})
 	sort.Slice(ret, func(i, j int) bool {
 		return ret[i].Text < ret[j].Text
 	})
