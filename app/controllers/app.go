@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"sort"
 	"strconv"
 	"sync"
 	"time"
@@ -425,6 +426,32 @@ func (c App) EndVoting() revel.Result {
 			player.Cards = append(player.Cards, match.Deck.NewRandomWhiteCard())
 		}
 	}
+
+	// Determina il vincitore
+	round := match.GetRound()
+	var totals []Total
+
+	for card, jury := range round.Wcs {
+		totals = append(totals, Total{
+			ID: card.Id,
+			Votes: len(jury),
+		})
+	}
+
+	sort.Slice(totals, func(i, j int) bool {
+		return totals[i].Votes < totals[j].Votes
+	})
+
+	winningID := totals[0].ID
+	var winner *models.Player
+	for card := range round.Wcs {
+		if card.Id != winningID {
+			continue
+		}
+		winner = card.Owner
+	}
+
+	fmt.Printf("Winner: %s\n", winner.User.Username)
 
 	return c.Render()
 }

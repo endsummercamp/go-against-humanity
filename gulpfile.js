@@ -47,7 +47,7 @@ gulp.task('scripts', function(){
         this.emit('end');
     }}))
     .pipe(babel({
-      presets: ['@babel/env', '@babel/react', 'minify']
+      presets: ['@babel/env', '@babel/react'/*, 'minify'*/]
     }))
     .pipe(rename({suffix: '.min'}))
     .pipe(gulp.dest('public/scripts/'))

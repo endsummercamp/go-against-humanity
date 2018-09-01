@@ -1,6 +1,6 @@
-interface=wlo0		# replace this with your if
+interface=wlp3s0		# replace this with your if
 ssid=ESCah		# SSID
-hw_mode=g		# 802.11g
+# hw_mode=g		# 802.11g
 channel=6		# recommended: 1, 6, 11
 auth_algs=1
 wmm_enabled=0
