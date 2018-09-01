@@ -19,6 +19,8 @@ func hashPassword(password string) string {
 
 var deck *models.Deck
 var mm = &game.MatchManager{}
+var ws SocketServer
+var _ = ws.Start()
 
 type App struct {
 	*revel.Controller

@@ -20,22 +20,11 @@ func(mm *MatchManager) NewMatch() *models.Match {
 }
 
 func (mm *MatchManager) IsJoinable(id int) bool {
-	for _, m := range mm.matches {
-		if m.Id == id {
-			return true
-		}
-	}
-	return false
+	return mm.GetMatchByID(id) != nil
 }
 
 func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
-	var match *models.Match = nil
-	for _, m := range mm.matches {
-		if m.Id == id {
-			match = m
-			break
-		}
-	}
+	match := mm.GetMatchByID(id)
 
 	if match == nil {
 		return false
@@ -50,4 +39,13 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 	match.Players = append(match.Players, player)
 
 	return true
+}
+
+func (mm *MatchManager) GetMatchByID(id int) *models.Match {
+	for _, m := range mm.matches {
+		if m.Id == id {
+			return m
+		}
+	}
+	return nil
 }
