@@ -14,10 +14,27 @@
         align-items: center;
         justify-content: center;
     }
+    #react-mycards {
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        overflow-y: scroll;
+    }
+    #react-mycards > .card {
+        flex-shrink: 0;
+    }
 </style>
 
+<h1>Cards against Humanity</h1>
+
 <div id="react-blackrow"></div>
-<div class="flex" id="react-whiterow">
+<div class="flex" id="react-whiterow"></div>
+
+<div id="react-mycards" style="display: none;"></div>
+
+<script type="text/javascript">
+    const MATCH_ID = {{ .match_id }};
+</script>
 
 <script src="/public/scripts/react.development.js"></script>
 <script src="/public/scripts/react-dom.development.js"></script>
