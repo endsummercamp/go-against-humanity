@@ -25,6 +25,7 @@
 @endVotingColor: #673AB7;
 
 @selectedCard: #f44336;
+@votedCard: #7CB342;
 
 html{
     background-color: @bodybgColor;
@@ -260,6 +261,10 @@ div.card {
 
     &.inverted {
         border: 2px solid @selectedCard;
+    }
+
+    &.voted {
+        border: 2px solid @votedCard;
     }
 
     div.card-top {

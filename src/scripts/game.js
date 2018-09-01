@@ -71,6 +71,7 @@ class AnswersRow extends React.Component {
         req.open("PUT", `/match/${MATCH_ID}/vote_card/${id}`);
         req.send();
         canVote = false;
+        return true;
     }
     render() {
         /* Expects:
@@ -83,7 +84,12 @@ class AnswersRow extends React.Component {
         }
         return <div className="flex" id="blackrow">
             {
-                this.props.answers.map((answer, i) => <Card text={answer.text} id={answer.ID} total={answer.total} sum={sum} onClick={() => this.tryVote(answer.ID)} key={i} />)
+                this.props.answers.map((answer, i) => <Card text={answer.text} id={answer.ID} total={answer.total} sum={sum} onClick={(evt) => {
+                    console.log("Voted!");
+                    const success = this.tryVote(answer.ID);
+                    if (!success) return;
+                    evt.target.parentNode.classList.add("voted");
+                }} key={i} />)
             }
         </div>;
     }
@@ -174,7 +180,6 @@ socket.onmessage = function (e) {
         }
         break;
     case "new_black":
-        console.log("new_black", data.Duration, data.NewCard.text);
         mycardsDiv.style.display = "flex";
         ShowBlackCard(data.Duration, data.NewCard.text);
         break;
