@@ -46,9 +46,6 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 
 		for i := 0; i < 10; i++ {
 			card := NewRandomCardFromDeck(models.WHITE_CARD, match.Deck)
-			if card == nil {
-				panic("No such card!")
-			}
 			cards = append(cards, card)
 		}
 

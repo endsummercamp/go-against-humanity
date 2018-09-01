@@ -6,7 +6,6 @@ import (
 	"os"
 	gc_log "github.com/denysvitali/gc_log"
 	"time"
-	"fmt"
 )
 
 type Match struct {
@@ -41,8 +40,6 @@ func deckAllowed(deckName string) bool {
 
 func(m *Match) NewDeck(){
 	if m.Deck != nil {
-		fmt.Printf("%#v\n", m.Deck)
-		panic("NewDeck() on already initialized deck")
 		return
 	}
 

@@ -30,7 +30,6 @@ func NewRandomCardFromDeck(color models.CardColor, deck *models.Deck) models.Car
 		return card
 	case models.WHITE_CARD:
 		if len(deck.White_cards) == 0 {
-			panic("Picking from no cards!")
 			return nil
 		}
 		i := rand.Intn(len(deck.White_cards))
