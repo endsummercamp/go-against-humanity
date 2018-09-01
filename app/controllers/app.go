@@ -128,6 +128,8 @@ func (c App) JoinMatch(id int) revel.Result {
 
 	if !mm.IsJoinable(id){
 		c.Flash.Error(fmt.Sprintf("Unable to join %d. The match doesn't exists, is already started or already ended.", id))
+		c.FlashParams()
+		return c.Redirect(App.Matches)
 	}
 
 	mm.JoinMatch(id, user)
@@ -142,6 +144,8 @@ func (c App) Match(id int) revel.Result {
 	}
 
 	if !mm.UserJoined(id, user) {
+		c.Flash.Error("Cannot join an unjoined match")
+		c.FlashParams()
 		return c.Redirect(App.Matches)
 	}
 
@@ -410,6 +414,10 @@ func (c App) EndVoting() revel.Result {
 	match := mm.GetMatchByID(matchId)
 	if match == nil {
 		return c.NotFound("Match not found.")
+	}
+
+	if match.State != models.MATCH_VOTING {
+		return c.Forbidden("Unable to end voting because voting hasn't started yet.")
 	}
 
 	match.EndVote()

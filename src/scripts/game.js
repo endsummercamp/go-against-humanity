@@ -214,7 +214,6 @@ function ShowBlackCard(seconds_left, black_card_text) {
         timer.textContent = minutes + ":" + seconds;
         seconds_left--;
     }, 1000);
-    setTimeout(stopTimer, seconds_left * 1000);
     ReactDOM.render(<BlackRow card={<Card text={black_card_text} black />}/>, blackrowDiv);
 }
 
