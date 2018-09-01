@@ -421,6 +421,12 @@ func (c App) EndVoting() revel.Result {
 	}
 	ws.BroadcastToRoom(matchId, msg)
 
+	for _, player := range match.Players {
+		if len(player.Cards) < 10 {
+			player.Cards = append(player.Cards, match.Deck.NewRandomWhiteCard())
+		}
+	}
+
 	return c.Render()
 }
 

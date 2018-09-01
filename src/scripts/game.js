@@ -46,7 +46,7 @@ class Card extends React.Component {
     }
 }
 
-class BlackRow extends React.PureComponent {
+class BlackRow extends React.Component {
     render() {
         return <div className="flex" id="blackrow">
             {("card" in this.props) ?
@@ -161,23 +161,7 @@ socket.onmessage = function (e) {
     let cardText;
     switch (eventName) {
     case "join_successful":
-        answers = [];
-        ReactDOM.render(<BlackRow />, blackrowDiv);
-        ReactDOM.render(<AnswersRow answers={[]}/>, whiterowDiv);
-        if (IS_PLAYER) {
-            const req = new XMLHttpRequest();
-            req.addEventListener("load", () => {
-                const resp = JSON.parse(req.responseText);
-                const cards = resp.map(item => ({text: item.text, ID: item.Id}));
-                console.log("My cards:", cards);
-                ReactDOM.render(<MyCardsRow cards={cards} />, mycardsDiv);
-            });
-            req.open("GET", `/mycards?match_id=${MATCH_ID}`);
-            req.send();
-        }
-        if (data.SecondsUntilFinishPicking != 0) {
-            ShowBlackCard(data.SecondsUntilFinishPicking, data.InitialBlackCard.text);
-        }
+        freshStart(data.SecondsUntilFinishPicking, data.InitialBlackCard.text);
         break;
     case "new_black":
         mycardsDiv.style.display = "flex";
@@ -200,8 +184,37 @@ socket.onmessage = function (e) {
         mycardsDiv.style.display = "none";
         canVote = true;
         break;
+    case "show_results":
+        freshStart();
+        break;
     default:
         alert("Unknown event " + eventName);
+    }
+}
+
+function freshStart(SecondsUntilFinishPicking, InitialBlackText) {
+    for (const tag of document.getElementsByClassName("inverted")) {
+        tag.classList.remove("inverted")
+    }
+    for (const tag of document.getElementsByClassName("voted")) {
+        tag.classList.remove("voted")
+    }
+    answers = [];
+    ReactDOM.render(<BlackRow />, blackrowDiv);
+    ReactDOM.render(<AnswersRow answers={[]}/>, whiterowDiv);
+    if (IS_PLAYER) {
+        const req = new XMLHttpRequest();
+        req.addEventListener("load", () => {
+            const resp = JSON.parse(req.responseText);
+            const cards = resp.map(item => ({text: item.text, ID: item.Id}));
+            console.log("My cards:", cards);
+            ReactDOM.render(<MyCardsRow cards={cards} />, mycardsDiv);
+        });
+        req.open("GET", `/mycards?match_id=${MATCH_ID}`);
+        req.send();
+    }
+    if (SecondsUntilFinishPicking) {
+        ShowBlackCard(SecondsUntilFinishPicking, InitialBlackText);
     }
 }
 
