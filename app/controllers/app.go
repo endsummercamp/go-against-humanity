@@ -375,25 +375,19 @@ func (c App) MatchNewBlackCard() revel.Result {
 		msg := Event {
 			Name: "voting",
 		}
-		for _, conn := range ws.rooms[matchId] {
-			conn.WriteJSON(msg)
-		}
+		ws.BroadcastToRoom(matchId, msg)
 
 		for _, card := range round.GetChoices() {
 			msg := Event {
 				Name: "new_white",
 				NewCard: card,
 			}
-			for _, conn := range ws.rooms[matchId] {
-				conn.WriteJSON(msg)
-			}
+			ws.BroadcastToRoom(matchId, msg)
 			time.Sleep(time.Second)
 		}
 	}()
 
-	for _, conn := range ws.rooms[matchId] {
-		conn.WriteJSON(msg)
-	}
+	ws.BroadcastToRoom(matchId, msg)
 	return c.RenderJSON(true)
 }
 
@@ -424,9 +418,7 @@ func (c App) EndVoting() revel.Result {
 	msg := Event {
 		Name: "show_results",
 	}
-	for _, conn := range ws.rooms[matchId] {
-		conn.WriteJSON(msg)
-	}
+	ws.BroadcastToRoom(matchId, msg)
 
 	return c.Render()
 }
@@ -521,12 +513,10 @@ func (c App) VoteCard() revel.Result {
 		return true
 	})
 
-	for _, c := range ws.rooms[matchId] {
-		c.WriteJSON(Event{
-			Name: "vote_cast",
-			Totals: totals,
-		})
-	}
+	ws.BroadcastToRoom(matchId, Event{
+		Name: "vote_cast",
+		Totals: totals,
+	})
 
 	return c.Render()
 }

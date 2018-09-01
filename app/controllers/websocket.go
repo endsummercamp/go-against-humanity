@@ -10,6 +10,7 @@ import (
 	"github.com/ESCah/go-against-humanity/app/models"
 	"github.com/gorilla/websocket"
 	"time"
+	"sync"
 )
 
 type Card struct {
@@ -32,31 +33,46 @@ type Event struct {
 }
 
 type SocketServer struct {
+	sync.Mutex
 	mm    *game.MatchManager
 	rooms map[int][]*websocket.Conn
+}
+
+func (s *SocketServer) BroadcastToRoom(room int, msg interface{}) {
+	s.Lock()
+	for _, conn := range ws.rooms[room] {
+		conn.WriteJSON(msg)
+	}
+	s.Unlock()
 }
 
 func (s *SocketServer) onConnect(conn *websocket.Conn, matchID int) {
 	log.Printf("MatchID: %d\n", matchID)
 	if !mm.IsJoinable(matchID) {
+		s.Lock()
 		conn.WriteJSON(Event{
 			Name: "cannot_join",
 		})
+		s.Unlock()
 		return
 	} else {
 		round := s.mm.GetMatchByID(matchID).GetRound()
 		if round != nil {
 			card := *round.BlackCard
 			delay := round.TimeFinishPick.Sub(time.Now()).Seconds()
+			s.Lock()
 			conn.WriteJSON(Event{
 				Name: "join_successful",
 				InitialBlackCard: card,
 				SecondsUntilFinishPicking: int(delay),
 			})
+			s.Unlock()
 		} else {
+			s.Lock()
 			conn.WriteJSON(Event{
 				Name: "join_successful",
 			})
+			s.Unlock()
 		}
 		s.rooms[matchID] = append(s.rooms[matchID], conn)
 		return
