@@ -2,10 +2,6 @@ if (!window.WebSocket) {
     alert("Your browser does not support WebSockets!")
 }
 
-// TODO: uncomment
-// const IS_PLAYER = !!window.IS_PLAYER;
-const IS_PLAYER = 1;
-
 function dashFix(content){
     return content.replace(/_/g, '<div class="long-dash"></div>')
 }
