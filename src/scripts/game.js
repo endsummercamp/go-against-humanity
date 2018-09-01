@@ -22,8 +22,7 @@ class Card extends React.Component {
         };
         if (this.props.total) {
             const percentage = this.props.total / this.props.sum;
-            // const percText = 100*percentage + "%";
-            style.height = percentage * baseHeight + "rem";
+            style.height = percentage * 100 + "%";
         };
         console.log(this.props, style);
         return <div className={"card card-" + (this.props.black ? "black" : "white")} onClick={() => this.submitVote()}>
@@ -38,7 +37,7 @@ class Card extends React.Component {
             <div className="card-bottom">
                 Cards Against Humanity
             </div>
-            <div style={{position: "relative", /* width: 0, */ height: 0}}>
+            <div style={{position: "absolute", top: 0, left: 0, bottom: 0,right: 0}}>
                 <div style={style} className="vote-bg"></div>
             </div>
         </div>
@@ -77,7 +76,7 @@ ReactDOM.render(<WhiteRow answers={[]} />, whiterowDiv);
 
 const whiteRow = document.getElementById("whiterow");
 // TODO: cambiare URL e numero match
-const socket = new WebSocket("ws://localhost:8080/ws?match=0");
+const socket = new WebSocket("ws://192.168.43.34:8080/ws?match=0");
 socket.onopen = function() {
     console.log("Opened socket.");
 };
@@ -106,16 +105,15 @@ socket.onmessage = function (e) {
         ReactDOM.render(<WhiteRow answers={[]}/>, whiterowDiv);
         break;
     case "new_black":
-            cardText = getCardText(data)
-        ReactDOM.render(<BlackRow card={<Card text={cardText} black />}/>, blackrowDiv);
+        ReactDOM.render(<BlackRow card={<Card text={data.NewCard.text} black />}/>, blackrowDiv);
         break;
     case "new_white":
         cardText = getCardText(data)
-        answers.push({ text: cardText, total: 0, ID: });
+        answers.push({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id });
         ReactDOM.render(<WhiteRow answers={answers}/>, whiterowDiv);
         break;
     case "totals":
-        totals = getCardTotals(data);
+        totals = data.Totals
         for (const total of totals) {
             answers.find(a => a.ID == total.ID).total = total.Votes;
         }

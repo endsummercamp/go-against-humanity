@@ -44,9 +44,9 @@ func (s *SocketServer) onConnect(conn *websocket.Conn, matchID string) {
 			Icon: "",
 			Text: "Lorem ipsum?",
 			Pick: 1,
+			Id: 1,
 		},
 	}
-	time.Sleep(time.Second)
 	conn.WriteJSON(m)
 
 	var totals []Total
@@ -58,7 +58,7 @@ func (s *SocketServer) onConnect(conn *websocket.Conn, matchID string) {
 				Deck: "",
 				Icon: "",
 				Text: "Answer 1",
-
+				Id: i,
 			},
 		}
 		totals = append(totals, Total{

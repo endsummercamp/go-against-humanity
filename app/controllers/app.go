@@ -72,7 +72,7 @@ func (c App) Login() revel.Result {
 
 func (c App) Matches() revel.Result {
 	if c.connected() == nil {
-		return c.Redirect("/login")
+		return c.Redirect(App.Login)
 	}
 
 	c.ViewArgs["matches"] = mm.GetMatches()
@@ -128,7 +128,24 @@ func (c App) JoinMatch(id int) revel.Result {
 	}
 
 	mm.JoinMatch(id, user)
-	return c.Redirect(fmt.Sprintf("/match/%d"))
+	return c.Redirect(fmt.Sprintf("/match/%d", id))
+}
+
+func (c App) Match(id int) revel.Result {
+	user := c.connected()
+
+	if user == nil {
+		return c.Redirect(App.Login)
+	}
+
+	if !mm.UserJoined(id, user) {
+		return c.Redirect(App.Matches)
+	}
+
+	c.ViewArgs["user"] = user
+	c.ViewArgs["match_id"] = id
+
+	return c.Render()
 }
 
 func (c App) PostRegister() revel.Result {
@@ -169,7 +186,11 @@ func (c App) NewMatch() revel.Result {
 	if !c.isAdmin() {
 		return c.Forbidden("Unauthorized.")
 	}
-	mm.NewMatch().NewDeck()
+	match := mm.NewMatch()
+	match.NewDeck()
+
+	c.Flash.Success(fmt.Sprintf("New Match created succesfully! (ID: %d)", match.Id))
+	c.FlashParams()
 
 	return c.Redirect(App.Admin)
 }
@@ -186,7 +207,7 @@ func (c App) AdminUsers() revel.Result {
 		log.Fatal(err)
 	}
 
-	log.Printf("Users: (%d) %v\n", len(userlist), userlist)
+	c.ViewArgs["users"] = userlist
 
 	return c.Render()
 }

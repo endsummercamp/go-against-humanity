@@ -11,8 +11,10 @@ import (
 type Match struct {
 	Id	int
 	Players []Player
+	Jury []Juror
 	CreatedOn time.Time
-
+	Rounds []Round
+	current_rount int
 	deck 	*Deck
 }
 

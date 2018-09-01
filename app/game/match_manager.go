@@ -30,15 +30,55 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 		return false
 	}
 
-	player := models.Player{
-		user,
-		0,
-		[]models.Card{},
+	if user.UserType == models.PlayerType {
+		for _, p := range match.Players {
+			if p.User.Id == user.Id {
+				return true
+			}
+		}
+
+		player := models.Player{
+			User:  user,
+			Cards: []models.Card{},
+		}
+
+		match.Players = append(match.Players, player)
+	} else {
+		for _, j := range match.Jury {
+			if j.User.Id == user.Id {
+				return true
+			}
+		}
+
+		juror := models.Juror {
+			User: user,
+		}
+
+		match.Jury = append(match.Jury, juror)
 	}
 
-	match.Players = append(match.Players, player)
-
 	return true
+}
+
+func (mm *MatchManager) UserJoined (id int, user *models.User) bool {
+	match := mm.GetMatchByID(id)
+	if match == nil {
+		return false
+	}
+
+	for _, p := range match.Players {
+		if p.User.Id == user.Id {
+			return true
+		}
+	}
+
+	for _, p := range match.Jury {
+		if p.User.Id == user.Id {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (mm *MatchManager) GetMatchByID(id int) *models.Match {

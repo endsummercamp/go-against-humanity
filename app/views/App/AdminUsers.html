@@ -1,0 +1,11 @@
+{{set . "title" "User List"}}
+{{template "header.html" .}}
+
+<h1>User List</h1>
+        <ul>
+        {{ range $element := .users }}
+            <li>{{ $element.Username }} - {{ $element.Id }}</li>
+        {{ end }}
+        </ul>
+
+{{template "footer.html" .}}

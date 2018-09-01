@@ -3,6 +3,9 @@
 
 <h1>Current Matches</h1>
 <div class="matches-container">
+    {{ if eq (len .matches) 0 }}
+    <p>No matches available</p>
+    {{ else }}
     {{ range $element := .matches }}
         <div class="matches-match match">
             <h2>Match {{ $element.Id }}</h2>
@@ -31,6 +34,7 @@
                 </tr>
             </table>
         </div>
+    {{ end }}
     {{ end }}
 </div>
 {{template "footer.html" .}}

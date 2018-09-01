@@ -1,7 +1,8 @@
-{{set . "title" "Home"}}
+{{set . "title" "Admin"}}
 {{template "header.html" .}}
 
 <h1>Admin</h1>
+        {{ template "flash.html" . }}
 <ul>
     <li><a href="/admin/match/new">New Match</a></li>
     <li><a href="/admin/users">Users list</a></li>

@@ -1,0 +1,26 @@
+{{set . "title" "Match"}}
+{{template "header.html" .}}
+
+<style>
+    h1 {
+        text-align: center;
+    }
+    .flex {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        flex-grow: 1;
+        flex-shrink: 1;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+<div id="react-blackrow"></div>
+<div class="flex" id="react-whiterow">
+
+<script src="/public/scripts/react.development.js"></script>
+<script src="/public/scripts/react-dom.development.js"></script>
+<script src="/public/scripts/game.min.js"></script>
+
+{{ template "footer.html" .}}
