@@ -4,15 +4,16 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"io"
+	"log"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/ESCah/go-against-humanity/app/game"
 	"github.com/ESCah/go-against-humanity/app/models"
 	"github.com/gorilla/websocket"
 	"github.com/revel/revel"
-	"io"
-	"log"
-	"strconv"
-	"time"
-	"sync"
 )
 
 func hashPassword(password string) string {
@@ -127,7 +128,7 @@ func (c App) JoinMatch(id int) revel.Result {
 		return c.Redirect(App.Login)
 	}
 
-	if !mm.IsJoinable(id){
+	if !mm.IsJoinable(id) {
 		c.Flash.Error(fmt.Sprintf("Unable to join %d. The match doesn't exists, is already started or already ended.", id))
 		c.FlashParams()
 		return c.Redirect(App.Matches)
@@ -276,8 +277,7 @@ func (c App) PickCard() revel.Result {
 		return c.Redirect(App.Login)
 	}
 
-
-	matchId, err  := strconv.Atoi(c.Params.Route.Get("matchId"))
+	matchId, err := strconv.Atoi(c.Params.Route.Get("matchId"))
 
 	if err != nil {
 		return c.NotFound("Invalid MatchId")
@@ -345,7 +345,7 @@ func (c App) MatchNewBlackCard() revel.Result {
 		return c.Forbidden("Not allowed.")
 	}
 
-	matchId, err  := strconv.Atoi(c.Params.Route.Get("matchId"))
+	matchId, err := strconv.Atoi(c.Params.Route.Get("matchId"))
 	if err != nil {
 		return c.NotFound("Invalid MatchId")
 	}
@@ -362,25 +362,25 @@ func (c App) MatchNewBlackCard() revel.Result {
 	}
 
 	msg := Event{
-		Name:    "new_black",
-		NewCard: card,
-		Duration: 20, // Timeout in seconds
+		Name:     "new_black",
+		NewCard:  card,
+		Duration: 5, // Timeout in seconds
 	}
 
 	round := match.GetRound()
 	round.TimeFinishPick = time.Now()
 
-	go func(){
+	go func() {
 		time.Sleep(time.Duration(msg.Duration) * time.Second)
 		match.State = models.MATCH_VOTING
-		msg := Event {
+		msg := Event{
 			Name: "voting",
 		}
 		ws.BroadcastToRoom(matchId, msg)
 
 		for _, card := range round.GetChoices() {
-			msg := Event {
-				Name: "new_white",
+			msg := Event{
+				Name:    "new_white",
 				NewCard: card,
 			}
 			ws.BroadcastToRoom(matchId, msg)
@@ -399,8 +399,7 @@ func (c App) EndVoting() revel.Result {
 		return c.Redirect(App.Login)
 	}
 
-
-	matchId, err  := strconv.Atoi(c.Params.Route.Get("matchId"))
+	matchId, err := strconv.Atoi(c.Params.Route.Get("matchId"))
 
 	if err != nil {
 		return c.NotFound("Invalid MatchId")
@@ -416,7 +415,7 @@ func (c App) EndVoting() revel.Result {
 	}
 
 	match.EndVote()
-	msg := Event {
+	msg := Event{
 		Name: "show_results",
 	}
 	ws.BroadcastToRoom(matchId, msg)
@@ -438,7 +437,7 @@ func (c App) VoteCard() revel.Result {
 	}
 
 	if user.UserType != models.JurorType {
-		return c.Forbidden("Only Jurors can cast a vote!");
+		return c.Forbidden("Only Jurors can cast a vote!")
 	}
 
 	matchId, err := strconv.Atoi(c.Params.Route.Get("matchId"))
@@ -480,22 +479,12 @@ func (c App) VoteCard() revel.Result {
 		return c.Forbidden("Voting disallowed")
 	}
 
-	round.Wcs.Range(func(_c, _jury interface{}) bool {
-		c := _c.(*models.WhiteCard)
-		jury := _jury.([]*models.Juror)
-		for _, j := range jury {
-			if j.User.Id == user.Id {
-				match.RemoveVote(round, c, j)
-			}
-		}
-		return true
-	})
-
-	var juror *models.Juror
+	var juror *models.Juror = nil
 
 	for _, j := range match.Jury {
 		if j.User.Id == user.Id {
 			juror = &j
+			break
 		}
 	}
 
@@ -503,25 +492,32 @@ func (c App) VoteCard() revel.Result {
 		return c.NotFound("Juror not found! Are you a Juror in this match?")
 	}
 
+	log.Printf("User: %#v\n", user)
+	log.Printf("Juror: %#v\n", juror.User)
+
+	for _, j := range round.Voters {
+		if j.User.Id == juror.User.Id {
+			return c.Forbidden("Cannot vote twice.")
+		}
+	}
+
+	round.Voters = append(round.Voters, *juror)
+
+
 	// Cast vote
-	_val, _ := round.Wcs.Load(card)
-	val := _val.([]*models.Juror)
-	round.Wcs.Store(card, append(val, juror))
+	round.Wcs[card] = append(round.Wcs[card], *juror)
 
-	var totals []Total
+	totals := []Total{}
 
-	round.Wcs.Range(func(_card, _jury interface{}) bool {
-		card := _card.(*models.WhiteCard)
-		jury := _jury.([]*models.Juror)
+	for card, jury := range round.Wcs {
 		totals = append(totals, Total{
-			ID: card.Id,
+			ID:    card.Id,
 			Votes: len(jury),
 		})
-		return true
-	})
+	}
 
 	ws.BroadcastToRoom(matchId, Event{
-		Name: "vote_cast",
+		Name:   "vote_cast",
 		Totals: totals,
 	})
 

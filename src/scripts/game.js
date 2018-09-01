@@ -28,13 +28,18 @@ class Card extends React.Component {
         classes += "card-" + (this.props.black ? "black" : "white") + " ";
         if (this.props.text.length > 40)
             classes += "small-text";
+
+        let classes_middle = "card-middle";
+        if (this.props.total) {
+            classes_middle += " active";
+        }
         return <div className={classes} onClick={this.props.onClick}>
             <div className="card-top">
                 <div className="card-content" dangerouslySetInnerHTML={{__html:dashFix(this.props.text)}}>
                 </div>
             </div>
-            <div className="card-middle">
-                {this.props.total || ""}
+            <div className={classes_middle}>
+                <div class="card-votes">{this.props.total || ""}</div>
             </div>
             <div className="card-bottom">
                 Cards Against Humanity

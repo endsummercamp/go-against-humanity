@@ -9,28 +9,26 @@ import (
 type Round struct {
 	BlackCard      *BlackCard
 	TimeFinishPick time.Time
-	Wcs            sync.Map // map[*WhiteCard][]*Juror
+	Wcs            map[*WhiteCard][]Juror
+	Mutex	  	   sync.Mutex
+	Voters			[]Juror
+
 }
 
-type WcsKey *WhiteCard
-type WcsVal []*Juror
-
 func (r *Round) AddCard(card *WhiteCard) bool {
-	if _, ok := r.Wcs.Load(card); ok {
+	if _, ok := r.Wcs[card]; ok {
 		return false
 	}
 
-	r.Wcs.Store(card, []*Juror{})
+	r.Wcs[card] = []Juror{}
 	return true
 }
 
 func (r *Round) GetChoices() []*WhiteCard {
 	var ret []*WhiteCard
-	r.Wcs.Range(func(_card, _ interface{}) bool {
-		card := _card.(*WhiteCard)
+	for card := range r.Wcs {
 		ret = append(ret, card)
-		return true
-	})
+	}
 	sort.Slice(ret, func(i, j int) bool {
 		return ret[i].Text < ret[j].Text
 	})
