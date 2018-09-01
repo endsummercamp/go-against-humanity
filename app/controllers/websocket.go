@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/ESCah/go-against-humanity/app/models"
 	"math/rand"
 	"net/http"
 	"time"
@@ -21,7 +22,7 @@ type Total struct {
 
 type Event struct {
 	Name string
-	NewCard Card
+	NewCard models.Card
 	Totals []Total
 }
 
@@ -38,8 +39,11 @@ func (s *SocketServer) onConnect(conn *websocket.Conn, matchID string) {
 
 	m = Event{
 		Name: "new_black",
-		NewCard: Card{
+		NewCard: models.BlackCard{
+			Deck: "",
+			Icon: "",
 			Text: "Lorem ipsum?",
+			Pick: 1,
 		},
 	}
 	time.Sleep(time.Second)
@@ -50,9 +54,11 @@ func (s *SocketServer) onConnect(conn *websocket.Conn, matchID string) {
 	for i := 0; i < 5; i++ {
 		m = Event{
 			Name: "new_white",
-			NewCard: Card{
-				ID: i,
-				Text: "Lorem ipsum.",
+			NewCard: models.WhiteCard{
+				Deck: "",
+				Icon: "",
+				Text: "Answer 1",
+
 			},
 		}
 		totals = append(totals, Total{

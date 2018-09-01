@@ -12,6 +12,7 @@ type Match struct {
 	Id	int
 	Players []Player
 	CreatedOn time.Time
+
 	deck 	*Deck
 }
 

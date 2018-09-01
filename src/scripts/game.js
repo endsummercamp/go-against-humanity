@@ -39,7 +39,7 @@ class Card extends React.Component {
                 Cards Against Humanity
             </div>
             <div style={{position: "relative", /* width: 0, */ height: 0}}>
-                <div style={style} class="vote-bg"></div>
+                <div style={style} className="vote-bg"></div>
             </div>
         </div>
     }
@@ -81,11 +81,24 @@ const socket = new WebSocket("ws://localhost:8080/ws?match=0");
 socket.onopen = function() {
     console.log("Opened socket.");
 };
+
+function getCardText(data) {
+    const {NewCard: { text: cardText }} = data
+    return cardText
+}
+
+function getCardTotals(data) {
+    const { Totals: _totals } = data
+    return _totals
+}
+
 let answers = [];
 let totals = [];
 socket.onmessage = function (e) {
     console.log("Received", e.data);
-    const {Name: eventName, NewCard: {Text: cardText, ID: cardID}, Totals: _totals} = JSON.parse(e.data);
+    const data = JSON.parse(e.data);
+    const { Name: eventName } = data 
+    let cardText;
     switch (eventName) {
     case "new_game":
         answers = [];
@@ -93,14 +106,16 @@ socket.onmessage = function (e) {
         ReactDOM.render(<WhiteRow answers={[]}/>, whiterowDiv);
         break;
     case "new_black":
+            cardText = getCardText(data)
         ReactDOM.render(<BlackRow card={<Card text={cardText} black />}/>, blackrowDiv);
         break;
     case "new_white":
-        answers.push({text: cardText, ID: cardID, total: 0});
+        cardText = getCardText(data)
+        answers.push({ text: cardText, total: 0, ID: });
         ReactDOM.render(<WhiteRow answers={answers}/>, whiterowDiv);
         break;
     case "totals":
-        totals = _totals;
+        totals = getCardTotals(data);
         for (const total of totals) {
             answers.find(a => a.ID == total.ID).total = total.Votes;
         }
