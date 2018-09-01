@@ -80,11 +80,13 @@ class MyCardsRow extends React.Component {
     submitCard(id) {
         if (!canPickCard) {
             alert("You cannot pick a card at this time!");
-            return;
+            return false;
         }
         const req = new XMLHttpRequest();
         req.open("PUT", `/match/${MATCH_ID}/pick_card/${id}`);
         req.send();
+        canPickCard = false;
+        return true;
     }
     render() {
         /* Expects:
@@ -92,7 +94,11 @@ class MyCardsRow extends React.Component {
          */
         return <>
             {
-                this.props.cards.map((answer, i) => <Card text={answer.text} id={answer.ID} onClick={() => this.submitCard(answer.ID)} key={i} />)
+                this.props.cards.map((answer, i) => <Card text={answer.text} id={answer.ID} onClick={(evt) => {
+                    const success = this.submitCard(answer.ID);
+                    if (!success) return;
+                    evt.target.classList.add("inverted");
+                }} key={i} />)
             }
         </>;
     }
@@ -108,7 +114,6 @@ if (IS_PLAYER) {
 }
 
 const whiteRow = document.getElementById("whiterow");
-// TODO: cambiare URL e numero match
 const socket = new WebSocket(`ws://${document.location.hostname}:8080/ws?match=${MATCH_ID}`);
 socket.onopen = function() {
     console.log("Opened socket.");
