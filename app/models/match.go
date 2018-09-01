@@ -81,7 +81,7 @@ func(m *Match) NewDeck(){
 	}
 
 	for _, card := range v.Black {
-		if deckAllowed(card.Deck) {
+		if deckAllowed(card.Deck) && card.Pick == 1 {
 			card.Id = i
 			i++
 			blackcards = append(blackcards, card)
