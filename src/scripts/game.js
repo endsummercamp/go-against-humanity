@@ -188,7 +188,7 @@ socket.onmessage = function (e) {
         answers.push({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id });
         ReactDOM.render(<AnswersRow answers={answers}/>, whiterowDiv);
         break;
-    case "totals":
+    case "vote_cast":
         totals = data.Totals
         for (const total of totals) {
             answers.find(a => a.ID == total.ID).total = total.Votes;
@@ -226,18 +226,23 @@ socket.onclose = function () {
 }
 
 let bcb = document.getElementsByClassName("admin-panel-new-blackcard")[0];
-bcb.addEventListener("click", ()=>{
-    const req = new XMLHttpRequest();
-    req.open("PUT", `/admin/match/${MATCH_ID}/new_black_card`);
-    req.send();
-});
+
+if (bcb != undefined) {
+    bcb.addEventListener("click", () => {
+        const req = new XMLHttpRequest();
+        req.open("PUT", `/admin/match/${MATCH_ID}/new_black_card`);
+        req.send();
+    });
+}
 
 let endv = document.getElementsByClassName("admin-panel-end-voting")[0];
-endv.addEventListener("click", () => {
-    const req = new XMLHttpRequest();
-    req.open("PUT", `/admin/match/${MATCH_ID}/end_voting`);
-    req.send();
-});
+if (endv != undefined) {
+    endv.addEventListener("click", () => {
+        const req = new XMLHttpRequest();
+        req.open("PUT", `/admin/match/${MATCH_ID}/end_voting`);
+        req.send();
+    });
+}
 
 function stopTimer() {
     clearInterval(timer_interval);
