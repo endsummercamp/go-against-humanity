@@ -5,7 +5,6 @@ if (!window.WebSocket) {
 // TODO: uncomment
 // const IS_PLAYER = !!window.IS_PLAYER;
 const IS_PLAYER = 1;
-var selected = true;
 
 function dashFix(content){
     return content.replace(/_/g, '<div class="long-dash"></div>')
