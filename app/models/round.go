@@ -1,9 +1,9 @@
 package models
 
 import (
-	"time"
 	"sort"
 	"sync"
+	"time"
 )
 
 type Round struct {
