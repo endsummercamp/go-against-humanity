@@ -144,7 +144,7 @@ func (m *Match) EndVote() bool {
 func (m *Match) RemoveVote(round *Round, card *WhiteCard, juror *Juror) {
 	found := -1
 	_arr, _ := round.Wcs.Load(card)
-	arr := _arr.(WcsVal)
+	arr := _arr.([]*Juror)
 	for i, j := range arr {
 		if j == juror {
 			found = i

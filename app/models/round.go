@@ -27,7 +27,7 @@ func (r *Round) AddCard(card *WhiteCard) bool {
 func (r *Round) GetChoices() []*WhiteCard {
 	var ret []*WhiteCard
 	r.Wcs.Range(func(_card, _ interface{}) bool {
-		card := _card.(WcsKey)
+		card := _card.(*WhiteCard)
 		ret = append(ret, card)
 		return true
 	})

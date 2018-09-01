@@ -482,8 +482,8 @@ func (c App) VoteCard() revel.Result {
 	}
 
 	round.Wcs.Range(func(_c, _jury interface{}) bool {
-		c := _c.(models.WcsKey)
-		jury := _jury.(models.WcsVal)
+		c := _c.(*models.WhiteCard)
+		jury := _jury.([]*models.Juror)
 		for _, j := range jury {
 			if j.User.Id == user.Id {
 				match.RemoveVote(round, c, j)
@@ -506,14 +506,14 @@ func (c App) VoteCard() revel.Result {
 
 	// Cast vote
 	_val, _ := round.Wcs.Load(card)
-	val := _val.(models.WcsVal)
+	val := _val.([]*models.Juror)
 	round.Wcs.Store(card, append(val, juror))
 
 	var totals []Total
 
 	round.Wcs.Range(func(_card, _jury interface{}) bool {
-		card := _card.(models.WcsKey)
-		jury := _jury.(models.WcsVal)
+		card := _card.(*models.WhiteCard)
+		jury := _jury.([]*models.Juror)
 		totals = append(totals, Total{
 			ID: card.Id,
 			Votes: len(jury),
