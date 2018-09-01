@@ -2,11 +2,11 @@ if (!window.WebSocket) {
     alert("Your browser does not support WebSockets!")
 }
 
+// TODO: uncomment
+// const IS_PLAYER = !!window.IS_PLAYER;
+const IS_PLAYER = 1;
+
 class Card extends React.Component {
-    submitVote() {
-        console.log(this.props);
-        alert("POST /vote/" + this.props.id);
-    }
     render() {
         // https://stackoverflow.com/a/6040258
         // https://stackoverflow.com/a/8541575
@@ -25,7 +25,7 @@ class Card extends React.Component {
             style.height = percentage * 100 + "%";
         };
         console.log(this.props, style);
-        return <div className={"card card-" + (this.props.black ? "black" : "white")} onClick={() => this.submitVote()}>
+        return <div className={"card card-" + (this.props.black ? "black" : "white")} onClick={this.props.onClick}>
             <div className="card-top">
                 <div className="card-content">
                     {this.props.text}
@@ -55,8 +55,12 @@ class BlackRow extends React.PureComponent {
     }
 }
 
-class WhiteRow extends React.Component {
+class AnswersRow extends React.Component {
     render() {
+        /* Expects:
+           * a prop "answers", containing an array of {text, ID};
+           * a prop "totals", containing an array of {Votes}.
+         */
         let sum = 0;
         if (this.props.totals) {
             sum = this.props.totals.reduce((a, b) => a + b.Votes, 0);
@@ -69,10 +73,32 @@ class WhiteRow extends React.Component {
     }
 }
 
+class MyCardsRow extends React.Component {
+    submitCard(id) {
+        const req = new XMLHttpRequest();
+        req.open("POST", `/pick_card?card_id=${id}&match_id=${0}`);
+        req.send();
+    }
+    render() {
+        /* Expects:
+           * a prop "cards", containing an array of {text, ID};
+         */
+        return <div className="flex" id="blackrow">
+            {
+                this.props.cards.map((answer, i) => <Card text={answer.text} id={answer.ID} onClick={() => this.submitCard(answer.ID)} key={i} />)
+            }
+        </div>;
+    }
+}
+
 const blackrowDiv = document.getElementById("react-blackrow");
 ReactDOM.render(<BlackRow />, blackrowDiv);
 const whiterowDiv = document.getElementById("react-whiterow");
-ReactDOM.render(<WhiteRow answers={[]} />, whiterowDiv);
+ReactDOM.render(<AnswersRow answers={[]} />, whiterowDiv);
+const mycardsDiv = document.getElementById("react-mycards");
+if (IS_PLAYER) {
+    mycardsDiv.style.display = "block";
+}
 
 const whiteRow = document.getElementById("whiterow");
 // TODO: cambiare URL e numero match
@@ -102,7 +128,18 @@ socket.onmessage = function (e) {
     case "join_successful":
         answers = [];
         ReactDOM.render(<BlackRow />, blackrowDiv);
-        ReactDOM.render(<WhiteRow answers={[]}/>, whiterowDiv);
+        ReactDOM.render(<AnswersRow answers={[]}/>, whiterowDiv);
+        if (IS_PLAYER) {
+            const req = new XMLHttpRequest();
+            req.addEventListener("load", () => {
+                const resp = JSON.parse(req.responseText);
+                const cards = resp.map(item => ({text: item.text, ID: item.Id}));
+                console.log("My cards:", cards);
+                ReactDOM.render(<MyCardsRow cards={cards} />, mycardsDiv);
+            });
+            req.open("GET", "/mycards");
+            req.send();
+        }
         break;
     case "new_black":
         ReactDOM.render(<BlackRow card={<Card text={data.NewCard.text} black />}/>, blackrowDiv);
@@ -110,14 +147,14 @@ socket.onmessage = function (e) {
     case "new_white":
         cardText = getCardText(data)
         answers.push({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id });
-        ReactDOM.render(<WhiteRow answers={answers}/>, whiterowDiv);
+        ReactDOM.render(<AnswersRow answers={answers}/>, whiterowDiv);
         break;
     case "totals":
         totals = data.Totals
         for (const total of totals) {
             answers.find(a => a.ID == total.ID).total = total.Votes;
         }
-        ReactDOM.render(<WhiteRow answers={answers} totals={totals}/>, whiterowDiv);
+        ReactDOM.render(<AnswersRow answers={answers} totals={totals}/>, whiterowDiv);
         break;
     default:
         alert("Unknown event " + eventName);

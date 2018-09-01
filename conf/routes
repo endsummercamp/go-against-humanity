@@ -18,6 +18,7 @@ GET     /match/*id                              App.Match
 GET     /admin                                  App.Admin
 GET     /admin/match/new                        App.NewMatch
 GET     /admin/users                            App.AdminUsers
+GET     /mycards                                App.MyCards
 
 GET     /matches/join/*id                       App.JoinMatch
 

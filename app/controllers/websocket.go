@@ -2,39 +2,40 @@ package controllers
 
 import (
 	"fmt"
-	"github.com/ESCah/go-against-humanity/app/game"
-	"github.com/ESCah/go-against-humanity/app/models"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/ESCah/go-against-humanity/app/game"
+	"github.com/ESCah/go-against-humanity/app/models"
+	"github.com/gorilla/websocket"
 )
 
 type Card struct {
-	ID int
+	ID   int
 	Text string
 }
 
 type Total struct {
-	ID int
+	ID    int
 	Votes int
 }
 
 type Event struct {
-	Name string
+	Name    string
 	NewCard models.Card
-	Totals []Total
+	Totals  []Total
 }
 
 type SocketServer struct {
-	mm	*game.MatchManager
+	mm    *game.MatchManager
 	rooms map[int][]*websocket.Conn
 }
 
 func (s *SocketServer) onConnect(conn *websocket.Conn, matchID int) {
 	log.Printf("MatchID: %d\n", matchID)
 	if !mm.IsJoinable(matchID) {
-		conn.WriteJSON(Event {
+		conn.WriteJSON(Event{
 			Name: "cannot_join",
 		})
 		return

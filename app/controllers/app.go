@@ -233,3 +233,57 @@ func (c App) Card() revel.Result {
 
 	return c.Render()
 }
+
+func (c App) MyCards() revel.Result {
+	ret := []models.WhiteCard{
+		{
+			Id:   1,
+			Deck: "deck",
+			Icon: "icon",
+			Text: "Uso",
+		},
+		{
+			Id:   2,
+			Deck: "deck",
+			Icon: "icon",
+			Text: "il",
+		},
+		{
+			Id:   3,
+			Deck: "deck",
+			Icon: "icon",
+			Text: "mio",
+		},
+		{
+			Id:   4,
+			Deck: "deck",
+			Icon: "icon",
+			Text: "iphone",
+		},
+		{
+			Id:   5,
+			Deck: "deck",
+			Icon: "icon",
+			Text: "Uso",
+		},
+		{
+			Id:   6,
+			Deck: "deck",
+			Icon: "icon",
+			Text: "il",
+		},
+		{
+			Id:   7,
+			Deck: "deck",
+			Icon: "icon",
+			Text: "mio",
+		},
+		{
+			Id:   8,
+			Deck: "deck",
+			Icon: "icon",
+			Text: "iphone",
+		},
+	}
+	return c.RenderJSON(ret)
+}
