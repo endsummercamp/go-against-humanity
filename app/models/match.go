@@ -125,3 +125,12 @@ func (m *Match) NewBlackCard() *BlackCard {
 
 	return blackCard
 }
+
+func (m *Match) EndVote() bool {
+	if m.State != MATCH_VOTING {
+		return false
+	}
+
+	m.State = MATCH_SHOW_RESULTS
+	return true
+}

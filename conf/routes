@@ -20,6 +20,7 @@ GET     /admin/match/new                        App.NewMatch
 GET     /admin/users                            App.AdminUsers
 GET     /mycards                                App.MyCards
 PUT     /admin/match/:matchId/new_black_card    App.MatchNewBlackCard
+PUT     /admin/match/:matchId/end_voting        App.EndVoting
 PUT     /match/:matchId/pick_card/:cardId       App.PickCard
 
 GET     /matches/join/*id                       App.JoinMatch
