@@ -189,7 +189,7 @@ func (c App) AdminUsers() revel.Result {
 	return c.Render()
 }
 
-func (c App) Gioco() revel.Result {
+func (c App) Game() revel.Result {
 	return c.Render()
 }
 
