@@ -157,14 +157,12 @@ socket.onmessage = function (e) {
         canPickCard = true;
         seconds_left = data.Duration;
         timer_interval = setInterval(() => {
-            minutes = Math.floor(seconds_left / 60);
-            seconds = seconds_left % 60;
+            const minutes = Math.floor(seconds_left / 60);
+            const seconds = seconds_left % 60;
             timer.textContent = minutes + ":" + seconds;
-        }, 100);
-        setTimeout(() => {
-            clearInterval(timer_interval);
-            canPickCard = false;
-        }, data.Duration * 1000);
+            seconds_left--;
+        }, 1000);
+        setTimeout(stopTimer, data.Duration * 1000);
         ReactDOM.render(<BlackRow card={<Card text={data.NewCard.text} black />}/>, blackrowDiv);
         break;
     case "new_white":
@@ -179,6 +177,9 @@ socket.onmessage = function (e) {
         }
         ReactDOM.render(<AnswersRow answers={answers} totals={totals}/>, whiterowDiv);
         break;
+    case "voting":
+        stopTimer();
+        break;
     default:
         alert("Unknown event " + eventName);
     }
@@ -192,11 +193,18 @@ bcb.addEventListener("click", ()=>{
     const req = new XMLHttpRequest();
     req.open("PUT", `/admin/match/${MATCH_ID}/new_black_card`);
     req.send();
-})
+});
 
 let endv = document.getElementsByClassName("admin-panel-end-voting")[0];
 endv.addEventListener("click", () => {
     const req = new XMLHttpRequest();
     req.open("PUT", `/admin/match/${MATCH_ID}/end_voting`);
     req.send();
-})
+});
+
+function stopTimer() {
+    clearInterval(timer_interval);
+    timer.textContent = "";
+    timer.style.display = "none";
+    canPickCard = false;
+}
