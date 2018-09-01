@@ -2,9 +2,9 @@ package models
 
 import (
 	"encoding/json"
+	gc_log "github.com/denysvitali/gc_log"
 	"log"
 	"os"
-	gc_log "github.com/denysvitali/gc_log"
 	"time"
 )
 
@@ -67,18 +67,18 @@ func(m *Match) NewDeck(){
 		log.Fatal(err)
 	}
 
-	var whitecards []Card
-	var blackcards []Card
+	var whitecards []*WhiteCard
+	var blackcards []*BlackCard
 
 	for _, card := range v.White {
 		if deckAllowed(card.Deck) {
-			whitecards = append(whitecards, card)
+			whitecards = append(whitecards, &card)
 		}
 	}
 
 	for _, card := range v.Black {
 		if deckAllowed(card.Deck) {
-			blackcards = append(blackcards, card)
+			blackcards = append(blackcards, &card)
 		}
 	}
 
@@ -104,4 +104,17 @@ func (m *Match) GetRound() *Round {
 	}
 
 	return &m.Rounds[len(m.Rounds)-1]
+}
+
+func (m *Match) NewBlackCard() bool {
+	black_card := m.Deck.NewRandomBlackCard()
+	if black_card == nil {
+		return false
+	}
+	m.Rounds = append(m.Rounds, Round{
+		black_card,
+		map[*WhiteCard][]*Juror{},
+	})
+
+	return true
 }

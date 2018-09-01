@@ -226,8 +226,8 @@ func (c App) Card() revel.Result {
 		return c.Forbidden("Unauthorized.")
 	}
 
-	black_card := game.NewRandomCardFromDeck(models.BLACK_CARD, deck)
-	white_card := game.NewRandomCardFromDeck(models.WHITE_CARD, deck)
+	black_card := deck.NewRandomBlackCard()
+	white_card := deck.NewRandomWhiteCard()
 
 	c.ViewArgs["cards"] = []models.Card{white_card, black_card}
 
@@ -295,7 +295,7 @@ func (c App) PickCard(matchId int, cardId int) revel.Result {
 	var card *models.WhiteCard = nil
 	for i, c := range player.Cards {
 		if c.Id == cardId {
-			card = &c
+			card = c
 			foundId = i
 			break
 		}
