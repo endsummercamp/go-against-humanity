@@ -430,3 +430,95 @@ func (c App) EndVoting() revel.Result {
 
 	return c.Render()
 }
+
+func (c App) VoteCard() revel.Result {
+	user := c.connected()
+
+	if user == nil {
+		return c.Redirect(App.Login)
+	}
+
+	if user.UserType != models.JurorType {
+		return c.Forbidden("Only Jurors can cast a vote!");
+	}
+
+	matchId, err := strconv.Atoi(c.Params.Route.Get("matchId"))
+	if err != nil {
+		return c.NotFound("Invalid matchId parameter")
+	}
+
+	cardId, err := strconv.Atoi(c.Params.Route.Get("cardId"))
+	if err != nil {
+		return c.NotFound("Invalid cardId parameter")
+	}
+
+	match := mm.GetMatchByID(matchId)
+
+	if match == nil {
+		return c.NotFound("Match not found")
+	}
+
+	round := match.GetRound()
+
+	if round == nil {
+		return c.NotFound("Round not found")
+	}
+
+	var card *models.WhiteCard = nil
+
+	for _, c := range round.GetChoices() {
+		if c.Id == cardId {
+			card = c
+			break
+		}
+	}
+
+	if card == nil {
+		return c.NotFound("Card not found")
+	}
+
+	if match.State != models.MATCH_VOTING {
+		return c.Forbidden("Voting disallowed")
+	}
+
+	for c, jury := range round.Wcs {
+		for _, j := range jury {
+			if j.User.Id == user.Id {
+				match.RemoveVote(round, c, j)
+			}
+		}
+	}
+
+	var juror *models.Juror = nil;
+
+	for _, j := range match.Jury {
+		if j.User.Id == user.Id {
+			juror = &j
+		}
+	}
+
+	if juror == nil {
+		return c.NotFound("Juror not found! Are you a Juror in this match?")
+	}
+
+	// Cast vote
+	round.Wcs[card] = append(round.Wcs[card], juror)
+
+	totals := []Total{}
+
+	for card, jury := range round.Wcs {
+		totals = append(totals, Total{
+			ID: card.Id,
+			Votes: len(jury),
+		})
+	}
+
+	for _, c := range ws.rooms[matchId] {
+		c.WriteJSON(Event{
+			Name: "vote_cast",
+			Totals: totals,
+		})
+	}
+
+	return c.Render()
+}

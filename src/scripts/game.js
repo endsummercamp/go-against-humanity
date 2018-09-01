@@ -187,6 +187,10 @@ socket.onmessage = function (e) {
 function ShowBlackCard(seconds_left, black_card_text) {
     canPickCard = true;
     timer_interval = setInterval(() => {
+        if(seconds_left == 0) {
+            clearInterval(timer_interval)
+            return;
+        }
         const minutes = String(Math.floor(seconds_left / 60)).padStart(2, '0');
         const seconds = String(seconds_left % 60).padStart(2, '0');
         timer.textContent = minutes + ":" + seconds;

@@ -119,8 +119,8 @@ func (m *Match) NewBlackCard() *BlackCard {
 		return nil
 	}
 	m.Rounds = append(m.Rounds, Round{
-		BlackCard:      blackCard,
-		wcs:            map[*WhiteCard][]*Juror{},
+		BlackCard: blackCard,
+		Wcs:       map[*WhiteCard][]*Juror{},
 	})
 
 	return blackCard
@@ -133,4 +133,20 @@ func (m *Match) EndVote() bool {
 
 	m.State = MATCH_SHOW_RESULTS
 	return true
+}
+func (m *Match) RemoveVote(round *Round, card *WhiteCard, juror *Juror) {
+	found := -1
+	for i, j := range round.Wcs[card] {
+		if j == juror {
+			found = i
+			break
+		}
+	}
+
+	if found == -1 {
+		return
+	}
+
+	round.Wcs[card] = append(round.Wcs[card][:found], round.Wcs[card][found+1:]...)
+
 }

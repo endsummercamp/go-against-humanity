@@ -6,23 +6,23 @@ import (
 )
 
 type Round struct {
-	BlackCard *BlackCard
+	BlackCard      *BlackCard
 	TimeFinishPick time.Time
-	wcs       map[*WhiteCard][]*Juror
+	Wcs            map[*WhiteCard][]*Juror
 }
 
 func (r *Round) AddCard(card *WhiteCard) bool {
-	if _, ok := r.wcs[card]; ok {
+	if _, ok := r.Wcs[card]; ok {
 		return false
 	}
 
-	r.wcs[card] = []*Juror{}
+	r.Wcs[card] = []*Juror{}
 	return true
 }
 
 func (r *Round) GetChoices() []*WhiteCard {
 	var ret []*WhiteCard
-	for card := range r.wcs {
+	for card := range r.Wcs {
 		ret = append(ret, card)
 	}
 	sort.Slice(ret, func(i, j int) bool {
