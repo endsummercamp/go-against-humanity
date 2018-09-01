@@ -4,7 +4,6 @@ var gulp = require('gulp'),
 var autoprefixer = require('gulp-autoprefixer');
 var babel = require('gulp-babel');
 var concat = require('gulp-concat');
-var uglify = require('gulp-uglify');
 var imagemin = require('gulp-imagemin'),
     cache = require('gulp-cache');
 var minifycss = require('gulp-minify-css');
@@ -32,17 +31,25 @@ gulp.task('styles', function(){
 });
 
 gulp.task('scripts', function(){
-  return gulp.src('src/scripts/**/*.js')
+  // Copy deps directly, without processing
+  gulp.src('src/scripts/deps/*.js')
     .pipe(plumber({
       errorHandler: function (error) {
         console.log(error.message);
         this.emit('end');
     }}))
-    .pipe(concat('main.js'))
-    .pipe(babel())
     .pipe(gulp.dest('public/scripts/'))
+  // Process files in the root directory
+  gulp.src('src/scripts/*.js')
+    .pipe(plumber({
+      errorHandler: function (error) {
+        console.log(error.message);
+        this.emit('end');
+    }}))
+    .pipe(babel({
+      presets: ['@babel/env', '@babel/react', 'minify']
+    }))
     .pipe(rename({suffix: '.min'}))
-    .pipe(uglify())
     .pipe(gulp.dest('public/scripts/'))
 });
 

@@ -13,6 +13,7 @@ GET     /register                               App.Register
 GET     /card                                   App.Card
 GET     /round/new                              App.NewRound
 GET     /deck                                   App.GetDeck
+GET     /gioco                                  App.Gioco
 
 POST    /login                                  App.PostLogin
 POST    /register                               App.PostRegister

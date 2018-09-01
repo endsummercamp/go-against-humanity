@@ -104,6 +104,10 @@ func (c App) Card() revel.Result {
 	return c.Render()
 }
 
+func (c App) Gioco() revel.Result {
+	return c.Render()
+}
+
 func deckAllowed(deckName string) bool {
 	switch deckName {
 	case "ita-original-sfoltita":
