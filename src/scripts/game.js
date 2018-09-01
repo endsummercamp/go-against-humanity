@@ -157,8 +157,8 @@ socket.onmessage = function (e) {
         canPickCard = true;
         seconds_left = data.Duration;
         timer_interval = setInterval(() => {
-            const minutes = Math.floor(seconds_left / 60);
-            const seconds = seconds_left % 60;
+            const minutes = String(Math.floor(seconds_left / 60)).padStart(2, '0');
+            const seconds = String(seconds_left % 60).padStart(2, '0');
             timer.textContent = minutes + ":" + seconds;
             seconds_left--;
         }, 1000);
