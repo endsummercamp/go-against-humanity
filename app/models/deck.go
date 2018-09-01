@@ -6,8 +6,8 @@ import (
 )
 
 type Deck struct {
-	Black_cards             	[]*BlackCard
-	White_cards             	[]*WhiteCard
+	Black_cards             	[]BlackCard
+	White_cards             	[]WhiteCard
 	LastExtractedCard 			*Card
 }
 
@@ -24,7 +24,7 @@ type DeckData struct {
 	Metadata map[string]DeckMetadata	 `json:"metadata"`
 }
 
-func RemoveBlackCard(cards []*BlackCard, index int) []*BlackCard {
+func RemoveBlackCard(cards []BlackCard, index int) []BlackCard {
 	log.Printf("Removing %s...\n", cards[index].GetText())
 	cards[len(cards)-1], (cards)[index] = (cards)[index], cards[len(cards)-1]
 	cards = (cards)[:len(cards)-1]
@@ -32,7 +32,7 @@ func RemoveBlackCard(cards []*BlackCard, index int) []*BlackCard {
 }
 
 
-func RemoveWhiteCard(cards []*WhiteCard, index int) []*WhiteCard {
+func RemoveWhiteCard(cards []WhiteCard, index int) []WhiteCard {
 	log.Printf("Removing %s...\n", cards[index].GetText())
 	cards[len(cards)-1], (cards)[index] = (cards)[index], cards[len(cards)-1]
 	cards = (cards)[:len(cards)-1]
@@ -46,7 +46,7 @@ func (deck *Deck) NewRandomWhiteCard() *WhiteCard {
 	i := rand.Intn(len(deck.White_cards))
 	card := &deck.White_cards[i]
 	deck.White_cards = RemoveWhiteCard(deck.White_cards, i)
-	return *card
+	return card
 }
 
 func (deck *Deck) NewRandomBlackCard() *BlackCard {
@@ -57,5 +57,5 @@ func (deck *Deck) NewRandomBlackCard() *BlackCard {
 	card := &deck.Black_cards[i]
 	log.Printf("Removing card %s\n", card)
 	deck.Black_cards = RemoveBlackCard(deck.Black_cards, i)
-	return *card
+	return card
 }

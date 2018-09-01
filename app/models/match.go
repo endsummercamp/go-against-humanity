@@ -67,18 +67,18 @@ func(m *Match) NewDeck(){
 		log.Fatal(err)
 	}
 
-	var whitecards []*WhiteCard
-	var blackcards []*BlackCard
+	var whitecards []WhiteCard
+	var blackcards []BlackCard
 
 	for _, card := range v.White {
 		if deckAllowed(card.Deck) {
-			whitecards = append(whitecards, &card)
+			whitecards = append(whitecards, card)
 		}
 	}
 
 	for _, card := range v.Black {
 		if deckAllowed(card.Deck) {
-			blackcards = append(blackcards, &card)
+			blackcards = append(blackcards, card)
 		}
 	}
 
