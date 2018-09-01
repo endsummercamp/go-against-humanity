@@ -107,6 +107,13 @@ func (m *Match) GetRound() *Round {
 }
 
 func (m *Match) NewBlackCard() bool {
+
+	if m.State != MATCH_SHOW_RESULTS && m.State != MATCH_WAIT_USERS {
+		return false
+	}
+
+	m.State = MATCH_PLAYBALE
+
 	black_card := m.Deck.NewRandomBlackCard()
 	if black_card == nil {
 		return false

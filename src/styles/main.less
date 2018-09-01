@@ -288,6 +288,22 @@ div.card {
     }
 }
 
+button {
+    display: block;
+    padding: 10px;
+    border: 0px;
+    margin-top: 1rem;
+    .BoxShadowHelper(1);
+    width: 100%;
+    color: #FFF;
+    background-color: #3F51B5;
+    border-radius: 5px;
+
+    &:hover{
+        cursor: pointer;
+    }
+}
+
 form.form {
     @formWidth: 20rem;
     width: 20rem;
@@ -302,22 +318,6 @@ form.form {
         margin-left: 0;
         margin-bottom: 1rem;
         border: 1px solid #CCC;
-    }
-
-    button {
-        display: block;
-        padding: 10px;
-        border: 0px;
-        margin-top: 1rem;
-        .BoxShadowHelper(1);
-        width: 100%;
-        color: #FFF;
-        background-color: #3F51B5;
-        border-radius: 5px;
-
-        &:hover{
-            cursor: pointer;
-        }
     }
 
     label.form-label {
@@ -361,5 +361,23 @@ table.table{
         font-weight: bold;
         padding-right: 1em;
         text-align: left;
+    }
+}
+
+div.match-admin-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    margin: 10px;
+
+    button.admin-panel-new-blackcard{
+        .BoxShadowHelper(2);
+        margin-top: 0;
+        background-color: #000;
+        color: @white;
+
+        &:active {
+            .BoxShadowHelper(1);
+        }
     }
 }

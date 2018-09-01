@@ -164,3 +164,10 @@ socket.onmessage = function (e) {
 socket.onclose = function () {
     console.log("Socket closed.");
 }
+
+let bcb = document.getElementsByClassName("admin-panel-new-blackcard")[0];
+bcb.addEventListener("click", ()=>{
+    const req = new XMLHttpRequest();
+    req.open("PUT", `/admin/match/${MATCH_ID}/new_black_card`);
+    req.send();
+})

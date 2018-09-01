@@ -126,7 +126,7 @@ func (c App) JoinMatch(id int) revel.Result {
 	}
 
 	if !mm.IsJoinable(id){
-		c.Flash.Error(fmt.Sprintf("Unable to join %d. The match doesn't exists or already ended.", id))
+		c.Flash.Error(fmt.Sprintf("Unable to join %d. The match doesn't exists, is already started or already ended.", id))
 	}
 
 	mm.JoinMatch(id, user)
@@ -263,15 +263,28 @@ func (c App) MyCards() revel.Result {
 	return c.RenderJSON(matchPlayer.Cards)
 }
 
-func (c App) PickCard(matchId int, cardId int) revel.Result {
+func (c App) PickCard() revel.Result {
 	user := c.connected()
 
 	if user == nil {
 		return c.Redirect(App.Login)
 	}
 
+
+	matchId, err  := strconv.Atoi(c.Params.Route.Get("matchId"))
+
+	if err != nil {
+		return c.NotFound("Invalid MatchId")
+	}
+
 	if !mm.UserJoined(matchId, user) {
 		return c.Forbidden("Vbb.")
+	}
+
+	cardId, err := strconv.Atoi(c.Params.Route.Get("cardId"))
+
+	if err != nil {
+		return c.NotFound("Invalid CardId")
 	}
 
 	match := mm.GetMatchByID(matchId)
@@ -310,4 +323,31 @@ func (c App) PickCard(matchId int, cardId int) revel.Result {
 	round.AddCard(card)
 
 	return c.RenderJSON(nil)
+}
+
+func (c App) MatchNewBlackCard() revel.Result {
+	user := c.connected()
+	if user == nil {
+		return c.Redirect(App.Login)
+	}
+
+	if !user.IsAdmin() {
+		return c.Forbidden("Not allowed.")
+	}
+
+	matchId, err  := strconv.Atoi(c.Params.Route.Get("matchId"))
+	if err != nil {
+		return c.NotFound("Invalid MatchId")
+	}
+
+	log.Fatal(matchId)
+
+	match := mm.GetMatchByID(matchId)
+
+	if match == nil {
+		return c.NotFound("Match not found")
+	}
+
+	match.NewBlackCard()
+	return c.Result
 }

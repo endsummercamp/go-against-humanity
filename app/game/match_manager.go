@@ -35,6 +35,10 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 		return false
 	}
 
+	if match.State != models.MATCH_WAIT_USERS {
+		return false
+	}
+
 	if user.UserType == models.PlayerType {
 		for _, p := range match.Players {
 			if p.User.Id == user.Id {
