@@ -17,6 +17,10 @@
 @blockQuoteColor: #456;
 @openQuoteColor: #666;
 
+
+@errorColor: #c62828;
+@successColor: #9CCC65;
+
 html{
     background-color: @bodybgColor;
 }
@@ -280,5 +284,81 @@ div.card {
         text-align: center;
         align-self: flex-end;
         max-height: 2.2em;
+    }
+}
+
+form.form {
+    @formWidth: 20rem;
+    width: 20rem;
+    text-align: left;
+
+    input[type=text], input[type=password] {
+        @padding: 0.5rem;
+        width: @formWidth - (2*@padding);
+        border-radius: 2px;
+        height: 2em;
+        padding: @padding;
+        margin-left: 0;
+        margin-bottom: 1rem;
+        border: 1px solid #CCC;
+    }
+
+    button {
+        display: block;
+        padding: 10px;
+        border: 0px;
+        margin-top: 1rem;
+        .BoxShadowHelper(1);
+        width: 100%;
+        color: #FFF;
+        background-color: #3F51B5;
+        border-radius: 5px;
+
+        &:hover{
+            cursor: pointer;
+        }
+    }
+
+    label.form-label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 1rem;
+    }
+
+    label.radio-label {
+        margin-right: 1rem;
+    }
+}
+
+
+div.flash {
+    color: @white;
+    width: 100%;
+    min-height: 2em;
+    margin: 5px 0px 5px 0px;
+    border-radius: 2px;
+    text-align: center;
+
+    div.flash-inner {
+        padding: 10px;
+    }
+
+    &.flash-alert {
+        &.alert-success {
+            background-color: @successColor;
+        }
+
+        &.alert-danger {
+            background-color: @errorColor;
+        }
+    }
+}
+
+table.table{
+    width: 100%;
+    td.table-td-desc {
+        font-weight: bold;
+        padding-right: 1em;
+        text-align: left;
     }
 }

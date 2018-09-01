@@ -1,4 +1,4 @@
-package game
+package models
 
 type Game struct {
 	players []Player

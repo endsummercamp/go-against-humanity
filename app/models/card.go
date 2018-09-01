@@ -1,10 +1,7 @@
-package game
+package models
 
 import (
-	"log"
-	"math/rand"
 	"strings"
-	"time"
 )
 
 type Card interface {
@@ -59,32 +56,4 @@ func NewCard(color CardColor, text string) Card {
 		}
 	}
 	return c
-}
-
-func NewRandomCardFromDeck(color CardColor, deck *Deck) *Card {
-	rand.Seed(time.Now().Unix())
-
-	var card *Card = nil
-
-	switch color {
-	case BLACK_CARD:
-		if len(deck.Black_cards) == 0 {
-			return nil
-		}
-		i := rand.Intn(len(deck.Black_cards))
-		card = &deck.Black_cards[i]
-		deck.Black_cards = append(deck.Black_cards[:i], deck.Black_cards[i+1:]...)
-		return card
-	case WHITE_CARD:
-		if len(deck.White_cards) == 0 {
-			return nil
-		}
-		i := rand.Intn(len(deck.White_cards))
-		card = &deck.White_cards[i]
-		log.Printf("%#v\n", card)
-		deck.White_cards = append(deck.White_cards[:i], deck.White_cards[i+1:]...)
-		return card
-	default:
-		return nil
-	}
 }

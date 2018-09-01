@@ -6,9 +6,9 @@
     {{ else }}
  <div class="card card-white">
     {{ end }}
-    <div class="card-top{{ if long_text $element.Text }} small-text{{end}}">
+    <div class="card-top{{ if card_text $element | long_text}} small-text{{end}}">
         <div class="card-content">
-            {{ card_dash $element.Text | raw }}
+            {{ card_dash $element | raw }}
         </div>
     </div>
 

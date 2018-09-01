@@ -1,9 +1,11 @@
 package app
 
 import (
-	"github.com/ESCah/go-against-humanity/app/game"
+	"github.com/ESCah/go-against-humanity/app/models"
 	"github.com/revel/revel"
+	"math/rand"
 	"strings"
+	"time"
 )
 
 var (
@@ -36,17 +38,31 @@ func init() {
 		return strings.Replace(input, from, to, -1)
 	}
 
-	revel.TemplateFuncs["card_dash"] = func(input string) string {
-		return strings.Replace(input, "_", "<div class=\"long-dash\"></div>", -1)
+	revel.TemplateFuncs["card_text"] = func(input models.Card) string {
+		return input.GetText()
 	}
 
-	revel.TemplateFuncs["card_black"] = func(input game.Card) bool {
-		return input.GetColor() == game.BLACK_CARD
+	revel.TemplateFuncs["card_dash"] = func(input models.Card) string {
+		return strings.Replace(input.GetText(), "_", "<div class=\"long-dash\"></div>", -1)
+	}
+
+	revel.TemplateFuncs["card_black"] = func(input models.Card) bool {
+		return input.GetColor() == models.BLACK_CARD
 	}
 
 	revel.TemplateFuncs["long_text"] = func(input string) bool {
 		return len(input) > 100
 	}
+
+	revel.TemplateFuncs["is_player"] = func(user models.User) bool {
+		return user.UserType == models.PlayerType
+	}
+
+	revel.TemplateFuncs["format_date"] = func(date time.Time) string {
+		return date.Format("2 Jan 2006, 15:04:01")
+	}
+
+	rand.Seed(time.Now().Unix())
 
 	// Register startup functions with OnAppStart
 	// revel.DevMode and revel.RunMode only work inside of OnAppStart. See Example Startup Script

@@ -9,11 +9,17 @@ module:testrunner
 
 GET     /                                       App.Index
 GET     /login                                  App.Login
+GET     /logout                                 App.Logout
 GET     /register                               App.Register
 GET     /card                                   App.Card
-GET     /round/new                              App.NewRound
 GET     /deck                                   App.GetDeck
+GET     /matches                                App.Matches
+GET     /admin                                  App.Admin
+GET     /admin/match/new                        App.NewMatch
+GET     /admin/users                            App.AdminUsers
 GET     /gioco                                  App.Gioco
+
+GET     /matches/join/*id                       App.JoinMatch
 
 POST    /login                                  App.PostLogin
 POST    /register                               App.PostRegister

@@ -1,0 +1,36 @@
+{{set . "title" "Matches"}} 
+{{template "header.html" .}}
+
+<h1>Current Matches</h1>
+<div class="matches-container">
+    {{ range $element := .matches }}
+        <div class="matches-match match">
+            <h2>Match {{ $element.Id }}</h2>
+            <table class="table table-match">
+                <tr>
+                    <td class="table-td-desc">Created on</td>
+                    <td class="table-td-value">{{ format_date $element.CreatedOn }}</td>
+                </tr>
+                <tr>
+                    <td class="table-td-desc">Players</td>
+                    <td class="table-td-value">
+                        {{ if eq (len $element.Players) 0 }}
+                        No players
+                        {{ else }}
+                        <ul>
+                        {{ range $element.Players }}
+                            <li>{{ .Identifier }} ({{ .Points }})</li>
+                        {{ end }}
+                        </ul>
+                        {{ end }}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="table-td-desc">Join</td>
+                    <td class="table-td-value"><a href="/matches/join/{{ $element.Id }}">Join the match!</a></td>
+                </tr>
+            </table>
+        </div>
+    {{ end }}
+</div>
+{{template "footer.html" .}}

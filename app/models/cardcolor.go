@@ -1,5 +1,5 @@
 //go:generate stringer -type=CardColor
-package game
+package models
 
 type CardColor int
 
