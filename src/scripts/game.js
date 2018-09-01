@@ -70,7 +70,7 @@ class AnswersRow extends React.Component {
         const req = new XMLHttpRequest();
         req.open("PUT", `/match/${MATCH_ID}/vote_card/${id}`);
         req.send();
-        canVote = false;
+        // canVote = false;
         return true;
     }
     render() {
