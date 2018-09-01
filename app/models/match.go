@@ -70,14 +70,20 @@ func(m *Match) NewDeck(){
 	var whitecards []WhiteCard
 	var blackcards []BlackCard
 
+	i := 0
+
 	for _, card := range v.White {
 		if deckAllowed(card.Deck) {
+			card.Id = i
+			i++
 			whitecards = append(whitecards, card)
 		}
 	}
 
 	for _, card := range v.Black {
 		if deckAllowed(card.Deck) {
+			card.Id = i
+			i++
 			blackcards = append(blackcards, card)
 		}
 	}
