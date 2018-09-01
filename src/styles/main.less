@@ -22,6 +22,7 @@
 @successColor: #9CCC65;
 
 @darkGray: #607D8B;
+@endVotingColor: #673AB7;
 
 html{
     background-color: @bodybgColor;
@@ -376,6 +377,16 @@ div.match-admin-panel {
         .BoxShadowHelper(2);
         margin-top: 0;
         background-color: #000;
+        color: @white;
+
+        &:active {
+            .BoxShadowHelper(1);
+        }
+    }
+
+    button.admin-panel-end-voting {
+        .BoxShadowHelper(2);
+        background-color: @endVotingColor;
         color: @white;
 
         &:active {

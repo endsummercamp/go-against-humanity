@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"strconv"
+	"time"
 )
 
 func hashPassword(password string) string {
@@ -360,8 +361,50 @@ func (c App) MatchNewBlackCard() revel.Result {
 		NewCard: card,
 		Duration: 120, // Timeout in seconds
 	}
+
+	go func(){
+		time.Sleep(time.Duration(msg.Duration) * time.Second)
+		match.State = models.MATCH_VOTING
+		msg := Event {
+			Name: "voting",
+		}
+		for _, conn := range ws.rooms[matchId] {
+			conn.WriteJSON(msg)
+		}
+	}()
+
 	for _, conn := range ws.rooms[matchId] {
 		conn.WriteJSON(msg)
 	}
 	return c.RenderJSON(true)
+}
+
+func (c App) EndVoting() revel.Result {
+	user := c.connected()
+
+	if user == nil {
+		return c.Redirect(App.Login)
+	}
+
+
+	matchId, err  := strconv.Atoi(c.Params.Route.Get("matchId"))
+
+	if err != nil {
+		return c.NotFound("Invalid MatchId")
+	}
+
+	match := mm.GetMatchByID(matchId)
+	if match == nil {
+		return c.NotFound("Match not found.")
+	}
+
+	match.EndVote()
+	msg := Event {
+		Name: "show_results",
+	}
+	for _, conn := range ws.rooms[matchId] {
+		conn.WriteJSON(msg)
+	}
+
+	return c.Render()
 }

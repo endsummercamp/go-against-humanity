@@ -195,6 +195,13 @@ bcb.addEventListener("click", ()=>{
     req.send();
 });
 
+let endv = document.getElementsByClassName("admin-panel-end-voting")[0];
+endv.addEventListener("click", () => {
+    const req = new XMLHttpRequest();
+    req.open("PUT", `/admin/match/${MATCH_ID}/end_voting`);
+    req.send();
+});
+
 function stopTimer() {
     clearInterval(timer_interval);
     timer.textContent = "";
