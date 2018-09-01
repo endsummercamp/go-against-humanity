@@ -1,4 +1,4 @@
-package app
+package controllers
 
 import (
 	"fmt"
@@ -25,7 +25,11 @@ type Event struct {
 	Totals []Total
 }
 
-func echo(conn *websocket.Conn) {
+type SocketServer struct {
+
+}
+
+func (s *SocketServer) onConnect(conn *websocket.Conn, matchID string) {
 	m := Event{
 		Name: "new_game",
 	}
@@ -69,20 +73,29 @@ func echo(conn *websocket.Conn) {
 	}
 }
 
-func wsHandler(w http.ResponseWriter, r *http.Request) {
+func (s *SocketServer) wsHandler(w http.ResponseWriter, r *http.Request) {
+	matchID := r.URL.Query().Get("match")
+	if matchID == "" {
+		http.Error(w, "The 'match' parameter is required", http.StatusBadRequest)
+		return
+	}
 	conn, err := websocket.Upgrade(w, r, w.Header(), 1024, 1024)
 	if err != nil {
 		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
+		return
 	}
-	go echo(conn)
+	go s.onConnect(conn, matchID)
 }
 
-func wsMain() {
-	http.HandleFunc("/ws", wsHandler)
+func (s *SocketServer) Start() int {
+	http.HandleFunc("/ws", s.wsHandler)
 	fmt.Println("Websocket server listening on :8080.")
 
-	err := http.ListenAndServe(":8080", nil)
-	if err != nil {
-		panic(err)
-	}
+	go func() {
+		err := http.ListenAndServe(":8080", nil)
+		if err != nil {
+			panic(err)
+		}
+	}()
+	return 0 // So that it can be used as "var _ = s.Start()"
 }

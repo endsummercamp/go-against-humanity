@@ -76,7 +76,8 @@ const whiterowDiv = document.getElementById("react-whiterow");
 ReactDOM.render(<WhiteRow answers={[]} />, whiterowDiv);
 
 const whiteRow = document.getElementById("whiterow");
-const socket = new WebSocket("ws://localhost:8080/ws");
+// TODO: cambiare URL e numero match
+const socket = new WebSocket("ws://localhost:8080/ws?match=0");
 socket.onopen = function() {
     console.log("Opened socket.");
 };
