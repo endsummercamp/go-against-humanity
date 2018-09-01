@@ -143,7 +143,6 @@ socket.onmessage = function (e) {
         if (IS_PLAYER) {
             const req = new XMLHttpRequest();
             req.addEventListener("load", () => {
-                console.log(req.responseText);
                 const resp = JSON.parse(req.responseText);
                 const cards = resp.map(item => ({text: item.text, ID: item.Id}));
                 console.log("My cards:", cards);
@@ -152,18 +151,13 @@ socket.onmessage = function (e) {
             req.open("GET", `/mycards?match_id=${MATCH_ID}`);
             req.send();
         }
+        if (data.SecondsUntilFinishPicking != 0) {
+            ShowBlackCard(data.SecondsUntilFinishPicking, data.InitialBlackCard.text);
+        }
         break;
     case "new_black":
-        canPickCard = true;
-        seconds_left = data.Duration;
-        timer_interval = setInterval(() => {
-            const minutes = String(Math.floor(seconds_left / 60)).padStart(2, '0');
-            const seconds = String(seconds_left % 60).padStart(2, '0');
-            timer.textContent = minutes + ":" + seconds;
-            seconds_left--;
-        }, 1000);
-        setTimeout(stopTimer, data.Duration * 1000);
-        ReactDOM.render(<BlackRow card={<Card text={data.NewCard.text} black />}/>, blackrowDiv);
+        console.log("new_black", data.Duration, data.NewCard.text);
+        ShowBlackCard(data.Duration, data.NewCard.text);
         break;
     case "new_white":
         cardText = getCardText(data)
@@ -184,6 +178,20 @@ socket.onmessage = function (e) {
         alert("Unknown event " + eventName);
     }
 }
+
+// Can be used to start a new game, or to "resume" an existing one
+function ShowBlackCard(seconds_left, black_card_text) {
+    canPickCard = true;
+    timer_interval = setInterval(() => {
+        const minutes = String(Math.floor(seconds_left / 60)).padStart(2, '0');
+        const seconds = String(seconds_left % 60).padStart(2, '0');
+        timer.textContent = minutes + ":" + seconds;
+        seconds_left--;
+    }, 1000);
+    setTimeout(stopTimer, seconds_left * 1000);
+    ReactDOM.render(<BlackRow card={<Card text={black_card_text} black />}/>, blackrowDiv);
+}
+
 socket.onclose = function () {
     console.log("Socket closed.");
 }

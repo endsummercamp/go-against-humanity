@@ -119,8 +119,8 @@ func (m *Match) NewBlackCard() *BlackCard {
 		return nil
 	}
 	m.Rounds = append(m.Rounds, Round{
-		blackCard,
-		map[*WhiteCard][]*Juror{},
+		BlackCard:      blackCard,
+		wcs:            map[*WhiteCard][]*Juror{},
 	})
 
 	return blackCard

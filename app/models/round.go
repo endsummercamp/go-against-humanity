@@ -1,8 +1,11 @@
 package models
 
+import "time"
+
 type Round struct {
-	bc *BlackCard
-	wcs map[*WhiteCard][]*Juror
+	BlackCard *BlackCard
+	TimeFinishPick time.Time
+	wcs       map[*WhiteCard][]*Juror
 }
 
 func (r *Round) AddCard(card *WhiteCard) bool {

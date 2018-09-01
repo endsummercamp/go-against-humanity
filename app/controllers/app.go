@@ -362,6 +362,8 @@ func (c App) MatchNewBlackCard() revel.Result {
 		Duration: 120, // Timeout in seconds
 	}
 
+	match.GetRound().TimeFinishPick = time.Now()
+
 	go func(){
 		time.Sleep(time.Duration(msg.Duration) * time.Second)
 		match.State = models.MATCH_VOTING
