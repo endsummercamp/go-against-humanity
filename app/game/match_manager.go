@@ -17,7 +17,7 @@ func(mm *MatchManager) GetMatches() []*models.Match {
 func(mm *MatchManager) NewMatch() *models.Match {
 	mm.counter++
 
-	new_match := models.NewMatch(mm.counter, []models.Player{})
+	new_match := models.NewMatch(mm.counter, []*models.Player{})
 	new_match.NewDeck()
 	fmt.Printf("NewMatch: deck is %#v\n", new_match.Deck)
 	mm.matches = append(mm.matches, new_match)
@@ -59,7 +59,7 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 		player.User = user
 		player.Cards = cards
 
-		match.Players = append(match.Players, player)
+		match.Players = append(match.Players, &player)
 	} else {
 		for _, j := range match.Jury {
 			if j.User.Id == user.Id {
@@ -71,7 +71,7 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 			User: user,
 		}
 
-		match.Jury = append(match.Jury, juror)
+		match.Jury = append(match.Jury, &juror)
 	}
 
 	return true

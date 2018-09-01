@@ -12,8 +12,8 @@ import (
 
 type Match struct {
 	Id        int
-	Players   []Player
-	Jury      []Juror
+	Players   []*Player
+	Jury      []*Juror
 	CreatedOn time.Time
 	Rounds    []Round
 	State     MatchState
@@ -30,7 +30,7 @@ const (
 	MATCH_END
 )
 
-func NewMatch(id int, players []Player) *Match {
+func NewMatch(id int, players []*Player) *Match {
 	m := new(Match)
 	m.Deck = nil
 	m.Id = id
@@ -100,7 +100,7 @@ func (m *Match) NewDeck() {
 func (m *Match) GetPlayerByID(id int64) *Player {
 	for _, player := range m.Players {
 		if player.User.Id == id {
-			return &player
+			return player
 		}
 	}
 	return nil

@@ -325,7 +325,17 @@ func (c App) PickCard() revel.Result {
 		return c.NotFound("Card not found.")
 	}
 
+	for _, c := range player.Cards {
+		log.Printf("P%d, C: %d\n", player.User.Id, c.Id)
+	}
+
 	player.Cards = append(player.Cards[:foundId], player.Cards[foundId+1:]...)
+
+	log.Printf("-----------")
+
+	for _, c := range player.Cards {
+		log.Printf("P%d, C: %d\n", player.User.Id, c.Id)
+	}
 
 	result := round.AddCard(card)
 
@@ -374,6 +384,15 @@ func (c App) MatchNewBlackCard() revel.Result {
 	go func() {
 		time.Sleep(time.Duration(msg.Duration) * time.Second)
 		match.State = models.MATCH_VOTING
+
+		// Removing cards from Player's deck
+		/*for c, _ := range round.Wcs {
+			for _, p := range match.Players {
+				for _, uc :=
+			}
+		}*/
+
+
 		msg := Event{
 			Name: "voting",
 		}
@@ -422,8 +441,11 @@ func (c App) EndVoting() revel.Result {
 	ws.BroadcastToRoom(matchId, msg)
 
 	for _, player := range match.Players {
+		log.Printf("Range over players... (%d - %d)", player.User.Id, len(player.Cards))
 		if len(player.Cards) < 10 {
-			player.Cards = append(player.Cards, match.Deck.NewRandomWhiteCard())
+			whitecard := match.Deck.NewRandomWhiteCard()
+			log.Printf("Whitecard player %d : %#v", &player.User.Id, whitecard)
+			player.Cards = append(player.Cards, whitecard)
 		}
 	}
 
@@ -510,7 +532,7 @@ func (c App) VoteCard() revel.Result {
 
 	for _, j := range match.Jury {
 		if j.User.Id == user.Id {
-			juror = &j
+			juror = j
 			break
 		}
 	}
