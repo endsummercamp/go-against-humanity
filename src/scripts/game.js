@@ -76,7 +76,7 @@ class AnswersRow extends React.Component {
 class MyCardsRow extends React.Component {
     submitCard(id) {
         const req = new XMLHttpRequest();
-        req.open("UPDATE", `/match/${MATCH_ID}/pick_card/${id}`);
+        req.open("PUT", `/match/${MATCH_ID}/pick_card/${id}`);
         req.send();
     }
     render() {
