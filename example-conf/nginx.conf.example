@@ -7,14 +7,14 @@ server {
 
     # For others
     location / {
-        return 301 http://escah.local/;
+        return 301 http://escah.antani.cf/;
     }
  }
 
 server {
     listen       80;
     listen       [::]:80;
-    server_name  escah.local;
+    server_name  escah.antani.cf;
 
     gzip on;
 

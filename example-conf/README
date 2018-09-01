@@ -1,0 +1,9 @@
+Troubleshooting
+
+hostapd not starting:
+- turn off wifi from nm
+- rfkill unblock wlan
+- /etc/init.d/hostapd restart || systemctl restart hostapd.service
+
+dnsmasq not starting:
+- ifconfig your-wlan-if up 192.168.1.1
