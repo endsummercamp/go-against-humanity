@@ -375,7 +375,7 @@ func (c App) MatchNewBlackCard() revel.Result {
 	msg := Event{
 		Name:     "new_black",
 		NewCard:  card,
-		Duration: 5, // Timeout in seconds
+		Duration: 20, // Timeout in seconds
 	}
 
 	round := match.GetRound()
