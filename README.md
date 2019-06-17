@@ -1,17 +1,22 @@
-# Welcome to Revel
+# Go Against Humanity
 
-A high-productivity web framework for the [Go language](http://www.golang.org/).
+A Cards Against Humanity web game written in [Go](http://www.golang.org/).
+The game is intended to be played with multiple players, divided into 
+"players" and "jurors". The card that gets most votes wins.
 
+Written in 3 days during the [End Summer Camp](https://www.endsummercamp.org). Meant to be played for a good laugh together.
+
+![Cards Against Humanity](screenshots/1.png)
 
 ### Start the web server:
 
-   revel run myapp
+   revel run
 
-### Go to http://localhost:9000/ and you'll see:
+### Tell the players / jurors to go to http://<your-ip>:9000/ and enjoy the game!
 
-    "It works"
 
-## Code Layout
+## Based on Revel
+### Code Layout
 
 The directory structure of a generated Revel application:
 
@@ -34,7 +39,7 @@ The directory structure of a generated Revel application:
     tests/            Test suites
 
 
-## Help
+### Help
 
 * The [Getting Started with Revel](http://revel.github.io/tutorial/gettingstarted.html).
 * The [Revel guides](http://revel.github.io/manual/index.html).
