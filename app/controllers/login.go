@@ -63,5 +63,5 @@ func DoLogin(c echo.Context) error {
 	s.Values["user"] = v[0].(*models.User);
 
 	_ = s.Save(c.Request(), c.Response())
-	return c.Redirect(http.StatusFound, "/")
+	return c.Redirect(http.StatusSeeOther, "/")
 }

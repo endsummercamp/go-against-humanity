@@ -53,7 +53,7 @@ func DoSignUp(c echo.Context) error {
 	/* c.String(http.StatusOK, fmt.Sprintf("U: %s, P: %s, T: %s", username, password,
 	user_type)) */
 
-	_ = c.Redirect(http.StatusTemporaryRedirect, "/")
+	_ = c.Redirect(http.StatusSeeOther, "/")
 	return nil
 }
 
