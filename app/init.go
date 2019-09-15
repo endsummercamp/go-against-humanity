@@ -1,4 +1,4 @@
-package app
+package main
 
 import (
 	"github.com/ESCah/go-against-humanity/app/models"

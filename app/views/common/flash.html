@@ -1,0 +1,15 @@
+{{if .Success}}
+<div class="flash flash-alert alert-success">
+    <div class="flash-inner">
+        {{.Success}}
+    </div>
+</div>
+{{end}}
+
+{{if .Error}}
+<div class="flash flash-alert alert-danger">
+	<div class="flash-inner">
+	      {{.Error}}
+  </div>
+</div>
+{{end}}

@@ -1,5 +1,5 @@
-{{set . "title" "Card"}}
-{{template "header.html" .}}
+{{define "title"}}Card{{end}}
+{{template "header.html" .Header}}
 {{ range $element := .cards }}
     {{ if card_black $element }}
 <div class="card card-black">
@@ -8,7 +8,7 @@
     {{ end }}
     <div class="card-top{{ if card_text $element | long_text}} small-text{{end}}">
         <div class="card-content">
-            {{ card_dash $element | raw }}
+            {{ card_dash $element }}
         </div>
     </div>
 

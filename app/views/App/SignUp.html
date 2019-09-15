@@ -1,10 +1,10 @@
-{{set . "title" "Register"}}
-{{template "header.html" .}}
+{{define "title"}}Sign Up{{end}}
+{{template "header.html" .Header}}
 
 <h1>Registration</h1>
-<form method="POST" action="/register" class="form form-registration">
-    {{if .error}}
-        <strong>{{ .error }}</strong>
+<form method="POST" action="/signup" class="form form-registration">
+    {{if .Error}}
+        <strong>{{ .Error }}</strong>
     {{end}}
     <div>
         <label for="inputUsername" class="form-label">Username</label>

@@ -35,14 +35,14 @@ type App struct {
 
 func (c App) connected() *models.User {
 	if username, ok := c.Session["user"]; ok {
-		return c.getUser(username)
+		return  c.getUser(username.(string))
 	}
 	return nil
 }
 
 func (c App) isAdmin() bool {
 	if username, ok := c.Session["user"]; ok {
-		return c.getUser(username).IsAdmin()
+		return  c.getUser(username.(string)).IsAdmin()
 	}
 	return false
 }
@@ -51,9 +51,9 @@ func (c App) initDeck() {
 	deck = new(models.Deck)
 }
 
-func (c App) getUser(username string) *models.User {
+func (c App) getUser(username interface{}) *models.User {
 	user := models.User{}
-	DbMap.SelectOne(&user, "SELECT * FROM users WHERE username=?", username)
+	_ = DbMap.SelectOne(&user, "SELECT * FROM users WHERE username=?", username)
 
 	return &user
 }
@@ -118,11 +118,12 @@ func (c App) Logout() revel.Result {
 	}
 
 	c.Flash.Success("Logged out successfully")
-	c.Session = make(revel.Session)
+	delete(c.Session, "REVEL_SESSION")
 	return c.Redirect(App.Login)
 }
 
-func (c App) JoinMatch(id int) revel.Result {
+func (c App) JoinMatch(id int) revel.
+	Result {
 	user := c.connected()
 
 	if user == nil {

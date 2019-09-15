@@ -1,8 +1,8 @@
 package game
 
 import (
-	"github.com/ESCah/go-against-humanity/app/models"
 	"fmt"
+	"github.com/ESCah/go-against-humanity/app/models"
 )
 
 type MatchManager struct {
