@@ -1,16 +1,14 @@
 {{define "title"}}Home{{end}}
 {{template "header.html" .Header}}
+{{template "navbar.html" .}}
 
 <section class="has-text-centered">
 	<h1 class="title">ESC against Humanity</h1>
-	<img src="public/scripts/7fbf6dd4c0e425be645022e0b69f62f7.png" style="width: 5em" /> <!-- todo: fix path -->
+	<img src="public/img/ESC-logo-small.png" style="width: 5em" /> <!-- todo: fix path -->
 	<p><strong>{{ .User.Username }}</strong> - {{ if is_player .User }}Player{{ else }}Juror{{ end }}{{ if is_admin .User }}, admin{{ end }}</p>
 </section>
 
 <br>
 
 {{template "flash.html" .Flash}}
-
-{{ template "menu.html" . }}
-
 {{template "footer.html" .}}

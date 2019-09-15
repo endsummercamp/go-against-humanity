@@ -1,5 +1,6 @@
 node_modules
-public/
+public/*
+!public/img/
 .idea/
 
 # App files
