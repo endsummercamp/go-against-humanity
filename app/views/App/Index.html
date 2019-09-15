@@ -1,16 +1,36 @@
 {{define "title"}}Home{{end}}
 {{template "header.html" .Header}}
-<div style="background-color:#A9F16C">
-  <h1>Welcome {{ .User.Username }}</h1>
-  <p>{{ if is_player .User }}Player{{ else }}Juror{{ end }}</p>
-</div>
+
+<section class="has-text-centered" style="padding-top: 2em;">
+	<h1 class="title">ESC against Humanity</h1>
+	<img src="public/scripts/7fbf6dd4c0e425be645022e0b69f62f7.png" style="width: 5em" /> <!-- todo: fix path -->
+	<p><strong>{{ .User.Username }}</strong> - {{ if is_player .User }}Player{{ else }}Juror{{ end }}{{ if is_admin .User }}, admin{{ end }}</p>
+</section>
+
+<br>
 
 {{template "flash.html" .Flash}}
 
-<ul>
-  {{ if is_admin .User }} <li><a href="/admin">Admin</a></li> {{ end }}
-  <li><a href="/matches">Matches</a></li>
-  <li><a href="/logout">Log out</a></li>
-</ul>
+<nav class="panel">
+	<!-- Todo: JS to make the panel work -->
+	{{ if is_admin .User }}
+	<p class="panel-tabs">
+		<a class="is-active">User</a>
+		<a>Admin tools</a>
+	</p>
+	{{ end }}
+	<a class="panel-block">
+		<span class="panel-icon">
+			<i class="fa fa-gamepad"></i>
+		</span>
+		Current match
+	</a>
+	<a class="panel-block">
+		<span class="panel-icon">
+			<i class="fa fa-times-circle"></i>
+		</span>
+		Log out
+	</a>
+</nav>
 
 {{template "footer.html" .}}
