@@ -1,3 +1,8 @@
+import React, { Component } from "react"
+import ReactDOM from "react-dom"
+
+import '@/styles/main.less'
+
 if (!window.WebSocket) {
     alert("Your browser does not support WebSockets!")
 }
@@ -6,7 +11,7 @@ function dashFix(content){
     return content.replace(/_/g, '<div class="long-dash"></div>')
 }
 
-class Card extends React.Component {
+class Card extends Component {
     render() {
         // https://stackoverflow.com/a/6040258
         // https://stackoverflow.com/a/8541575
@@ -51,7 +56,7 @@ class Card extends React.Component {
     }
 }
 
-class BlackRow extends React.Component {
+class BlackRow extends Component {
     render() {
         return <div className="flex" id="blackrow">
             {("card" in this.props) ?
@@ -64,7 +69,7 @@ class BlackRow extends React.Component {
 
 let canVote = false;
 
-class AnswersRow extends React.Component {
+class AnswersRow extends Component {
     tryVote(id) {
         if (IS_PLAYER) {
             alert("You're a player, you cannot vote!");
@@ -100,7 +105,7 @@ class AnswersRow extends React.Component {
     }
 }
 
-class MyCardsRow extends React.Component {
+class MyCardsRow extends Component {
     submitCard(id) {
         if (!canPickCard) {
             alert("You cannot pick a card at this time!");
@@ -162,7 +167,7 @@ let seconds_left;
 socket.onmessage = function (e) {
     console.log("Received", e.data);
     const data = JSON.parse(e.data);
-    const { Name: eventName } = data 
+    const { Name: eventName } = data
     let cardText;
     switch (eventName) {
     case "join_successful":
