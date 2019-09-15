@@ -109,7 +109,7 @@ module.exports = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: "style.css"
+            filename: "../styles/main.css"
         }),
         new CopyPlugin([
             {from: 'src/images/', to: 'public/images/'}
