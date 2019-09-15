@@ -1,8 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/ESCah/go-against-humanity/app/utils"
 	"github.com/gorilla/sessions"
+	"log"
 	"net/http"
 
 	"github.com/ESCah/go-against-humanity/app/models"
@@ -34,11 +36,13 @@ func Login(c echo.Context) error {
 
 func DoLogin(c echo.Context) error {
 	s, _ := session.Get("session", c)
+
 	s.Options = &sessions.Options{
 		Path:     "/",
-		MaxAge:   86400 * 7,
+		MaxAge:   3600,
 		HttpOnly: true,
 	}
+
 	username := c.FormValue("username")
 	pwhash := utils.HashPassword(c.FormValue("password"))
 
@@ -47,8 +51,7 @@ func DoLogin(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	var user *models.User
-	v, err := cc.Db.Select(&user, "SELECT * FROM users WHERE username=? AND pwhash=?", username, pwhash)
+	v, err := cc.Db.Select(models.User{}, "SELECT * FROM users WHERE username=? AND pwhash=?", username, pwhash)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			s.AddFlash("Invalid username or password")
@@ -60,8 +63,12 @@ func DoLogin(c echo.Context) error {
 		}
 	}
 
-	s.Values["user"] = v[0].(*models.User);
+	s.Values["user"] = username
+	fmt.Printf("Logging in as %s\n", v[0].(*models.User).Username)
 
-	_ = s.Save(c.Request(), c.Response())
+	err = s.Save(c.Request(), c.Response())
+	if err != nil {
+		log.Fatal(err)
+	}
 	return c.Redirect(http.StatusSeeOther, "/")
 }

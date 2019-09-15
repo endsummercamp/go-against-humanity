@@ -2,15 +2,14 @@ package main
 
 import (
 	"fmt"
-	"html/template"
-	"io"
-	"net/http"
-
 	"github.com/ESCah/go-against-humanity/app/controllers"
 	"github.com/ESCah/go-against-humanity/app/utils"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
+	"html/template"
+	"io"
+	"net/http"
 )
 
 type Template struct {
@@ -54,6 +53,8 @@ func main() {
 			return next(cc)
 		}
 	})
+
+
 
 	e.Static("/public", "public")
 	e.GET("/login", controllers.Login)
