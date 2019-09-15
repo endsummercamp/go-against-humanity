@@ -45,6 +45,16 @@ func main() {
 	e.Renderer = t
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
+	/* Custom Context */
+
+	e.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(c echo.Context) error {
+			db := utils.InitDB()
+			cc := &utils.CustomContext{Context: c, Db: db}
+			return next(cc)
+		}
+	})
+
 	e.Static("/public", "public")
 	e.GET("/login", controllers.Login)
 	e.POST("/login", controllers.DoLogin)

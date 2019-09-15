@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"fmt"
+	"github.com/labstack/echo-contrib/session"
+	"log"
 	"net/http"
 
 	"github.com/ESCah/go-against-humanity/app/models"
@@ -11,6 +13,7 @@ import (
 )
 
 func DoSignUp(c echo.Context) error {
+	s, err := session.Get("session", c)
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 	userType := c.FormValue("user_type")
@@ -28,21 +31,24 @@ func DoSignUp(c echo.Context) error {
 
 	fmt.Printf("%#v\n", user)
 
-	/*count, err := DbMap.SelectInt("SELECT COUNT(*) FROM users WHERE username=?", username)
+	cc := c.(*utils.CustomContext)
+
+	count, err := cc.Db.SelectInt("SELECT COUNT(*) FROM users WHERE username=?", username)
 	if err != nil {
 		log.Panic(err)
 	}
 	if count != 0 {
-		c.Flash.Error("Another user with that username already exists.")
-		c.FlashParams()
-		return c.Redirect(App.Login)
+		return c.Render(http.StatusOK, "SignUp.html", data.SignupPageData{
+			Flash: data.FlashData{
+				Error: "Another user with that username already exists.",
+			},
+		})
 	}
-	err = DbMap.Insert(&user)
+	err = cc.Db.Insert(&user)
 	if err != nil {
 		panic(err)
 	}
-	c.Flash.Success("Registration completed! You may now login.")
-	c.FlashParams()
+	s.AddFlash("Registration completed! You may now login.", "success")
 
 	/* c.String(http.StatusOK, fmt.Sprintf("U: %s, P: %s, T: %s", username, password,
 	user_type)) */
