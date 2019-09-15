@@ -7,10 +7,6 @@
 
 {{template "flash.html" .Flash}}
 
-<ul>
-  {{ if is_admin .User }} <li><a href="/admin">Admin</a></li> {{ end }}
-  <li><a href="/matches">Matches</a></li>
-  <li><a href="/logout">Log out</a></li>
-</ul>
+{{ template "menu.html" . }}
 
 {{template "footer.html" .}}

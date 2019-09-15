@@ -8,7 +8,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-func Index(c echo.Context) error {
+func Admin(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")
 	}
@@ -20,7 +20,11 @@ func Index(c echo.Context) error {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	return c.Render(http.StatusOK, "Index.html", data.IndexPageData{
+	if !user.Admin {
+		return c.NoContent(http.StatusForbidden)
+	}
+
+	return c.Render(http.StatusOK, "Admin.html", data.AdminPageData{
 		User: *user,
 	})
 }
