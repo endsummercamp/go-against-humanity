@@ -1,14 +1,14 @@
-{{$title:="Home"}}
-{{template "header.html" .}}
+{{define "title"}}Home{{end}}
+{{template "header.html" .Header}}
 <div style="background-color:#A9F16C">
   <h1>It works!</h1>
-  <p>{{ if is_player .user }}Player{{ else }}Juror{{ end }}</p>
+  <p>{{ if is_player .User }}Player{{ else }}Juror{{ end }}</p>
 </div>
 
-{{template "flash.html" .}}
+{{template "flash.html" .Flash}}
 
 <ul>
-  {{ if is_admin .user }} <li><a href="/admin">Admin</a></li> {{ end }}
+  {{ if is_admin .User }} <li><a href="/admin">Admin</a></li> {{ end }}
   <li><a href="/matches">Matches</a></li>
   <li><a href="/logout">Log out</a></li>
 </ul>

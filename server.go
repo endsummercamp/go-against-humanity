@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/ESCah/go-against-humanity/app/controllers"
 	"github.com/ESCah/go-against-humanity/app/utils"
@@ -42,7 +41,7 @@ func main() {
 		templates: template.Must(template.New("").Funcs(utils.FuncMap).ParseGlob("app/views/**/*.html")),
 	}
 
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))))
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte("SECRET"))))
 	e.Renderer = t
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
@@ -51,5 +50,8 @@ func main() {
 	e.POST("/login", controllers.DoLogin)
 	e.GET("/signup", controllers.SignUp)
 	e.POST("/signup", controllers.DoSignUp)
+	e.GET("/logout", controllers.Logout)
+
+	e.GET("/", controllers.Index)
 	e.Logger.Debug(e.Start(":1323"))
 }
