@@ -9,22 +9,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/ESCah/go-against-humanity/app/controllers"
 	"github.com/ESCah/go-against-humanity/app/models"
-	"github.com/labstack/echo"
-
-	"crypto/sha256"
-
-	"encoding/hex"
-
 	"github.com/gorilla/sessions"
+	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
 )
-
-func hashPassword(password string) string {
-	hasher := sha256.New()
-	io.WriteString(hasher, password)
-	return hex.EncodeToString(hasher.Sum(nil))
-}
 
 type Template struct {
 	templates *template.Template
@@ -74,81 +64,6 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 	c.String(http.StatusInternalServerError, err.Error())
 }
 
-type HeaderData struct {
-	MoreStyles  []string
-	MoreScripts []string
-}
-
-type FlashData struct {
-	Success string
-	Error   string
-}
-
-type LoginPageData struct {
-	Header HeaderData
-	Flash  FlashData
-}
-
-type SignupPageData struct {
-	Header HeaderData
-	Error  string
-}
-
-func Login(c echo.Context) error {
-	return c.Render(http.StatusOK, "Login.html", LoginPageData{})
-}
-
-func DoLogin(c echo.Context) error {
-	s, _ := session.Get("session", c)
-	s.Save(c.Request(), c.Response())
-	return nil
-}
-
-func DoSignUp(c echo.Context) error {
-	username := c.FormValue("username")
-	password := c.FormValue("password")
-	user_type := c.FormValue("user_type")
-
-	user := models.User{
-		Username: username,
-		PwHash:   hashPassword(password),
-	}
-
-	if user_type == "player" {
-		user.UserType = models.PlayerType
-	} else {
-		user.UserType = models.JurorType
-	}
-
-	fmt.Printf("%#v\n", user)
-
-	/*count, err := DbMap.SelectInt("SELECT COUNT(*) FROM users WHERE username=?", username)
-	if err != nil {
-		log.Panic(err)
-	}
-	if count != 0 {
-		c.Flash.Error("Another user with that username already exists.")
-		c.FlashParams()
-		return c.Redirect(App.Login)
-	}
-	err = DbMap.Insert(&user)
-	if err != nil {
-		panic(err)
-	}
-	c.Flash.Success("Registration completed! You may now login.")
-	c.FlashParams()
-
-	/* c.String(http.StatusOK, fmt.Sprintf("U: %s, P: %s, T: %s", username, password,
-	user_type)) */
-
-	c.Redirect(http.StatusTemporaryRedirect, "/")
-	return nil
-}
-
-func SignUp(c echo.Context) error {
-	return c.Render(http.StatusOK, "SignUp.html", SignupPageData{})
-}
-
 func main() {
 	e := echo.New()
 
@@ -161,9 +76,9 @@ func main() {
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	e.Static("/public", "public")
-	e.GET("/login", Login)
-	e.POST("/login", DoLogin)
-	e.GET("/signup", SignUp)
-	e.POST("/signup", DoSignUp)
+	e.GET("/login", controllers.Login)
+	e.POST("/login", controllers.DoLogin)
+	e.GET("/signup", controllers.SignUp)
+	e.POST("/signup", controllers.DoSignUp)
 	e.Logger.Debug(e.Start(":1323"))
 }
