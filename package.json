@@ -30,6 +30,7 @@
     "webpack-cli": "^3.3.8"
   },
   "dependencies": {
+    "bulma": "^0.7.5",
     "file-loader": "^4.2.0",
     "font-awesome": "^4.7.0",
     "react": "^16.9.0",

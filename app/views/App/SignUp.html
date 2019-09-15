@@ -2,24 +2,34 @@
 {{template "header.html" .Header}}
 
 <form method="POST" action="/signup" class="form page-centered">
-	<h1>Registration</h1>
-    {{if .Error}}
-        <strong>{{ .Error }}</strong>
-    {{end}}
-    <div>
-        <label for="inputUsername" class="form-label">Username</label>
-        <input type="text" id="inputUsername" name="username">
-    </div>
-    <div>
-        <label for="inputPassword" class="form-label">Password</label>
-        <input type="password" id="inputPassword" name="password">
-    </div>
-    <div>
-        <label class="form-user_type form-label">I'm a...</label>
-        <input type="radio" name="user_type" id="player" value="player">
-        <label for="player" class="radio-label">Player</label>
-        <input type="radio" name="user_type" id="juror" value="juror">
-        <label for="juror" class="radio-label">Juror</label>
-    </div>
-    <button type="submit">Sign up</button>
+	<h1 class="title">Registration</h1>
+	{{if .Error}}
+	<strong>{{ .Error }}</strong>
+	{{end}}
+	<div class="field">
+		<label for="inputUsername" class="label">Username</label>
+		<div class="control">
+			<input class="input" type="text" id="inputUsername" name="username" required />
+		</div>
+	</div>
+	<div class="field">
+		<label for="inputPassword" class="label">Password</label>
+		<div class="control">
+			<input class="input" type="password" id="inputPassword" name="password" required />
+		</div>
+	</div>
+	<div class="field">
+		I'm a...
+		<label class="radio">
+			<input type="radio" name="user_type" value="player" checked /> Player
+		</label>
+		<label class="radio">
+			<input type="radio" name="user_type" value="juror" /> Juror
+		</label>
+	</div>
+	<div class="field">
+		<div class="control">
+			<button type="submit" class="button is-link">Sign up</button>
+		</div>
+	</div>
 </form>
