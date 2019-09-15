@@ -1,8 +1,6 @@
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
 
-import '@/styles/main.less'
-
 if (!window.WebSocket) {
     alert("Your browser does not support WebSockets!")
 }
@@ -178,14 +176,14 @@ socket.onmessage = function (e) {
         ShowBlackCard(data.Duration, data.NewCard.text);
         break;
     case "new_white":
-        cardText = getCardText(data)
+        cardText = getCardText(data);
         answers.push({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id });
         ReactDOM.render(<AnswersRow answers={answers}/>, whiterowDiv);
         break;
     case "vote_cast":
         totals = data.Totals
         for (const total of totals) {
-            answers.find(a => a.ID == total.ID).total = total.Votes;
+            answers.find(a => a.ID === total.ID).total = total.Votes;
         }
         ReactDOM.render(<AnswersRow answers={answers} totals={totals}/>, whiterowDiv);
         break;
@@ -246,7 +244,7 @@ function ShowBlackCard(seconds_left, black_card_text) {
 
 socket.onclose = function () {
     console.log("Socket closed.");
-}
+};
 
 let bcb = document.getElementsByClassName("admin-panel-new-blackcard")[0];
 
@@ -259,7 +257,7 @@ if (bcb != undefined) {
 }
 
 let endv = document.getElementsByClassName("admin-panel-end-voting")[0];
-if (endv != undefined) {
+if (endv !== undefined) {
     endv.addEventListener("click", () => {
         const req = new XMLHttpRequest();
         req.open("PUT", `/admin/match/${MATCH_ID}/end_voting`);

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "production": "NODE_ENV=production npm run dev"
+    "production": "NODE_ENV=production npm run build"
   },
   "author": "denvit, LucentW, zsavajji",
   "license": "MIT",
@@ -30,7 +30,11 @@
     "webpack-cli": "^3.3.8"
   },
   "dependencies": {
+    "file-loader": "^4.2.0",
+    "font-awesome": "^4.7.0",
     "react": "^16.9.0",
-    "react-dom": "^16.9.0"
+    "react-dom": "^16.9.0",
+    "typeface-open-sans": "0.0.75",
+    "url-loader": "^2.1.0"
   }
 }

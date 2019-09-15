@@ -31,7 +31,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 		c.Logger().Error(err)
 	}
 	c.Logger().Error(err)
-	c.String(http.StatusInternalServerError, err.Error())
+	_ = c.String(http.StatusInternalServerError, err.Error())
 }
 
 func main() {

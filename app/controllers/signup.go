@@ -13,14 +13,14 @@ import (
 func DoSignUp(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
-	user_type := c.FormValue("user_type")
+	userType := c.FormValue("user_type")
 
 	user := models.User{
 		Username: username,
 		PwHash:   utils.HashPassword(password),
 	}
 
-	if user_type == "player" {
+	if userType == "player" {
 		user.UserType = models.PlayerType
 	} else {
 		user.UserType = models.JurorType
@@ -47,7 +47,7 @@ func DoSignUp(c echo.Context) error {
 	/* c.String(http.StatusOK, fmt.Sprintf("U: %s, P: %s, T: %s", username, password,
 	user_type)) */
 
-	c.Redirect(http.StatusTemporaryRedirect, "/")
+	_ = c.Redirect(http.StatusTemporaryRedirect, "/")
 	return nil
 }
 

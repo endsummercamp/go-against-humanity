@@ -1,6 +1,5 @@
 node_modules
-public/styles
-public/scripts
+public/
 .idea/
 
 # App files

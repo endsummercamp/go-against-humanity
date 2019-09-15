@@ -12,10 +12,10 @@ import (
 func Index(c echo.Context) error {
 	s, _ := session.Get("session", c)
 
-	user_val := s.Values["user"]
+	userVal := s.Values["user"]
 
-	if user_val != nil {
-		user := user_val.(models.User)
+	if userVal != nil {
+		user := userVal.(models.User)
 		if user.Username != "" {
 			return c.Render(http.StatusOK, "Index.html", data.IndexPageData{User: user})
 		}
