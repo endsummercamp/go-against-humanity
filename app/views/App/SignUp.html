@@ -3,9 +3,7 @@
 
 <form method="POST" action="/signup" class="form page-centered">
 	<h1 class="title">Registration</h1>
-	{{if .Error}}
-	<strong>{{ .Error }}</strong>
-	{{end}}
+	{{template "flash.html" .Flash}}
 	<div class="field">
 		<label for="inputUsername" class="label">Username</label>
 		<div class="control">
