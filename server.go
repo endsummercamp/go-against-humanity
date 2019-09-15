@@ -6,11 +6,9 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strings"
-	"time"
 
 	"github.com/ESCah/go-against-humanity/app/controllers"
-	"github.com/ESCah/go-against-humanity/app/models"
+	"github.com/ESCah/go-against-humanity/app/utils"
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo-contrib/session"
@@ -18,33 +16,6 @@ import (
 
 type Template struct {
 	templates *template.Template
-}
-
-var funcMap = template.FuncMap{
-	"replace": func(input, from, to string) string {
-		return strings.Replace(input, from, to, -1)
-	},
-	"card_text": func(input models.Card) string {
-		return input.GetText()
-	},
-	"card_dash": func(input models.Card) string {
-		return strings.Replace(input.GetText(), "_", "<div class=\"long-dash\"></div>", -1)
-	},
-	"card_black": func(input models.Card) bool {
-		return input.GetColor() == models.BLACK_CARD
-	},
-	"long_text": func(input string) bool {
-		return len(input) > 100
-	},
-	"is_player": func(user models.User) bool {
-		return user.UserType == models.PlayerType
-	},
-	"is_admin": func(user models.User) bool {
-		return user.IsAdmin()
-	},
-	"format_date": func(date time.Time) string {
-		return date.Format("2 Jan 2006, 15:04:01")
-	},
 }
 
 func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
@@ -68,7 +39,7 @@ func main() {
 	e := echo.New()
 
 	t := &Template{
-		templates: template.Must(template.New("").Funcs(funcMap).ParseGlob("app/views/**/*.html")),
+		templates: template.Must(template.New("").Funcs(utils.FuncMap).ParseGlob("app/views/**/*.html")),
 	}
 
 	e.Use(session.Middleware(sessions.NewCookieStore([]byte(os.Getenv("SESSION_KEY")))))
