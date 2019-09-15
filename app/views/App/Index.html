@@ -1,7 +1,7 @@
 {{define "title"}}Home{{end}}
 {{template "header.html" .Header}}
 
-<section class="has-text-centered" style="padding-top: 2em;">
+<section class="has-text-centered">
 	<h1 class="title">ESC against Humanity</h1>
 	<img src="public/scripts/7fbf6dd4c0e425be645022e0b69f62f7.png" style="width: 5em" /> <!-- todo: fix path -->
 	<p><strong>{{ .User.Username }}</strong> - {{ if is_player .User }}Player{{ else }}Juror{{ end }}{{ if is_admin .User }}, admin{{ end }}</p>
