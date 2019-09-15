@@ -15,5 +15,6 @@ func Matches(c echo.Context) error {
 	cc := c.(*utils.CustomContext)
 	return c.Render(http.StatusOK, "Matches.html", data.MatchesPageData{
 		Matches: cc.MatchManager.GetMatches(),
+		User: *cc.GetUserByUsername(utils.GetUsername(c)),
 	})
 }

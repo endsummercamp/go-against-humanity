@@ -1,15 +1,11 @@
 {{define "title"}}Admin{{end}}
 {{template "header.html" .Header}}
 
-{{ template "menu.html" . }}
+{{ template "navbar.html" . }}
 
 
 <h1>Admin</h1>
-        {{ template "flash.html" .Flash }}
-<ul>
-    <li><a href="/admin/match/new">New Match</a></li>
-    <li><a href="/admin/users">Users list</a></li>
-</ul>
+{{ template "flash.html" .Flash }}
 
 
 {{template "footer.html" .}}
