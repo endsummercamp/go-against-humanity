@@ -1,8 +1,8 @@
 {{define "title"}}Sign Up{{end}}
 {{template "header.html" .Header}}
 
-<h1>Registration</h1>
-<form method="POST" action="/signup" class="form form-registration">
+<form method="POST" action="/signup" class="form page-centered">
+	<h1>Registration</h1>
     {{if .Error}}
         <strong>{{ .Error }}</strong>
     {{end}}
@@ -15,7 +15,7 @@
         <input type="password" id="inputPassword" name="password">
     </div>
     <div>
-        <label class="form-user_type form-label">User Type</label>
+        <label class="form-user_type form-label">I'm a...</label>
         <input type="radio" name="user_type" id="player" value="player">
         <label for="player" class="radio-label">Player</label>
         <input type="radio" name="user_type" id="juror" value="juror">
