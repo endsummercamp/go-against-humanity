@@ -10,13 +10,13 @@ var minifycss = require('gulp-minify-css');
 var less = require('gulp-less');
 
 gulp.task('images', function(){
-  gulp.src('src/images/**/*')
+  return gulp.src('src/images/**/*')
     .pipe(cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true })))
     .pipe(gulp.dest('public/images/'));
 });
 
 gulp.task('styles', function(){
-  gulp.src(['src/styles/**/*.less'])
+  return gulp.src(['src/styles/**/*.less'])
     .pipe(plumber({
       errorHandler: function (error) {
         console.log(error.message);
@@ -30,17 +30,17 @@ gulp.task('styles', function(){
     .pipe(gulp.dest('public/styles/'))
 });
 
-gulp.task('scripts', function(){
+gulp.task('scripts', gulp.parallel(
   // Copy deps directly, without processing
-  gulp.src('src/scripts/deps/*.js')
+  () => gulp.src('src/scripts/deps/*.js')
     .pipe(plumber({
       errorHandler: function (error) {
         console.log(error.message);
         this.emit('end');
     }}))
-    .pipe(gulp.dest('public/scripts/'))
+    .pipe(gulp.dest('public/scripts/')),
   // Process files in the root directory
-  gulp.src('src/scripts/*.js')
+  () => gulp.src('src/scripts/*.js')
     .pipe(plumber({
       errorHandler: function (error) {
         console.log(error.message);
@@ -51,10 +51,9 @@ gulp.task('scripts', function(){
     }))
     .pipe(rename({suffix: '.min'}))
     .pipe(gulp.dest('public/scripts/'))
-});
+));
 
 gulp.task('default', function(){
-  gulp.watch("src/styles/**/*.less", ['styles']);
-  gulp.watch("src/scripts/**/*.js", ['scripts']);
-  gulp.watch("*.html", ['bs-reload']);
+  gulp.watch("src/styles/**/*.less", gulp.series('styles'));
+  gulp.watch("src/scripts/**/*.js", gulp.series('scripts'));
 });
