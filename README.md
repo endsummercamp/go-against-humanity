@@ -8,11 +8,17 @@ Written in 3 days during the [End Summer Camp](https://www.endsummercamp.org). M
 
 ![Cards Against Humanity](screenshots/1.png)
 
+### Get deps
+```bash
+go get -v
+```
+
 ### Start the web server:
+```
+go run server.go
+```
 
-   revel run
-
-### Tell the players / jurors to go to http://<your-ip>:9000/ and enjoy the game!
+### Tell the players / jurors to go to http://<your-ip>:1323/ and enjoy the game!
 
 
 ## Based on Revel
