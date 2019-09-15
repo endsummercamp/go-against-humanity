@@ -1,17 +1,21 @@
 {{define "title"}}Login{{end}}
 {{template "header.html" .Header}}
 
-<h1>Login to continue</h1>
-<form method="POST" action="/login" class="form">
+<form method="POST" action="/login" class="form page-centered">
+	<h1>Login to continue</h1>
     {{template "flash.html" .Flash}}
     <div>
-        <label for="inputUsername">Username</label><br>
-        <input type="text" id="inputUsername" name="username">
+		<label for="inputUsername" class="form-label">
+			Username
+		</label>
+		<input type="text" id="inputUsername" name="username">
     </div>
     <div>
-        <label for="inputPassword">Password</label><br>
-        <input type="password" id="inputPassword" name="password">
-    </div>
+        <label for="inputPassword" class="form-label">
+			Password
+		</label>
+		<input type="password" id="inputPassword" name="password">
+	</div>
     <div>
         <a href="/signup">Need an account? Sign Up here!</a>
     </div>
