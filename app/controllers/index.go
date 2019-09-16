@@ -15,7 +15,8 @@ func (w *WebApp) Index(c echo.Context) error {
 
 	user := w.GetUserByUsername(utils.GetUsername(c))
 	if user == nil {
-		return c.NoContent(http.StatusInternalServerError)
+		// This can occur if you reload the server and delete the db
+		return w.Logout(c)
 	}
 
 	return c.Render(http.StatusOK, "Index.html", data.IndexPageData{
