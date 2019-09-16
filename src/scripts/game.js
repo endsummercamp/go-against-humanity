@@ -230,7 +230,7 @@ function freshStart(SecondsUntilFinishPicking, InitialBlackText) {
 function ShowBlackCard(seconds_left, black_card_text) {
     canPickCard = true;
     timer_interval = setInterval(() => {
-        if(seconds_left === 0) {
+        if(seconds_left <= 0) {
             clearInterval(timer_interval);
             return;
         }
