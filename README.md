@@ -16,6 +16,9 @@ git clone --recursive https://github.com/ESCah/go-against-humanity
 make ita-original # Choose your cards
 make compile      # Compile them
 
+npm install                    # Install Node.js deps
+node node_modules/.bin/webpack # Compile Web resources
+
 go get -v        # Fetch deps
 go run server.go # Start the web server
 ```
