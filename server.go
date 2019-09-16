@@ -55,8 +55,6 @@ func main() {
 		}
 	})
 
-
-
 	e.Static("/public", "public")
 	e.GET("/login", controllers.Login)
 	e.POST("/login", controllers.DoLogin)
@@ -68,5 +66,11 @@ func main() {
 	e.GET("/matches", controllers.Matches)
 
 	e.GET("/", controllers.Index)
+
+	var mm = &game.MatchManager{}
+	var ws = controllers.MakeSocketServer(mm)
+	// The ws start is not blocking, but the echo start is, so ws goes first
+	ws.Start()
+
 	e.Logger.Debug(e.Start(":1323"))
 }
