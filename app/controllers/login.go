@@ -36,7 +36,6 @@ func Login(c echo.Context) error {
 
 func DoLogin(c echo.Context) error {
 	s, _ := session.Get("session", c)
-
 	s.Options = &sessions.Options{
 		Path:     "/",
 		MaxAge:   3600,
@@ -44,17 +43,16 @@ func DoLogin(c echo.Context) error {
 	}
 
 	username := c.FormValue("username")
-	pwhash := utils.HashPassword(c.FormValue("password"))
 
 	cc := c.(*utils.CustomContext)
 	if cc.Db == nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
-	v, err := cc.Db.Select(models.User{}, "SELECT * FROM users WHERE username=? AND pwhash=?", username, pwhash)
+	v, err := cc.Db.Select(models.User{}, "SELECT * FROM users WHERE username=?", username)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
-			s.AddFlash("Invalid username or password")
+			s.AddFlash("Username not found")
 			return c.Render(http.StatusOK, "Login.html", data.LoginPageData{
 				Flash: data.FlashData{Error: s.Flashes()[0].(string)},
 			})
@@ -63,15 +61,16 @@ func DoLogin(c echo.Context) error {
 		}
 	}
 
-	if len(v) == 0 {
+	if len(v) == 0 || !utils.CheckPassword(v[0].(*models.User).PwHash, c.FormValue("password")) {
 		s.AddFlash("Invalid username or password")
 		return c.Render(http.StatusOK, "Login.html", data.LoginPageData{
 			Flash: data.FlashData{Error: s.Flashes()[0].(string)},
 		})
 	}
 
+	user := v[0].(*models.User)
 	s.Values["user"] = username
-	fmt.Printf("Logging in as %s\n", v[0].(*models.User).Username)
+	fmt.Printf("Logging in as %s\n", user.Username)
 
 	err = s.Save(c.Request(), c.Response())
 	if err != nil {
