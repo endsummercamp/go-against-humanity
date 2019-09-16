@@ -8,25 +8,18 @@ Written in 3 days during the [End Summer Camp](https://www.endsummercamp.org). M
 
 ![Cards Against Humanity](screenshots/1.png)
 
-### Get deps
+## Usage
+
 ```bash
-go get -v
+git clone --recursive https://github.com/ESCah/go-against-humanity
+
+make ita-original # Choose your cards
+make compile      # Compile them
+
+go get -v        # Fetch deps
+go run server.go # Start the web server
 ```
 
-### Compile Cards
-```bash
-# Choose your cards:
-
-make ita-original
-make compile
-```
-
-### Start the web server:
-```
-go run server.go
-```
-
-### Tell the players / jurors to go to http://<your-ip>:1323/ and enjoy the game!
-
+**Tell the players / jurors to go to http://<your-ip>:1323/ and enjoy the game!**
 
 ## Based on [Echo](https://echo.labstack.com/)
