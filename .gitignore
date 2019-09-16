@@ -12,3 +12,5 @@ app/tmp/main.go
 
 go-against-humanity
 go-against-humanity.debug
+
+config.toml
