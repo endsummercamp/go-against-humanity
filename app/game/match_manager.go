@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"github.com/ESCah/go-against-humanity/app/models"
 )
 
@@ -19,7 +18,6 @@ func(mm *MatchManager) NewMatch() *models.Match {
 
 	newMatch := models.NewMatch(mm.counter, []*models.Player{})
 	newMatch.NewDeck()
-	fmt.Printf("NewMatch: deck is %#v\n", newMatch.Deck)
 	mm.matches = append(mm.matches, newMatch)
 	return newMatch
 }

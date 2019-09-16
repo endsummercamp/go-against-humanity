@@ -13,10 +13,25 @@ Written in 3 days during the [End Summer Camp](https://www.endsummercamp.org). M
 ```bash
 git clone --recursive https://github.com/ESCah/go-against-humanity
 
-make ita-original # Choose your cards
-make compile      # Compile them
+make compile      # Compile the cards
 
 go get -v        # Fetch deps
+```
+
+## Configure the application
+Create a file `config.toml` and add the following:
+
+```toml
+[General]
+Decks = ['ita-original-sfoltita', 'ita-espansione', 'ita-HACK']
+```
+
+where Decks is an array containing the decks you want to use
+([here is the list](https://github.com/ESCah/json-against-humanity/tree/master/src))
+
+
+## Running
+```bash
 go run server.go # Start the web server
 ```
 
