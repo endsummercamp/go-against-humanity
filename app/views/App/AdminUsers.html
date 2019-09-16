@@ -1,9 +1,14 @@
 {{define "title"}}Admin - Users{{end}}
 {{template "header.html" .Header}}
 
+{{ template "navbar.html" . }}
+
+<h1>Users</h1>
+{{template "flash.html" .Flash}}
+<div class="matches-container">
 <h1>User List</h1>
         <ul>
-        {{ range $element := .users }}
+        {{ range $element := .Users }}
             <li>{{ $element.Username }} - {{ $element.Id }}</li>
         {{ end }}
         </ul>

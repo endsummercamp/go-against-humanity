@@ -28,7 +28,7 @@
 
 <div class="match-timer"></div>
 
-{{ if is_admin .user }}<div class="match-admin-panel">
+{{ if is_admin .User }}<div class="match-admin-panel">
     <button class="button admin-panel-new-blackcard">New Black Card</button>
     <button class="button admin-panel-end-voting">End Voting</button>
 </div> {{ end }}
@@ -40,8 +40,8 @@
 <div id="react-mycards" style="display: none;"></div>
 
 <script type="text/javascript">
-    const MATCH_ID = {{ .match_id }};
-    const IS_PLAYER = {{ if is_player .user }} true {{ else }} false {{ end }};
+    const MATCH_ID = {{ .Match.Id }};
+    const IS_PLAYER = {{ if is_player .User }} true {{ else }} false {{ end }};
 </script>
 
 <script src="/public/scripts/app.js"></script>

@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/echo-contrib/session"
 )
 
-func Login(c echo.Context) error {
+func (w *WebApp) Login(c echo.Context) error {
 	s, _ := session.Get("session", c)
 	if s.Values["user"] != nil {
 		return c.Redirect(http.StatusTemporaryRedirect, "/")
@@ -34,7 +34,7 @@ func Login(c echo.Context) error {
 	})
 }
 
-func DoLogin(c echo.Context) error {
+func (w *WebApp) DoLogin(c echo.Context) error {
 	s, _ := session.Get("session", c)
 	s.Options = &sessions.Options{
 		Path:     "/",
@@ -44,12 +44,7 @@ func DoLogin(c echo.Context) error {
 
 	username := c.FormValue("username")
 
-	cc := c.(*utils.CustomContext)
-	if cc.Db == nil {
-		return c.NoContent(http.StatusInternalServerError)
-	}
-
-	v, err := cc.Db.Select(models.User{}, "SELECT * FROM users WHERE username=?", username)
+	v, err := w.Db.Select(models.User{}, "SELECT * FROM users WHERE username=?", username)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			s.AddFlash("Username not found")

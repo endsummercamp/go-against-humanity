@@ -8,14 +8,12 @@ import (
 	"github.com/labstack/echo"
 )
 
-func Index(c echo.Context) error {
+func (w *WebApp) Index(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")
 	}
 
-	cc := c.(*utils.CustomContext)
-	user := cc.GetUserByUsername(utils.GetUsername(c))
-
+	user := w.GetUserByUsername(utils.GetUsername(c))
 	if user == nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}

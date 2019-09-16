@@ -10,3 +10,10 @@ type MatchesPageData struct {
 	User   models.User
 	Matches []*models.Match
 }
+
+type MatchPageData struct {
+	Header HeaderData
+	Flash  FlashData
+	User   models.User
+	Match  models.Match
+}

@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-func DoSignUp(c echo.Context) error {
+func (w *WebApp) DoSignUp(c echo.Context) error {
 	s, err := session.Get("session", c)
 	username := c.FormValue("username")
 	password := c.FormValue("password")
@@ -31,9 +31,7 @@ func DoSignUp(c echo.Context) error {
 
 	fmt.Printf("%#v\n", user)
 
-	cc := c.(*utils.CustomContext)
-
-	count, err := cc.Db.SelectInt("SELECT COUNT(*) FROM users WHERE username=?", username)
+	count, err := w.Db.SelectInt("SELECT COUNT(*) FROM users WHERE username=?", username)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -44,7 +42,7 @@ func DoSignUp(c echo.Context) error {
 			},
 		})
 	}
-	err = cc.Db.Insert(&user)
+	err = w.Db.Insert(&user)
 	if err != nil {
 		panic(err)
 	}
@@ -57,6 +55,6 @@ func DoSignUp(c echo.Context) error {
 	return nil
 }
 
-func SignUp(c echo.Context) error {
+func (w *WebApp) SignUp(c echo.Context) error {
 	return c.Render(http.StatusOK, "SignUp.html", data.SignupPageData{})
 }
