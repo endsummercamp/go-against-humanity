@@ -76,7 +76,7 @@ class AnswersRow extends Component {
         if (!canVote)
             return;
         const req = new XMLHttpRequest();
-        req.open("PUT", `/match/${MATCH_ID}/vote_card/${id}`);
+        req.open("PUT", `/matches/${MATCH_ID}/vote_card/${id}`);
         req.send();
         // canVote = false;
         return true;
@@ -110,7 +110,7 @@ class MyCardsRow extends Component {
             return false;
         }
         const req = new XMLHttpRequest();
-        req.open("PUT", `/match/${MATCH_ID}/pick_card/${id}`);
+        req.open("PUT", `/matches/${MATCH_ID}/pick_card/${id}`);
         req.send();
         canPickCard = false;
         return true;
@@ -230,8 +230,8 @@ function freshStart(SecondsUntilFinishPicking, InitialBlackText) {
 function ShowBlackCard(seconds_left, black_card_text) {
     canPickCard = true;
     timer_interval = setInterval(() => {
-        if(seconds_left == 0) {
-            clearInterval(timer_interval)
+        if(seconds_left === 0) {
+            clearInterval(timer_interval);
             return;
         }
         const minutes = String(Math.floor(seconds_left / 60)).padStart(2, '0');
@@ -248,10 +248,10 @@ socket.onclose = function () {
 
 let bcb = document.getElementsByClassName("admin-panel-new-blackcard")[0];
 
-if (bcb != undefined) {
+if (bcb !== undefined) {
     bcb.addEventListener("click", () => {
         const req = new XMLHttpRequest();
-        req.open("PUT", `/admin/match/${MATCH_ID}/new_black_card`);
+        req.open("PUT", `/admin/matches/${MATCH_ID}/new_black_card`);
         req.send();
     });
 }
@@ -260,7 +260,7 @@ let endv = document.getElementsByClassName("admin-panel-end-voting")[0];
 if (endv !== undefined) {
     endv.addEventListener("click", () => {
         const req = new XMLHttpRequest();
-        req.open("PUT", `/admin/match/${MATCH_ID}/end_voting`);
+        req.open("PUT", `/admin/matches/${MATCH_ID}/end_voting`);
         req.send();
     });
 }

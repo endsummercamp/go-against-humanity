@@ -11,6 +11,7 @@ type WebApp struct {
 	MatchManager *game.MatchManager
 	Echo         *echo.Echo
 	Db           *gorp.DbMap
+	Ws           SocketServer
 }
 
 func (w *WebApp) GetUserByUsername(username string) *models.User {
