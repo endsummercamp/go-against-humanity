@@ -66,6 +66,7 @@ func main() {
 	e.GET("/admin/users", w.AdminUsers)
 	e.GET("/admin/matches/new", w.AdminNewMatch)
 	e.PUT("/admin/matches/:id/new_black_card", w.NewBlackCard)
+	e.PUT("/admin/matches/:id/end_voting", w.EndVoting)
 
 	e.GET("/matches", w.Matches)
 	e.GET("/matches/join/:id", w.JoinMatch)

@@ -161,17 +161,17 @@ let totals = [];
 let canPickCard = false;
 let timer = document.getElementsByClassName("match-timer")[0];
 let timer_interval;
-let seconds_left;
 socket.onmessage = function (e) {
     console.log("Received", e.data);
     const data = JSON.parse(e.data);
-    const { Name: eventName } = data
+    const { Name: eventName } = data;
     let cardText;
     switch (eventName) {
     case "join_successful":
         freshStart(data.SecondsUntilFinishPicking, data.InitialBlackCard.text);
         break;
-    case "new_black":
+        case "new_black":
+        timer.style.display = 'block';
         mycardsDiv.style.display = "flex";
         ShowBlackCard(data.Duration, data.NewCard.text);
         break;
@@ -181,7 +181,7 @@ socket.onmessage = function (e) {
         ReactDOM.render(<AnswersRow answers={answers}/>, whiterowDiv);
         break;
     case "vote_cast":
-        totals = data.Totals
+        totals = data.Totals;
         for (const total of totals) {
             answers.find(a => a.ID === total.ID).total = total.Votes;
         }
@@ -198,7 +198,7 @@ socket.onmessage = function (e) {
     default:
         alert("Unknown event " + eventName);
     }
-}
+};
 
 function freshStart(SecondsUntilFinishPicking, InitialBlackText) {
     for (const tag of document.getElementsByClassName("inverted")) {

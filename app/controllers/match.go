@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/ESCah/go-against-humanity/app/models"
 	"github.com/ESCah/go-against-humanity/app/models/data"
 	"github.com/ESCah/go-against-humanity/app/utils"
 	"github.com/labstack/echo"
 	"log"
 	"net/http"
+	"sort"
 	"strconv"
 	"time"
 )
@@ -208,6 +210,83 @@ func (w *WebApp) PickCard(c echo.Context) error {
 	if !result {
 		return c.String(http.StatusForbidden, "Already played")
 	}
+
+	return c.JSON(http.StatusOK, nil)
+}
+
+func (w *WebApp) EndVoting(c echo.Context) error {
+	if !utils.IsLoggedIn(c) {
+		return c.Redirect(http.StatusTemporaryRedirect, "/login")
+	}
+
+	user := w.GetUserByUsername(utils.GetUsername(c))
+	if user == nil {
+		return c.NoContent(http.StatusInternalServerError)
+	}
+
+	if !user.Admin {
+		return c.NoContent(http.StatusForbidden)
+	}
+
+
+	matchId, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		return c.String(http.StatusNotFound, "Invalid MatchId")
+	}
+
+	match := w.MatchManager.GetMatchByID(matchId)
+	if match == nil {
+		return c.String(http.StatusNotFound, "Match not found.")
+	}
+
+	if match.State != models.MATCH_VOTING {
+		return c.String(http.StatusForbidden, "Unable to end voting because voting hasn't started yet.")
+	}
+
+	match.EndVote()
+	msg := Event{
+		Name: "show_results",
+	}
+	w.Ws.BroadcastToRoom(matchId, msg)
+
+	for _, player := range match.Players {
+		log.Printf("Range over players... (%d - %d)", player.User.Id, len(player.Cards))
+		if len(player.Cards) < 10 {
+			whitecard := match.Deck.NewRandomWhiteCard()
+			log.Printf("Whitecard player %d : %#v", &player.User.Id, whitecard)
+			player.Cards = append(player.Cards, whitecard)
+		}
+	}
+
+	// Choose winner
+	round := match.GetRound()
+	var totals []Total
+
+	for card, jury := range round.Wcs {
+		totals = append(totals, Total{
+			ID: card.Id,
+			Votes: len(jury),
+		})
+	}
+
+	sort.Slice(totals, func(i, j int) bool {
+		return totals[i].Votes < totals[j].Votes
+	})
+
+	winningID := totals[0].ID
+	var winner *models.Player
+	for card := range round.Wcs {
+		if card.Id != winningID {
+			continue
+		}
+		winner = card.Owner
+	}
+
+	if winner != nil {
+		fmt.Printf("Winner: %s\n", winner.User.Username)
+	}
+
 
 	return c.JSON(http.StatusOK, nil)
 }
