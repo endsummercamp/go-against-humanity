@@ -63,6 +63,13 @@ func DoLogin(c echo.Context) error {
 		}
 	}
 
+	if len(v) == 0 {
+		s.AddFlash("Invalid username or password")
+		return c.Render(http.StatusOK, "Login.html", data.LoginPageData{
+			Flash: data.FlashData{Error: s.Flashes()[0].(string)},
+		})
+	}
+
 	s.Values["user"] = username
 	fmt.Printf("Logging in as %s\n", v[0].(*models.User).Username)
 
