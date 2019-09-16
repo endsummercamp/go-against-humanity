@@ -1,4 +1,4 @@
-.PHONY: build-card ita-original
+.PHONY: build-card ita-original compile
 
 build-card:
 	mkdir -p cards/json-against-humanity/src/${DECK}
@@ -16,5 +16,8 @@ ita-original-sfoltita:
 
 ita-espansione: 
 	@$(MAKE) build-card DECK=ita-espansione
+
+compile:
+	cd cards/json-against-humanity; python compile.py
 
 all: hack-it ita-original ita-original-sfoltita ita-espansione
