@@ -1,10 +1,10 @@
-{{define "title"}}Matches{{end}}
 {{template "header.html" .Header}}
 
 {{ template "navbar.html" . }}
 
-<h1>Current Matches</h1>
+{{ template "hero.html" .Header }}
 {{template "flash.html" .Flash}}
+<section class="container">
 <div class="matches-container">
     {{ if eq (len .Matches) 0 }}
     <p>No matches available</p>
@@ -40,4 +40,5 @@
     {{ end }}
     {{ end }}
 </div>
+</section>
 {{template "footer.html" .}}

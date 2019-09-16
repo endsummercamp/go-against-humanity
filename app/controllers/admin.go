@@ -56,6 +56,10 @@ func (w *WebApp) AdminUsers(c echo.Context) error {
 	return c.Render(http.StatusOK, "AdminUsers.html", data.AdminUsersPageData{
 		User: *user,
 		Users: users,
+		Header: data.HeaderData{
+			Title: "Users",
+			SubTitle: "List of the users",
+		},
 	})
 }
 

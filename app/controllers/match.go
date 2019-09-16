@@ -21,6 +21,10 @@ func (w *WebApp) Matches(c echo.Context) error {
 	return c.Render(http.StatusOK, "Matches.html", data.MatchesPageData{
 		Matches: w.MatchManager.GetMatches(),
 		User:    *w.GetUserByUsername(utils.GetUsername(c)),
+		Header: data.HeaderData{
+			Title: "Matches",
+			SubTitle: "Join a match from the following...",
+		},
 	})
 }
 

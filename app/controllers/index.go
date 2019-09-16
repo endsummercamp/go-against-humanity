@@ -21,5 +21,9 @@ func (w *WebApp) Index(c echo.Context) error {
 
 	return c.Render(http.StatusOK, "Index.html", data.IndexPageData{
 		User: *user,
+		Header: data.HeaderData{
+			Title: "Home",
+			SubTitle: "Welcome to Cards Against Humanity",
+		},
 	})
 }
