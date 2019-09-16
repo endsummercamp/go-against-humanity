@@ -13,6 +13,14 @@ Written in 3 days during the [End Summer Camp](https://www.endsummercamp.org). M
 go get -v
 ```
 
+### Compile Cards
+```bash
+# Choose your cards:
+
+make ita-original
+make compile
+```
+
 ### Start the web server:
 ```
 go run server.go
