@@ -40,11 +40,19 @@ func (w *WebApp) JoinMatch(c echo.Context) error {
 	}
 
 	user := w.GetUserByUsername(utils.GetUsername(c))
-	if !w.MatchManager.IsJoinable(matchId) {
-		return c.Redirect(http.StatusFound, "/matches")
+
+	if !w.MatchManager.UserJoined(matchId, user) {
+		if !w.MatchManager.IsJoinable(matchId) {
+			return c.Redirect(http.StatusFound, "/matches")
+		}
+
+		joinResult := w.MatchManager.JoinMatch(matchId, user)
+
+		if !joinResult {
+			return c.Redirect(http.StatusTemporaryRedirect, "/matches");
+		}
 	}
 
-	w.MatchManager.JoinMatch(matchId, user)
 	match := w.MatchManager.GetMatchByID(matchId)
 
 	return c.Render(http.StatusOK, "Match.html", data.MatchPageData{
@@ -102,22 +110,31 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 		return c.NoContent(http.StatusNotAcceptable)
 	}
 
+	if match.State != models.MATCH_SHOW_RESULTS &&
+		match.State != models.MATCH_WAIT_USERS {
+		return c.NoContent(http.StatusNotAcceptable);
+	}
+
 	card := match.NewBlackCard()
 	if card == nil {
 		/* ... */
 	}
 
+	duration := 20;
+	expires :=  time.Now().Unix() + int64(duration);
+
 	msg := Event{
 		Name:     "new_black",
 		NewCard:  card,
-		Duration: 20, // Timeout in seconds
+		Expires: expires,
+		State: match.State,
 	}
 
 	round := match.GetRound()
-	round.TimeFinishPick = time.Now()
+	round.Expires = expires
 
 	go func() {
-		time.Sleep(time.Duration(msg.Duration) * time.Second)
+		time.Sleep(time.Duration(expires - time.Now().Unix()) *time.Second)
 		match.State = models.MATCH_VOTING
 
 		// Removing cards from Player's deck
@@ -129,6 +146,7 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 
 		w.Ws.BroadcastToRoom(matchId, Event{
 			Name: "voting",
+			State: match.State,
 		})
 
 		for _, card := range round.GetChoices() {
@@ -136,6 +154,7 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 			w.Ws.BroadcastToRoom(matchId, Event{
 				Name:    "new_white",
 				NewCard: card,
+				State: match.State,
 			})
 		}
 	}()
@@ -306,6 +325,7 @@ func (w *WebApp) VoteCard(c echo.Context) error {
 	w.Ws.BroadcastToRoom(matchId, Event{
 		Name:   "vote_cast",
 		Totals: totals,
+		State: match.State,
 	})
 
 	return c.JSON(http.StatusOK, nil)
@@ -320,7 +340,6 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 	if user == nil {
 		return c.NoContent(http.StatusInternalServerError)
 	}
-
 	if !user.Admin {
 		return c.NoContent(http.StatusForbidden)
 	}
@@ -344,6 +363,7 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 	match.EndVote()
 	w.Ws.BroadcastToRoom(matchId, Event{
 		Name: "show_results",
+		State: match.State,
 	})
 
 	for _, player := range match.Players {
@@ -370,21 +390,25 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 		return totals[i].Votes < totals[j].Votes
 	})
 
-	winningID := totals[0].ID
 	var winner *models.Player
 	var winningCard *models.WhiteCard
-	for card := range round.Wcs {
-		if card.Id != winningID {
-			continue
+
+	if len(totals) > 0 {
+		winningID := totals[0].ID
+		for card := range round.Wcs {
+			if card.Id != winningID {
+				continue
+			}
+			winner = card.Owner
+			winningCard = card
 		}
-		winner = card.Owner
-		winningCard = card
 	}
 
-	if winner != nil {
+	if winner != nil && winningCard != nil {
 		fmt.Printf("Winner: %s\n", winner.User.Username)
 		w.Ws.BroadcastToRoom(matchId, Event{
 			Name:   "winner",
+			State: match.State,
 			WinnerUsername: winner.User.Username,
 			WinnerText: winningCard.Text,
 		})

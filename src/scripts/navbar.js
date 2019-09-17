@@ -25,7 +25,7 @@ export default class Navbar extends Component {
 			<a className="navbar-item">
 				<img src="/public/img/ESC-logo-small.png" />
 			</a>
-			<Timer enabled={this.props.timerState.enabled} seconds={this.props.timerState.seconds} />
+			<Timer enabled={this.props.timerState.enabled} expires={this.props.timerState.expires} />
 			{adminButtons}
 			<UIStateLabel text={this.props.uiStateText} />
 		</nav>

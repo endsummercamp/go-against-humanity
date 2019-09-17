@@ -5,12 +5,12 @@ function dashFix(content){
 }
 
 function getCardText(data) {
-    const {NewCard: { text: cardText }} = data
+    const {NewCard: { text: cardText }} = data;
     return cardText
 }
 
 function getCardTotals(data) {
-    const { Totals: _totals } = data
+    const { Totals: _totals } = data;
     return _totals
 }
 
@@ -22,7 +22,7 @@ export default class Card extends Component {
         if (this.props.total) {
             const percentage = this.props.total / this.props.sum;
             style.height = percentage * 100 + "%";
-		};
+		}
 		const classes = [
 			"card",
 			this.props.black ? "card-black" : "card-white"
@@ -44,7 +44,7 @@ export default class Card extends Component {
             <div className="card-bottom">
                 Cards Against Humanity
             </div>
-            <div style={{position: "absolute", top: 0, left: 0, bottom: 0, right: 0}}>
+            <div style={{position: "absolute", top: 0, left: 0, bottom: 0, right: 0, zIndex: 0}}>
                 <div style={style} className="vote-bg"></div>
             </div>
         </div>

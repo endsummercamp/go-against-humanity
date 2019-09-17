@@ -89,13 +89,12 @@ class AnswersRow extends Component {
 		}
 
 		const cards = this.props.answers.map(answer => <Card
-			voted={answer.ID == this.state.votedCard}
+			voted={answer.ID === this.state.votedCard}
 			text={answer.text}
 			id={answer.ID}
 			total={answer.total}
 			sum={sum}
 			onClick={() => {
-				console.log("Voted!");
 				const success = this.tryVote(answer.ID);
 				if (!success) return;
 				this.setState({votedCard: answer.ID});
@@ -116,17 +115,17 @@ class Game extends Component {
 			// Navbar state
 			timerState: {
 				enabled: false,
-				seconds: 0
+				expiration: -1
 			},
 			uiStateText: "Connecting...",
 			// Game UI state
 			blackCard: null,
 			myCards: [],
 			answers: [],
+			totals: [],
 		};
 		this.socket.onopen = () => {
 			this.setState(Object.assign(this.state, {uiStateText: "Waiting for a black card..."}));
-			// console.log("Opened socket.");
 		};
 		this.socket.onmessage = e => {
 			const data = JSON.parse(e.data);
@@ -136,14 +135,17 @@ class Game extends Component {
 			case "join_successful":
 				// We joined successfully. Clear the UI.
 				this.resetUI();
-				if (data.SecondsUntilFinishPicking)
-					this.showBlackCard(data.SecondsUntilFinishPicking, data.InitialBlackText.text);	
+				if(data.InitialBlackCard.Id !== 0){
+					this.showBlackCard(data.Expires, data.InitialBlackCard.text);
+				}
+				this.setMatchState(data.State);
 				break;
 			case "new_black":
 				// A black card was chosen. Show it.
 				// mycardsDiv.style.display = "flex";
 				this.resetUI();
-				this.showBlackCard(data.Duration, data.NewCard.text);
+				this.showBlackCard(data.Expires, data.NewCard.text);
+				this.setMatchState(data.State);
 				break;
 			case "voting":
 				// The voting phase has begun.
@@ -152,19 +154,21 @@ class Game extends Component {
 				this.setState(Object.assign(this.state, {
 					timerState: {
 						enabled: false,
-						seconds: 0
+						expires: 0
 					},
 					uiStateText: IS_PLAYER
 						? "The jurors are voting..."
 						: "Vote for the best card!",
 					myCards: []
-				}))
+				}));
+				this.setMatchState(data.State);
 				break;
 			case "new_white":
 				// A new white card (from the voting phase) was received.
 				this.setState(Object.assign(this.state, {
 					answers: this.state.answers.concat({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id })
 				}));
+				this.setMatchState(data.State);
 				break;
 			case "vote_cast":
 				let totals = data.Totals;
@@ -172,15 +176,19 @@ class Game extends Component {
 				for (const total of totals) {
 					answers.find(a => a.ID === total.ID).total = total.Votes;
 				}
+
 				this.setState(Object.assign(this.state, {
-					answers,
-					totals,
+					answers: answers,
+					totals: totals,
 				}));
+
+				this.setMatchState(data.State);
 				break;
 			case "show_results":
 				this.setState(Object.assign(this.state, {
 					uiStateText: "", // TODO
 				}));
+				this.setMatchState(data.State);
 				break;
 			case "winner":
 				if (!IS_ADMIN)
@@ -188,6 +196,7 @@ class Game extends Component {
 				this.setState(Object.assign(this.state, {
 					answers: [{text: data.WinnerText, ID: 0}]
 				}));
+				this.setMatchState(data.State);
 				break;
 			default:
 				alert("Unknown event " + eventName);
@@ -195,16 +204,49 @@ class Game extends Component {
 		};
 	}
 
-	showBlackCard(duration, text) {
+	setMatchState(state) {
+		/*
+			const (
+				MATCH_WAIT_USERS MatchState = iota
+				MATCH_PLAYBALE
+				MATCH_VOTING
+				MATCH_SHOW_RESULTS
+				MATCH_END
+			)
+		*/
+		switch(state){
+			case 0:
+				this.setState(Object.assign(this.state, {
+					uiStateText: 'Waiting for other players to join...'
+				}));
+				break;
+			case 1:
+				this.setState(Object.assign(this.state, {
+					uiStateText: IS_PLAYER ? 'Play your white card!' :
+						'Players are choosing their white cards'
+				}));
+				break;
+			case 2:
+				this.setState(Object.assign(this.state, {
+					uiStateText: IS_PLAYER ? 'Jurors are voting...' :
+						'It\'s your turn - vote the best card!'
+				}));
+				break;
+			case 3:
+				this.setState(Object.assign(this.state, {
+					uiStateText: 'Result of this round'
+				}));
+				break;
+		}
+	}
+
+	showBlackCard(expiration_ts, text) {
 		canPickCard = true;
 		this.setState(Object.assign(this.state, {
 			timerState: {
 				enabled: true,
-				seconds: duration
+				expires: expiration_ts
 			},
-			uiStateText: IS_PLAYER
-				? "Play your white card!"
-				: "Waiting for the players...",
 			blackCard: <Card text={text} black />
 		}));
 	}
@@ -220,7 +262,8 @@ class Game extends Component {
 		*/
 		this.setState(Object.assign(this.state, {
 			blackCard: null,
-			answers: []
+			answers: [],
+			totals: [],
 		}));
 		if (IS_PLAYER)
 			this.fetchMyCards();
@@ -249,7 +292,7 @@ class Game extends Component {
 				{/* Maybe a table here? */}
 			</div>
 			<MyCardsRow cards={this.state.myCards} />
-			<AnswersRow answers={this.state.answers} />
+			<AnswersRow answers={this.state.answers} totals={this.state.totals} />
 		</>;
 	}
 }

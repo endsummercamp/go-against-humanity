@@ -273,10 +273,13 @@ div.card {
         width: 100%;
         align-self: flex-start;
         text-align: left;
+        z-index: 1;
+        overflow: hidden;
+        word-wrap: break-word;
 
         div.card-content{
             text-align: left;
-            word-wrap: anywhere;
+            word-wrap: break-word;
         }
 
         div.long-dash {
@@ -303,10 +306,14 @@ div.card {
 
         div.card-votes {
             width: 100%;
+            background-color: rgba(0,0,0,0.8);
+            color: #FFF;
+            z-index: 3;
         }
 
         &.active {
             background: rgba(0, 0, 0, 0.24);
+            z-index: 1;
         }
     }
 
@@ -321,6 +328,7 @@ div.card {
         text-align: center;
         align-self: flex-end;
         max-height: 2.2em;
+        z-index: 1;
     }
 }
 

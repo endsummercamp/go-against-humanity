@@ -4,27 +4,28 @@ export default class Timer extends PureComponent {
 	constructor(props) {
 		super(props);
 		this.state = {
-			seconds_left: props.seconds
+			now: Math.round((new Date()).getTime()/1000)
 		};
-		const interval = setInterval(() => {
-			const seconds_left = this.state.seconds_left;
-			if (seconds_left <= 0) {
-				this.setState({
-					seconds_left: 0
-				});
-				clearInterval(interval);
-				return;
-			}
+
+		setInterval(() => {
 			this.setState({
-				seconds_left: seconds_left - 1
+				now: Math.round((new Date()).getTime()/1000)
 			});
 		}, 1000);
 	}
 
 	render() {
-		const seconds_left = this.state.seconds_left;
-		const minutes = String(Math.floor(seconds_left / 60)).padStart(2, '0');
-		const seconds = String(seconds_left % 60).padStart(2, '0');
+		const now = this.state.now;
+		let minutes = 0;
+		let seconds = 0;
+
+		if(this.props.expires > now) {
+			const diff = this.props.expires - now;
+			minutes = Math.round(diff/60);
+			seconds = diff - minutes * 60;
+		}
+		minutes = ('0' + minutes).slice(-2);
+		seconds = ('0' + seconds).slice(-2);
 		return <a className="navbar-item">{minutes}:{seconds}</a>;
 	}
 }

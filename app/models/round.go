@@ -3,12 +3,11 @@ package models
 import (
 	"sort"
 	"sync"
-	"time"
 )
 
 type Round struct {
 	BlackCard      *BlackCard
-	TimeFinishPick time.Time
+	Expires int64
 	Wcs            map[*WhiteCard][]Juror
 	Mutex	  	   sync.Mutex
 	Voters			[]Juror
