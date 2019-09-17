@@ -71,6 +71,7 @@ func main() {
 
 	e.GET("/matches", w.Matches)
 	e.GET("/matches/join/:id", w.JoinMatch)
+	e.GET("/matches/join_latest", w.JoinLatestMatch)
 
 	e.GET("/mycards", w.MatchCards)
 	e.PUT("/matches/:match_id/pick_card/:card_id", w.PickCard)

@@ -28,6 +28,31 @@ func (w *WebApp) Matches(c echo.Context) error {
 	})
 }
 
+func (w *WebApp) JoinLatestMatch(c echo.Context) error {
+	if !utils.IsLoggedIn(c) {
+		return c.Redirect(http.StatusTemporaryRedirect, "/login")
+	}
+
+	matches := w.MatchManager.GetMatches()
+	if len(matches) == 0 {
+		return c.Redirect(http.StatusTemporaryRedirect, "/")
+	}
+	matchId := matches[len(matches) - 1].Id
+
+	user := w.GetUserByUsername(utils.GetUsername(c))
+	if !w.MatchManager.IsJoinable(matchId) {
+		return c.Redirect(http.StatusFound, "/matches")
+	}
+
+	w.MatchManager.JoinMatch(matchId, user)
+	match := w.MatchManager.GetMatchByID(matchId)
+
+	return c.Render(http.StatusOK, "Match.html", data.MatchPageData{
+		Match: *match,
+		User:  *w.GetUserByUsername(utils.GetUsername(c)),
+	})
+}
+
 func (w *WebApp) JoinMatch(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")

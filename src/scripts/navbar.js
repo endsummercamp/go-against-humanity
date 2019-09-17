@@ -22,7 +22,7 @@ export default class Navbar extends Component {
 			</div>;
 		
 		return <nav className="navbar is-fixed-top">
-			<a className="navbar-item">
+			<a href="/" className="navbar-item">
 				<img src="/public/img/ESC-logo-small.png" />
 			</a>
 			<Timer enabled={this.props.timerState.enabled} expires={this.props.timerState.expires} />
