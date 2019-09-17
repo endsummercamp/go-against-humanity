@@ -64,6 +64,7 @@ func main() {
 
 	e.GET("/admin", w.Admin)
 	e.GET("/admin/users", w.AdminUsers)
+	// Todo: make RESTful
 	e.GET("/admin/matches/new", w.AdminNewMatch)
 	e.PUT("/admin/matches/:id/new_black_card", w.NewBlackCard)
 	e.PUT("/admin/matches/:id/end_voting", w.EndVoting)

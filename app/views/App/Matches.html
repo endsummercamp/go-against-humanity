@@ -1,9 +1,11 @@
 {{template "header.html" .Header}}
 
-{{ template "navbar.html" . }}
-
 {{ template "hero.html" .Header }}
+
 {{template "flash.html" .Flash}}
+
+<!-- Todo: update automatically via websocket -->
+
 <section class="container">
 <div class="matches-container">
     {{ if eq (len .Matches) 0 }}
