@@ -1,67 +1,21 @@
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
 import Timer from "./timer"
+import Card from "./card"
 
 if (!window.WebSocket) {
     alert("Your browser does not support WebSockets!")
 }
 
-function dashFix(content){
-    return content.replace(/_/g, '<div class="long-dash"></div>')
-}
-
-class Card extends Component {
-    render() {
-        // https://stackoverflow.com/a/6040258
-        // https://stackoverflow.com/a/8541575
-        const baseHeight = 20.25; // in rems
-        let style = {
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: "100%",
-            height: "0%",
-            backgroundColor: "#a9f16c",
-            zIndex: -1,
-        };
-        if (this.props.total) {
-            const percentage = this.props.total / this.props.sum;
-            style.height = percentage * 100 + "%";
-        };
-        let classes = "card ";
-        classes += "card-" + (this.props.black ? "black" : "white") + " ";
-        if (this.props.text.length > 40)
-            classes += "small-text";
-
-        let classes_middle = "card-middle";
-        if (this.props.total) {
-            classes_middle += " active";
-        }
-        return <div className={classes} onClick={this.props.onClick}>
-            <div className="card-top">
-                <div className="card-content" dangerouslySetInnerHTML={{__html:dashFix(this.props.text)}}>
-                </div>
-            </div>
-            <div className={classes_middle}>
-                <div className="card-votes">{this.props.total || ""}</div>
-            </div>
-            <div className="card-bottom">
-                Cards Against Humanity
-            </div>
-            <div style={{position: "absolute", top: 0, left: 0, bottom: 0,right: 0}}>
-                <div style={style} className="vote-bg"></div>
-            </div>
-        </div>
-    }
+const uiStateLabel = document.getElementById("ui-state-label");
+function printUIState(text) {
+	uiStateLabel.textContent = text;
 }
 
 class BlackRow extends Component {
     render() {
         return <div className="flex" id="blackrow">
-            {("card" in this.props) ?
-                this.props.card :
-                <i>In attesa di una nuova carta nera...</i>
-            }
+            {("card" in this.props) ? this.props.card : <></>}
         </div>;
     }
 }
@@ -90,16 +44,17 @@ class AnswersRow extends Component {
         let sum = 0;
         if (this.props.totals) {
             sum = this.props.totals.reduce((a, b) => a + b.Votes, 0);
-        }
+		}
+
+		const cards = this.props.answers.map((answer, i) => <Card text={answer.text} id={answer.ID} total={answer.total} sum={sum} onClick={(evt) => {
+			console.log("Voted!");
+			const success = this.tryVote(answer.ID);
+			if (!success) return;
+			evt.target.parentNode.classList.add("voted");
+		}} key={i} />);
+
         return <div className="flex" id="blackrow">
-            {
-                this.props.answers.map((answer, i) => <Card text={answer.text} id={answer.ID} total={answer.total} sum={sum} onClick={(evt) => {
-                    console.log("Voted!");
-                    const success = this.tryVote(answer.ID);
-                    if (!success) return;
-                    evt.target.parentNode.classList.add("voted");
-                }} key={i} />)
-            }
+            {cards}
         </div>;
     }
 }
@@ -120,15 +75,12 @@ class MyCardsRow extends Component {
         /* Expects:
            * a prop "cards", containing an array of {text, ID};
          */
-        return <>
-            {
-                this.props.cards.map((answer, i) => <Card text={answer.text} id={answer.ID} onClick={(evt) => {
-                    const success = this.submitCard(answer.ID);
-                    if (!success) return;
-                    evt.target.parentNode.classList.add("inverted");
-                }} key={i} />)
-            }
-        </>;
+		const cards = this.props.cards.map((answer, i) => <Card text={answer.text} id={answer.ID} onClick={(evt) => {
+			const success = this.submitCard(answer.ID);
+			if (!success) return;
+			evt.target.parentNode.classList.add("selected");
+		}} key={i} />);
+        return <>{cards}</>;
     }
 }
 
@@ -142,28 +94,21 @@ if (IS_PLAYER) {
 }
 
 const socket = new WebSocket(`ws://${document.location.hostname}:8080/ws?match=${MATCH_ID}`);
+printUIState("Connecting...");
+
 socket.onopen = function() {
+	printUIState("Waiting for a black card...");
     console.log("Opened socket.");
 };
-
-function getCardText(data) {
-    const {NewCard: { text: cardText }} = data
-    return cardText
-}
-
-function getCardTotals(data) {
-    const { Totals: _totals } = data
-    return _totals
-}
 
 let answers = [];
 let totals = [];
 let canPickCard = false;
 
 socket.onmessage = function (e) {
-    console.log("Received", e.data);
     const data = JSON.parse(e.data);
-    const { Name: eventName } = data;
+    console.log("Received", data);
+	const { Name: eventName } = data;
     switch (eventName) {
     case "join_successful":
         freshStart(data.SecondsUntilFinishPicking, data.InitialBlackCard.text);
@@ -173,7 +118,7 @@ socket.onmessage = function (e) {
         ShowBlackCard(data.Duration, data.NewCard.text);
         break;
     case "new_white":
-        cardText = getCardText(data);
+        // let cardText = getCardText(data);
         answers.push({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id });
         ReactDOM.render(<AnswersRow answers={answers}/>, whiterowDiv);
         break;
@@ -199,8 +144,8 @@ socket.onmessage = function (e) {
 };
 
 function freshStart(SecondsUntilFinishPicking, InitialBlackText) {
-    for (const tag of document.getElementsByClassName("inverted")) {
-        tag.classList.remove("inverted")
+    for (const tag of document.getElementsByClassName("selected")) {
+        tag.classList.remove("selected")
     }
     for (const tag of document.getElementsByClassName("voted")) {
         tag.classList.remove("voted")
@@ -224,6 +169,12 @@ function freshStart(SecondsUntilFinishPicking, InitialBlackText) {
     }
 }
 
+socket.onclose = function () {
+	printUIState("Lost connection!");
+	// alert("Lost connection to the server.");
+    console.log("Socket closed.");
+};
+
 const timer = document.getElementById("match-timer");
 
 // Can be used to start a new game, or to "resume" an existing one
@@ -233,25 +184,18 @@ function ShowBlackCard(seconds_left, black_card_text) {
     ReactDOM.render(<BlackRow card={<Card text={black_card_text} black />}/>, blackrowDiv);
 }
 
-socket.onclose = function () {
-    console.log("Socket closed.");
-};
+if (IS_ADMIN) {
+	document.getElementById("admin-panel-new-blackcard")
+		.addEventListener("click", () => {
+			const req = new XMLHttpRequest();
+			req.open("PUT", `/admin/matches/${MATCH_ID}/new_black_card`);
+			req.send();
+		});
 
-let bcb = document.getElementById("admin-panel-new-blackcard");
-
-if (bcb !== null) {
-    bcb.addEventListener("click", () => {
-        const req = new XMLHttpRequest();
-        req.open("PUT", `/admin/matches/${MATCH_ID}/new_black_card`);
-        req.send();
-    });
-}
-
-let endv = document.getElementById("admin-panel-end-voting");
-if (endv !== null) {
-    endv.addEventListener("click", () => {
-        const req = new XMLHttpRequest();
-        req.open("PUT", `/admin/matches/${MATCH_ID}/end_voting`);
-        req.send();
-    });
+	document.getElementById("admin-panel-end-voting")
+		.addEventListener("click", () => {
+			const req = new XMLHttpRequest();
+			req.open("PUT", `/admin/matches/${MATCH_ID}/end_voting`);
+			req.send();
+		});
 }

@@ -24,6 +24,10 @@
     #react-mycards > .card {
         flex-shrink: 0;
     }
+
+    body {
+        padding-top: 3.25rem !important; /* Accounts for the navbar */
+    }
 </style>
 
 <nav class="navbar is-fixed-top">
@@ -41,9 +45,12 @@
         </div>
     </div>
     {{ end }}
+    <div class="navbar-item">
+        <strong id="ui-state-label"><!-- short instructions here --></strong>
+    </div>
 </nav>
 
-<h1>Cards against Humanity</h1>
+<!-- <h1>Cards against Humanity</h1> -->
 
 <div id="react-blackrow"></div>
 <div class="flex" id="react-whiterow"></div>
@@ -53,8 +60,11 @@
 <script type="text/javascript">
     const MATCH_ID = {{ .Match.Id }};
     const IS_PLAYER = {{ if is_player .User }} true {{ else }} false {{ end }};
+    const IS_ADMIN = {{ if is_admin .User }} true {{ else }} false {{ end }};
 </script>
 
 <script src="/public/scripts/game.js"></script>
 
+<!--
 {{ template "footer.html" .}}
+-->

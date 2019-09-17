@@ -1,9 +1,8 @@
-import React, { Component } from "react"
+import React, { PureComponent } from "react"
 
-export default class Timer extends Component {
+export default class Timer extends PureComponent {
 	constructor(props) {
 		super(props);
-		console.log("Timer init, props:", props);
 		this.state = {
 			seconds_left: props.seconds
 		};

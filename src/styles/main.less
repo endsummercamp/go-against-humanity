@@ -257,7 +257,7 @@ div.card {
         }
     }
 
-    &.inverted {
+    &.selected {
         border: 2px solid @selectedCard;
     }
 
@@ -312,7 +312,8 @@ div.card {
 
     div.card-bottom {
         flex: 1 5 auto;
-        color: #777;
+		/* color: #777; */
+		color: black;
         font-weight: 100;
         font-size: 0.8em;
         bottom: 0;
@@ -321,6 +322,16 @@ div.card {
         align-self: flex-end;
         max-height: 2.2em;
     }
+}
+
+.vote-bg {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 0%;
+	background-color: #a9f16c;
+	z-index: -1;
 }
 
 /*
