@@ -183,11 +183,6 @@ class Game extends Component {
 				}));
 				break;
 			case "winner":
-				if (!IS_ADMIN)
-					break;
-				this.setState(Object.assign(this.state, {
-					answers: [{text: data.WinnerText, ID: 0}]
-				}));
 				break;
 			default:
 				alert("Unknown event " + eventName);
