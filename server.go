@@ -56,6 +56,7 @@ func main() {
 	}
 
 	e.Static("/public", "public")
+	e.File("/favicon.ico", "public/img/favicon.ico")
 	e.GET("/login", w.Login)
 	e.POST("/login", w.DoLogin)
 	e.GET("/signup", w.SignUp)
