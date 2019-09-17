@@ -402,7 +402,7 @@ div.match-admin-panel {
     margin: 10px;
     z-index: 500;
 
-    button.admin-panel-new-blackcard{
+    button#admin-panel-new-blackcard{
         .BoxShadowHelper(2);
         margin-top: 0;
         background-color: #000;
@@ -413,7 +413,7 @@ div.match-admin-panel {
         }
     }
 
-    button.admin-panel-end-voting {
+    button#admin-panel-end-voting {
         .BoxShadowHelper(2);
         background-color: @endVotingColor;
         color: @white;
@@ -436,4 +436,17 @@ div.match-timer {
 .page-centered {
 	margin-left: auto;
 	margin-right: auto;
+}
+
+body {
+    padding-top: 2em !important;
+}
+
+/* Dirty fix to have horizontal items in navbar: https://github.com/jgthms/bulma/issues/1445#issuecomment-373873667 */
+.navbar {
+  display: flex;
+}
+.navbar-item {
+  display: flex;
+  align-items: center;
 }

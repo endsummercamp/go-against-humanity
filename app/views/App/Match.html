@@ -26,12 +26,23 @@
     }
 </style>
 
-<div class="match-timer"></div>
+<nav class="navbar is-fixed-top">
+    <a class="navbar-item">
+        <img src="/public/img/ESC-logo-small.png" />
+    </a>
+    <div class="navbar-item">
+        <div id="match-timer"></div>
+    </div>
+    {{ if is_admin .User }}
+    <div class="navbar-item">
+        <div class="match-admin-panel">
+            <button class="button" id="admin-panel-new-blackcard">New black card</button>
+            <button class="button" id="admin-panel-end-voting">End voting</button>
+        </div>
+    </div>
+    {{ end }}
+</nav>
 
-{{ if is_admin .User }}<div class="match-admin-panel">
-    <button class="button admin-panel-new-blackcard">New Black Card</button>
-    <button class="button admin-panel-end-voting">End Voting</button>
-</div> {{ end }}
 <h1>Cards against Humanity</h1>
 
 <div id="react-blackrow"></div>

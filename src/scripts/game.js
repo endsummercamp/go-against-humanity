@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import ReactDOM from "react-dom"
+import Timer from "./timer"
 
 if (!window.WebSocket) {
     alert("Your browser does not support WebSockets!")
@@ -42,7 +43,7 @@ class Card extends Component {
                 </div>
             </div>
             <div className={classes_middle}>
-                <div class="card-votes">{this.props.total || ""}</div>
+                <div className="card-votes">{this.props.total || ""}</div>
             </div>
             <div className="card-bottom">
                 Cards Against Humanity
@@ -140,7 +141,6 @@ if (IS_PLAYER) {
     mycardsDiv.style.display = "flex";
 }
 
-const whiteRow = document.getElementById("whiterow");
 const socket = new WebSocket(`ws://${document.location.hostname}:8080/ws?match=${MATCH_ID}`);
 socket.onopen = function() {
     console.log("Opened socket.");
@@ -159,19 +159,16 @@ function getCardTotals(data) {
 let answers = [];
 let totals = [];
 let canPickCard = false;
-let timer = document.getElementsByClassName("match-timer")[0];
-let timer_interval;
+
 socket.onmessage = function (e) {
     console.log("Received", e.data);
     const data = JSON.parse(e.data);
     const { Name: eventName } = data;
-    let cardText;
     switch (eventName) {
     case "join_successful":
         freshStart(data.SecondsUntilFinishPicking, data.InitialBlackCard.text);
         break;
-        case "new_black":
-        timer.style.display = 'block';
+	case "new_black":
         mycardsDiv.style.display = "flex";
         ShowBlackCard(data.Duration, data.NewCard.text);
         break;
@@ -188,7 +185,8 @@ socket.onmessage = function (e) {
         ReactDOM.render(<AnswersRow answers={answers} totals={totals}/>, whiterowDiv);
         break;
     case "voting":
-        stopTimer();
+	    canPickCard = false;
+		// timerComponent.stop();
         mycardsDiv.style.display = "none";
         canVote = true;
         break;
@@ -226,19 +224,12 @@ function freshStart(SecondsUntilFinishPicking, InitialBlackText) {
     }
 }
 
+const timer = document.getElementById("match-timer");
+
 // Can be used to start a new game, or to "resume" an existing one
 function ShowBlackCard(seconds_left, black_card_text) {
-    canPickCard = true;
-    timer_interval = setInterval(() => {
-        if(seconds_left <= 0) {
-            clearInterval(timer_interval);
-            return;
-        }
-        const minutes = String(Math.floor(seconds_left / 60)).padStart(2, '0');
-        const seconds = String(seconds_left % 60).padStart(2, '0');
-        timer.textContent = minutes + ":" + seconds;
-        seconds_left--;
-    }, 1000);
+	canPickCard = true;
+	ReactDOM.render(<Timer seconds={seconds_left} />, timer);
     ReactDOM.render(<BlackRow card={<Card text={black_card_text} black />}/>, blackrowDiv);
 }
 
@@ -246,9 +237,9 @@ socket.onclose = function () {
     console.log("Socket closed.");
 };
 
-let bcb = document.getElementsByClassName("admin-panel-new-blackcard")[0];
+let bcb = document.getElementById("admin-panel-new-blackcard");
 
-if (bcb !== undefined) {
+if (bcb !== null) {
     bcb.addEventListener("click", () => {
         const req = new XMLHttpRequest();
         req.open("PUT", `/admin/matches/${MATCH_ID}/new_black_card`);
@@ -256,18 +247,11 @@ if (bcb !== undefined) {
     });
 }
 
-let endv = document.getElementsByClassName("admin-panel-end-voting")[0];
-if (endv !== undefined) {
+let endv = document.getElementById("admin-panel-end-voting");
+if (endv !== null) {
     endv.addEventListener("click", () => {
         const req = new XMLHttpRequest();
         req.open("PUT", `/admin/matches/${MATCH_ID}/end_voting`);
         req.send();
     });
-}
-
-function stopTimer() {
-    clearInterval(timer_interval);
-    timer.textContent = "";
-    timer.style.display = "none";
-    canPickCard = false;
 }
