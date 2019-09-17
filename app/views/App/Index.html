@@ -1,8 +1,6 @@
 {{define "title"}}Home{{end}}
 {{template "header.html" .Header}}
-{{template "navbar.html" .}}
 
-{{ template "hero.html" .Header }}
 <section class="has-text-centered">
 	<h1 class="title">ESC against Humanity</h1>
 	<img src="public/img/ESC-logo-small.png" style="width: 5em" /> <!-- todo: fix path -->
@@ -12,4 +10,35 @@
 <br>
 
 {{template "flash.html" .Flash}}
+
+<nav class="panel">
+       <!-- Todo: JS to make the panel work -->
+       {{ if is_admin .User }}
+       <p class="panel-tabs">
+               <a class="is-active">User</a>
+               <a href="/admin">Admin tools</a>
+       </p>
+       {{ end }}
+       <!--
+       <a class="panel-block">
+               <span class="panel-icon">
+                       <i class="fa fa-gamepad"></i>
+               </span>
+               Current match
+       </a>
+       -->
+       <a href="/matches" class="panel-block">
+               <span class="panel-icon">
+                       <i class="fa fa-gamepad"></i>
+               </span>
+               Matches
+       </a>
+       <a href="/logout" class="panel-block">
+               <span class="panel-icon">
+                       <i class="fa fa-times-circle"></i>
+               </span>
+               Log out
+       </a>
+</nav>
+
 {{template "footer.html" .}}
