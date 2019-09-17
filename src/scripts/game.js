@@ -111,13 +111,31 @@ socket.onmessage = function (e) {
 	const { Name: eventName } = data;
     switch (eventName) {
     case "join_successful":
-        freshStart(data.SecondsUntilFinishPicking, data.InitialBlackCard.text);
+		// We joined successfully. Clear the UI.
+        resetUI(data.SecondsUntilFinishPicking, data.InitialBlackCard.text);
         break;
 	case "new_black":
+		// A black card was chosen. Show it.
         mycardsDiv.style.display = "flex";
-        ShowBlackCard(data.Duration, data.NewCard.text);
+		ShowBlackCard(data.Duration, data.NewCard.text);
+		if (IS_PLAYER)
+			printUIState("Play your white card(s)!");
+		else
+			printUIState("Waiting for the players...");
         break;
-    case "new_white":
+	case "voting":
+		// The voting phase has begun.
+		if (IS_PLAYER)
+			printUIState("The jurors are voting...");
+		else
+			printUIState("Vote for the best card!");
+		canPickCard = false;
+		// timerComponent.stop();
+		mycardsDiv.style.display = "none";
+		canVote = true;
+		break;
+	case "new_white":
+		// A new white card (from the voting phase) was received.
         // let cardText = getCardText(data);
         answers.push({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id });
         ReactDOM.render(<AnswersRow answers={answers}/>, whiterowDiv);
@@ -129,21 +147,16 @@ socket.onmessage = function (e) {
         }
         ReactDOM.render(<AnswersRow answers={answers} totals={totals}/>, whiterowDiv);
         break;
-    case "voting":
-	    canPickCard = false;
-		// timerComponent.stop();
-        mycardsDiv.style.display = "none";
-        canVote = true;
-        break;
     case "show_results":
-        freshStart();
+		printUIState(""); // TODO
+        resetUI();
         break;
     default:
         alert("Unknown event " + eventName);
     }
 };
 
-function freshStart(SecondsUntilFinishPicking, InitialBlackText) {
+function resetUI(SecondsUntilFinishPicking, InitialBlackText) {
     for (const tag of document.getElementsByClassName("selected")) {
         tag.classList.remove("selected")
     }

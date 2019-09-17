@@ -9,6 +9,9 @@ export default class Timer extends PureComponent {
 		const interval = setInterval(() => {
 			const seconds_left = this.state.seconds_left;
 			if (seconds_left <= 0) {
+				this.setState({
+					seconds_left: 0
+				});
 				clearInterval(interval);
 				return;
 			}
