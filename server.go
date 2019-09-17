@@ -30,6 +30,7 @@ func customHTTPErrorHandler(err error, c echo.Context) {
 	if err := c.File(errorPage); err != nil {
 		c.Logger().Error(err)
 	}
+	fmt.Printf("At %s:\n\t", c.Path())
 	c.Logger().Error(err)
 	_ = c.String(http.StatusInternalServerError, err.Error())
 }
