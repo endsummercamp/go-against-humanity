@@ -133,12 +133,12 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 		w.Ws.BroadcastToRoom(matchId, msg)
 
 		for _, card := range round.GetChoices() {
+			time.Sleep(time.Second)
 			msg := Event{
 				Name:    "new_white",
 				NewCard: card,
 			}
 			w.Ws.BroadcastToRoom(matchId, msg)
-			time.Sleep(time.Second)
 		}
 	}()
 
