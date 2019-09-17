@@ -193,7 +193,7 @@ func (w *WebApp) PickCard(c echo.Context) error {
 		}
 	}
 
-	if foundId == -1 {
+	if card == nil {
 		return c.String(http.StatusNotFound, "Card not found.")
 	}
 
@@ -214,6 +214,104 @@ func (w *WebApp) PickCard(c echo.Context) error {
 	if !result {
 		return c.String(http.StatusForbidden, "Already played")
 	}
+
+	return c.JSON(http.StatusOK, nil)
+}
+
+func (w *WebApp) VoteCard(c echo.Context) error {
+	if !utils.IsLoggedIn(c) {
+		return c.Redirect(http.StatusTemporaryRedirect, "/login")
+	}
+
+	user := w.GetUserByUsername(utils.GetUsername(c))
+
+	// TODO!
+	/*
+	if user.UserType != models.JurorType {
+		return c.Forbidden("Only Jurors can cast a vote!")
+	}
+	*/
+
+	matchId, err := strconv.Atoi(c.Param("match_id"))
+	if err != nil {
+		return err
+	}
+	cardId, err := strconv.Atoi(c.Param("card_id"))
+	if err != nil {
+		return err
+	}
+
+	match := w.MatchManager.GetMatchByID(matchId)
+	if match == nil {
+		return c.String(http.StatusNotFound, "Match not found.")
+	}
+
+	round := match.GetRound()
+	if round == nil {
+		return c.String(http.StatusForbidden, "Can't play this card right now (no rounds available).")
+	}
+
+	var card *models.WhiteCard = nil
+
+	for _, c := range round.GetChoices() {
+		if c.Id == cardId {
+			card = c
+			break
+		}
+	}
+
+	if card == nil {
+		return c.String(http.StatusNotFound, "Card not found.")
+	}
+
+	// TODO!
+	/*
+	if match.State != models.MATCH_VOTING {
+		return c.Forbidden("Voting disallowed")
+	}
+	*/
+
+	var juror *models.Juror = nil
+
+	for _, j := range match.Jury {
+		if j.User.Id == user.Id {
+			juror = j
+			break
+		}
+	}
+
+	if juror == nil {
+		return c.String(http.StatusNotFound, "Juror not found! Are you a Juror in this match?")
+	}
+
+	log.Printf("User: %#v\n", user)
+	log.Printf("Juror: %#v\n", juror.User)
+
+	for _, j := range round.Voters {
+		if j.User.Id == juror.User.Id {
+			return c.String(http.StatusForbidden, "Cannot vote twice.")
+		}
+	}
+
+	round.Voters = append(round.Voters, *juror)
+
+
+	// Cast vote
+	round.Wcs[card] = append(round.Wcs[card], *juror)
+
+	totals := []Total{}
+
+	for card, jury := range round.Wcs {
+		totals = append(totals, Total{
+			ID:    card.Id,
+			Votes: len(jury),
+		})
+	}
+
+	w.Ws.BroadcastToRoom(matchId, Event{
+		Name:   "vote_cast",
+		Totals: totals,
+	})
 
 	return c.JSON(http.StatusOK, nil)
 }

@@ -74,6 +74,7 @@ func main() {
 
 	e.GET("/mycards", w.MatchCards)
 	e.PUT("/matches/:match_id/pick_card/:card_id", w.PickCard)
+	e.PUT("/matches/:match_id/vote_card/:card_id", w.VoteCard)
 	e.GET("/", w.Index)
 	// The ws start is not blocking, but the echo start is, so ws goes first
 	ws.Start()
