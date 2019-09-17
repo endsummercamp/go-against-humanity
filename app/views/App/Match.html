@@ -15,6 +15,9 @@
         justify-content: center;
     }
     #react-mycards {
+        {{ if is_player .User }}
+        display: flex;
+        {{ end }}
         position: fixed;
         bottom: 0;
         left: 0;
@@ -30,25 +33,7 @@
     }
 </style>
 
-<nav class="navbar is-fixed-top">
-    <a class="navbar-item">
-        <img src="/public/img/ESC-logo-small.png" />
-    </a>
-    <div class="navbar-item">
-        <div id="match-timer"></div>
-    </div>
-    {{ if is_admin .User }}
-    <div class="navbar-item">
-        <div class="match-admin-panel">
-            <button class="button" id="admin-panel-new-blackcard">New black card</button>
-            <button class="button" id="admin-panel-end-voting">End voting</button>
-        </div>
-    </div>
-    {{ end }}
-    <div class="navbar-item">
-        <strong id="ui-state-label"><!-- short instructions here --></strong>
-    </div>
-</nav>
+<div id="react-game"></div>
 
 <!-- <h1>Cards against Humanity</h1> -->
 

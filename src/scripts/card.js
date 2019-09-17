@@ -27,6 +27,8 @@ export default class Card extends Component {
 			"card",
 			this.props.black ? "card-black" : "card-white"
 		];
+		if (this.props.selected)
+			classes.push("selected");
         if (this.props.text.length > 40)
             classes.push("small-text");
 

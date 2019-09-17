@@ -1,31 +1,81 @@
-import React, { Component } from "react"
+import React, { PureComponent, Component } from "react"
 import ReactDOM from "react-dom"
-import Timer from "./timer"
+import Navbar from "./navbar"
 import Card from "./card"
 
 if (!window.WebSocket) {
     alert("Your browser does not support WebSockets!")
 }
 
-const uiStateLabel = document.getElementById("ui-state-label");
-function printUIState(text) {
-	uiStateLabel.textContent = text;
-}
-
 class BlackRow extends Component {
     render() {
         return <div className="flex" id="blackrow">
-            {("card" in this.props) ? this.props.card : <></>}
+            {this.props.card || <></>}
         </div>;
     }
 }
 
-let canVote = false;
+class WhiteRow extends Component {
+	render() {
+		return <div id="react-mycards">
+			<div className="flex" id="blackrow"></div>
+		</div>;
+	}
+}
+
+let canPickCard = false,
+	canVote = false;
+
+class MyCardsRow extends Component {
+	constructor(props) {
+		super(props);
+		this.state = {
+			selectedCard: null
+		};
+	}
+
+	submitCard(id) {
+        if (!canPickCard) {
+            // alert("You cannot pick a card at this time!");
+            return false;
+        }
+        const req = new XMLHttpRequest();
+        req.open("PUT", `/matches/${MATCH_ID}/pick_card/${id}`);
+        req.send();
+        canPickCard = false;
+        return true;
+	}
+
+	render() {
+		const cards = this.props.cards.map(answer => <Card
+			text={answer.text}
+			id={answer.ID}
+			selected={answer.ID == this.state.selectedCard}
+			onClick={() => {
+				const success = this.submitCard(answer.ID);
+				if (!success)
+					return;
+				this.setState({selectedCard: answer.ID});
+			}}
+			key={answer.ID} />
+		);
+        return <div id="react-mycards">
+			{cards}
+		</div>
+	}
+}
 
 class AnswersRow extends Component {
-    tryVote(id) {
+	constructor(props) {
+		super(props);
+		this.state = {
+			votedCard: null
+		};
+	}
+
+	tryVote(id) {
         if (IS_PLAYER) {
-            alert("You're a player, you cannot vote!");
+            // alert("You're a player, you cannot vote!");
             return;
         }
         if (!canVote)
@@ -36,22 +86,29 @@ class AnswersRow extends Component {
         // canVote = false;
         return true;
     }
-    render() {
-        /* Expects:
-           * a prop "answers", containing an array of {text, ID};
-           * a prop "totals", containing an array of {Votes}.
-         */
+
+	render() {
+        // Expects:
+        // * a prop "answers", containing an array of {text, ID};
+        // * a prop "totals", containing an array of {Votes}.
         let sum = 0;
         if (this.props.totals) {
             sum = this.props.totals.reduce((a, b) => a + b.Votes, 0);
 		}
 
-		const cards = this.props.answers.map((answer, i) => <Card text={answer.text} id={answer.ID} total={answer.total} sum={sum} onClick={(evt) => {
-			console.log("Voted!");
-			const success = this.tryVote(answer.ID);
-			if (!success) return;
-			evt.target.parentNode.classList.add("voted");
-		}} key={i} />);
+		const cards = this.props.answers.map(answer => <Card
+			voted={answer.ID == this.state.votedCard}
+			text={answer.text}
+			id={answer.ID}
+			total={answer.total}
+			sum={sum}
+			onClick={(evt) => {
+				console.log("Voted!");
+				const success = this.tryVote(answer.ID);
+				if (!success) return;
+				this.setState({votedCard: answer.ID});
+			}}
+			key={answer.ID} />);
 
         return <div className="flex" id="blackrow">
             {cards}
@@ -59,156 +116,140 @@ class AnswersRow extends Component {
     }
 }
 
-class MyCardsRow extends Component {
-    submitCard(id) {
-        if (!canPickCard) {
-            alert("You cannot pick a card at this time!");
-            return false;
-        }
-        const req = new XMLHttpRequest();
-        req.open("PUT", `/matches/${MATCH_ID}/pick_card/${id}`);
-        req.send();
-        canPickCard = false;
-        return true;
-    }
-    render() {
-        /* Expects:
-           * a prop "cards", containing an array of {text, ID};
-         */
-		const cards = this.props.cards.map((answer, i) => <Card text={answer.text} id={answer.ID} onClick={(evt) => {
-			const success = this.submitCard(answer.ID);
-			if (!success) return;
-			evt.target.parentNode.classList.add("selected");
-		}} key={i} />);
-        return <>{cards}</>;
-    }
-}
+class Game extends Component {
+	constructor(props) {
+		super(props);
+		this.socket = new WebSocket(`ws://${document.location.hostname}:8080/ws?match=${MATCH_ID}`);
+		this.state = {
+			// Navbar state
+			timerState: {
+				enabled: false,
+				seconds: 0
+			},
+			uiStateText: "Connecting...",
+			// Game UI state
+			blackCard: null,
+			myCards: [],
+			answers: [],
+		};
+		this.socket.onopen = () => {
+			this.setState(Object.assign(this.state, {uiStateText: "Waiting for a black card..."}));
+			// console.log("Opened socket.");
+		};
+		this.socket.onmessage = e => {
+			const data = JSON.parse(e.data);
+			console.log("Received", data);
+			const eventName = data.Name;
+			switch (eventName) {
+			case "join_successful":
+				// We joined successfully. Clear the UI.
+				this.resetUI();
+				if (data.SecondsUntilFinishPicking)
+					this.showBlackCard(data.SecondsUntilFinishPicking, data.InitialBlackText.text);	
+				break;
+			case "new_black":
+				// A black card was chosen. Show it.
+				// mycardsDiv.style.display = "flex";
+				this.showBlackCard(data.Duration, data.NewCard.text);
+				break;
+			case "voting":
+				// The voting phase has begun.
+				canPickCard = false;
+				canVote = true;
+				this.setState(Object.assign(this.state, {
+					timerState: {
+						enabled: false,
+						seconds: 0
+					},
+					uiStateText: IS_PLAYER
+						? "The jurors are voting..."
+						: "Vote for the best card!",
+					myCards: []
+				}))
+				break;
+			case "new_white":
+				// A new white card (from the voting phase) was received.
+				this.setState(Object.assign(this.state, {
+					answers: this.state.answers.concat({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id })
+				}));
+				break;
+			case "vote_cast":
+				let totals = data.Totals;
+				let answers = this.state.answers;
+				for (const total of totals) {
+					answers.find(a => a.ID === total.ID).total = total.Votes;
+				}
+				this.setState(Object.assign(this.state, {
+					answers,
+					totals,
+				}));
+				break;
+			case "show_results":
+				this.setState(Object.assign(this.state, {
+					uiStateText: "", // TODO
+				}));
+				resetUI();
+				break;
+			default:
+				alert("Unknown event " + eventName);
+			}
+		};
+	}
 
-const blackrowDiv = document.getElementById("react-blackrow");
-ReactDOM.render(<BlackRow />, blackrowDiv);
-const whiterowDiv = document.getElementById("react-whiterow");
-ReactDOM.render(<AnswersRow answers={[]} />, whiterowDiv);
-const mycardsDiv = document.getElementById("react-mycards");
-if (IS_PLAYER) {
-    mycardsDiv.style.display = "flex";
-}
+	showBlackCard(duration, text) {
+		canPickCard = true;
+		console.log("showBlackCard:", duration);
+		this.setState(Object.assign(this.state, {
+			timerState: {
+				enabled: true,
+				seconds: duration
+			},
+			uiStateText: IS_PLAYER
+				? "Play your white card!"
+				: "Waiting for the players...",
+			blackCard: <Card text={text} black />
+		}));
+	}
 
-const socket = new WebSocket(`ws://${document.location.hostname}:8080/ws?match=${MATCH_ID}`);
-printUIState("Connecting...");
-
-socket.onopen = function() {
-	printUIState("Waiting for a black card...");
-    console.log("Opened socket.");
-};
-
-let answers = [];
-let totals = [];
-let canPickCard = false;
-
-socket.onmessage = function (e) {
-    const data = JSON.parse(e.data);
-    console.log("Received", data);
-	const { Name: eventName } = data;
-    switch (eventName) {
-    case "join_successful":
-		// We joined successfully. Clear the UI.
-        resetUI(data.SecondsUntilFinishPicking, data.InitialBlackCard.text);
-        break;
-	case "new_black":
-		// A black card was chosen. Show it.
-        mycardsDiv.style.display = "flex";
-		ShowBlackCard(data.Duration, data.NewCard.text);
+	resetUI() {
+		/* todo
+		for (const tag of document.getElementsByClassName("selected")) {
+			tag.classList.remove("selected")
+		}
+		for (const tag of document.getElementsByClassName("voted")) {
+			tag.classList.remove("voted")
+		}
+		*/
+		this.setState(Object.assign(this.state, {
+			blackCard: null,
+			answers: []
+		}));
 		if (IS_PLAYER)
-			printUIState("Play your white card(s)!");
-		else
-			printUIState("Waiting for the players...");
-        break;
-	case "voting":
-		// The voting phase has begun.
-		if (IS_PLAYER)
-			printUIState("The jurors are voting...");
-		else
-			printUIState("Vote for the best card!");
-		canPickCard = false;
-		// timerComponent.stop();
-		mycardsDiv.style.display = "none";
-		canVote = true;
-		break;
-	case "new_white":
-		// A new white card (from the voting phase) was received.
-        // let cardText = getCardText(data);
-        answers.push({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id });
-        ReactDOM.render(<AnswersRow answers={answers}/>, whiterowDiv);
-        break;
-    case "vote_cast":
-        totals = data.Totals;
-        for (const total of totals) {
-            answers.find(a => a.ID === total.ID).total = total.Votes;
-        }
-        ReactDOM.render(<AnswersRow answers={answers} totals={totals}/>, whiterowDiv);
-        break;
-    case "show_results":
-		printUIState(""); // TODO
-        resetUI();
-        break;
-    default:
-        alert("Unknown event " + eventName);
-    }
-};
+			this.fetchMyCards();
+	}
 
-function resetUI(SecondsUntilFinishPicking, InitialBlackText) {
-    for (const tag of document.getElementsByClassName("selected")) {
-        tag.classList.remove("selected")
-    }
-    for (const tag of document.getElementsByClassName("voted")) {
-        tag.classList.remove("voted")
-    }
-    answers = [];
-    ReactDOM.render(<BlackRow />, blackrowDiv);
-    ReactDOM.render(<AnswersRow answers={[]}/>, whiterowDiv);
-    if (IS_PLAYER) {
-        const req = new XMLHttpRequest();
-        req.addEventListener("load", () => {
-            const resp = JSON.parse(req.responseText);
-            const cards = resp.map(item => ({text: item.text, ID: item.Id}));
-            console.log("My cards:", cards);
-            ReactDOM.render(<MyCardsRow cards={cards} />, mycardsDiv);
-        });
-        req.open("GET", `/mycards?match_id=${MATCH_ID}`);
-        req.send();
-    }
-    if (SecondsUntilFinishPicking) {
-        ShowBlackCard(SecondsUntilFinishPicking, InitialBlackText);
-    }
-}
-
-socket.onclose = function () {
-	printUIState("Lost connection!");
-	// alert("Lost connection to the server.");
-    console.log("Socket closed.");
-};
-
-const timer = document.getElementById("match-timer");
-
-// Can be used to start a new game, or to "resume" an existing one
-function ShowBlackCard(seconds_left, black_card_text) {
-	canPickCard = true;
-	ReactDOM.render(<Timer seconds={seconds_left} />, timer);
-    ReactDOM.render(<BlackRow card={<Card text={black_card_text} black />}/>, blackrowDiv);
-}
-
-if (IS_ADMIN) {
-	document.getElementById("admin-panel-new-blackcard")
-		.addEventListener("click", () => {
-			const req = new XMLHttpRequest();
-			req.open("PUT", `/admin/matches/${MATCH_ID}/new_black_card`);
-			req.send();
+	fetchMyCards() {
+		if (!IS_PLAYER)
+			return;
+		const req = new XMLHttpRequest();
+		req.addEventListener("load", () => {
+			const resp = JSON.parse(req.responseText);
+			const cards = resp.map(item => ({text: item.text, ID: item.Id}));
+			console.log("My cards:", cards);
+			this.setState(Object.assign(this.state, {myCards: cards}));
 		});
+		req.open("GET", `/mycards?match_id=${MATCH_ID}`);
+		req.send();
+	}
 
-	document.getElementById("admin-panel-end-voting")
-		.addEventListener("click", () => {
-			const req = new XMLHttpRequest();
-			req.open("PUT", `/admin/matches/${MATCH_ID}/end_voting`);
-			req.send();
-		});
+	render() {
+		return <>
+			<Navbar timerState={this.state.timerState} uiStateText={this.state.uiStateText} />
+			<BlackRow card={this.state.blackCard} />
+			<MyCardsRow cards={this.state.myCards} />
+			<AnswersRow answers={this.state.answers} />
+		</>;
+	}
 }
+
+ReactDOM.render(<Game />, document.getElementById("react-game"));

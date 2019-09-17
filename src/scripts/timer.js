@@ -25,6 +25,6 @@ export default class Timer extends PureComponent {
 		const seconds_left = this.state.seconds_left;
 		const minutes = String(Math.floor(seconds_left / 60)).padStart(2, '0');
 		const seconds = String(seconds_left % 60).padStart(2, '0');
-		return <span>{minutes}:{seconds}</span>;
+		return <a className="navbar-item">{minutes}:{seconds}</a>;
 	}
 }
