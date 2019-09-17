@@ -127,18 +127,16 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 			}
 		}*/
 
-		msg := Event{
+		w.Ws.BroadcastToRoom(matchId, Event{
 			Name: "voting",
-		}
-		w.Ws.BroadcastToRoom(matchId, msg)
+		})
 
 		for _, card := range round.GetChoices() {
 			time.Sleep(time.Second)
-			msg := Event{
+			w.Ws.BroadcastToRoom(matchId, Event{
 				Name:    "new_white",
 				NewCard: card,
-			}
-			w.Ws.BroadcastToRoom(matchId, msg)
+			})
 		}
 	}()
 
@@ -225,12 +223,9 @@ func (w *WebApp) VoteCard(c echo.Context) error {
 
 	user := w.GetUserByUsername(utils.GetUsername(c))
 
-	// TODO!
-	/*
 	if user.UserType != models.JurorType {
-		return c.Forbidden("Only Jurors can cast a vote!")
+		return c.String(http.StatusForbidden, "Only Jurors can cast a vote!")
 	}
-	*/
 
 	matchId, err := strconv.Atoi(c.Param("match_id"))
 	if err != nil {
@@ -347,16 +342,15 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 	}
 
 	match.EndVote()
-	msg := Event{
+	w.Ws.BroadcastToRoom(matchId, Event{
 		Name: "show_results",
-	}
-	w.Ws.BroadcastToRoom(matchId, msg)
+	})
 
 	for _, player := range match.Players {
-		log.Printf("Range over players... (%d - %d)", player.User.Id, len(player.Cards))
+		// log.Printf("Range over players... (%d - %d)", player.User.Id, len(player.Cards))
 		if len(player.Cards) < 10 {
 			whitecard := match.Deck.NewRandomWhiteCard()
-			log.Printf("Whitecard player %d : %#v", &player.User.Id, whitecard)
+			// log.Printf("Whitecard player %d : %#v", &player.User.Id, whitecard)
 			player.Cards = append(player.Cards, whitecard)
 		}
 	}
@@ -378,17 +372,23 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 
 	winningID := totals[0].ID
 	var winner *models.Player
+	var winningCard *models.WhiteCard
 	for card := range round.Wcs {
 		if card.Id != winningID {
 			continue
 		}
 		winner = card.Owner
+		winningCard = card
 	}
 
 	if winner != nil {
 		fmt.Printf("Winner: %s\n", winner.User.Username)
+		w.Ws.BroadcastToRoom(matchId, Event{
+			Name:   "winner",
+			WinnerUsername: winner.User.Username,
+			WinnerText: winningCard.Text,
+		})
 	}
-
 
 	return c.JSON(http.StatusOK, nil)
 }

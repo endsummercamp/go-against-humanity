@@ -30,6 +30,8 @@ type Event struct {
 	Duration int
 	InitialBlackCard models.BlackCard
 	SecondsUntilFinishPicking int
+	WinnerUsername string
+	WinnerText string
 }
 
 type SocketServer struct {
