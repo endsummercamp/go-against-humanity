@@ -15,14 +15,6 @@ class BlackRow extends Component {
     }
 }
 
-class WhiteRow extends Component {
-	render() {
-		return <div id="react-mycards">
-			<div className="flex" id="blackrow"></div>
-		</div>;
-	}
-}
-
 let canPickCard = false,
 	canVote = false;
 
@@ -102,7 +94,7 @@ class AnswersRow extends Component {
 			id={answer.ID}
 			total={answer.total}
 			sum={sum}
-			onClick={(evt) => {
+			onClick={() => {
 				console.log("Voted!");
 				const success = this.tryVote(answer.ID);
 				if (!success) return;
@@ -150,6 +142,7 @@ class Game extends Component {
 			case "new_black":
 				// A black card was chosen. Show it.
 				// mycardsDiv.style.display = "flex";
+				this.resetUI();
 				this.showBlackCard(data.Duration, data.NewCard.text);
 				break;
 			case "voting":
@@ -188,7 +181,13 @@ class Game extends Component {
 				this.setState(Object.assign(this.state, {
 					uiStateText: "", // TODO
 				}));
-				resetUI();
+				break;
+			case "winner":
+				if (!IS_ADMIN)
+					break;
+				this.setState(Object.assign(this.state, {
+					answers: [{text: data.WinnerText, ID: 0}]
+				}));
 				break;
 			default:
 				alert("Unknown event " + eventName);
@@ -198,7 +197,6 @@ class Game extends Component {
 
 	showBlackCard(duration, text) {
 		canPickCard = true;
-		console.log("showBlackCard:", duration);
 		this.setState(Object.assign(this.state, {
 			timerState: {
 				enabled: true,
@@ -245,7 +243,11 @@ class Game extends Component {
 	render() {
 		return <>
 			<Navbar timerState={this.state.timerState} uiStateText={this.state.uiStateText} />
-			<BlackRow card={this.state.blackCard} />
+			{/* Middle row */}
+			<div className="flex" id="blackrow">
+				{this.state.blackCard}
+				{/* Maybe a table here? */}
+			</div>
 			<MyCardsRow cards={this.state.myCards} />
 			<AnswersRow answers={this.state.answers} />
 		</>;
