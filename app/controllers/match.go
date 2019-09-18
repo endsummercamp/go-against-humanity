@@ -239,17 +239,21 @@ func (w *WebApp) PickCard(c echo.Context) error {
 		return c.String(http.StatusNotFound, "Card not found.")
 	}
 
+	/*
 	for _, c := range player.Cards {
 		log.Printf("P%d, C: %d\n", player.User.Id, c.Id)
 	}
+	*/
 
 	player.Cards = append(player.Cards[:foundId], player.Cards[foundId+1:]...)
 
+	/*
 	log.Printf("-----------")
 
 	for _, c := range player.Cards {
 		log.Printf("P%d, C: %d\n", player.User.Id, c.Id)
 	}
+	*/
 
 	result := round.AddCard(card)
 
