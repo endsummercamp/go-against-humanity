@@ -6,6 +6,7 @@ type User struct {
 	PwHash string
 	Admin bool
 	UserType UserType
+	Score int
 }
 
 type UserType int

@@ -155,6 +155,7 @@ func (m *Match) EndVote() bool {
 	m.State = MATCH_SHOW_RESULTS
 	return true
 }
+
 func (m *Match) RemoveVote(round *Round, card *WhiteCard, juror *Juror) {
 	found := -1
 	for i, j := range round.Wcs[card] {

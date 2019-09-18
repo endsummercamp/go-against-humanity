@@ -112,10 +112,10 @@ func (s *SocketServer) wsHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *SocketServer) Start() int {
 	http.HandleFunc("/ws", s.wsHandler)
-	fmt.Println("Websocket server listening on :8080.")
+	fmt.Println("Websocket server listening on :4430.")
 
 	go func() {
-		err := http.ListenAndServe(":8080", nil)
+		err := http.ListenAndServe(":4430", nil)
 		if err != nil {
 			panic(err)
 		}

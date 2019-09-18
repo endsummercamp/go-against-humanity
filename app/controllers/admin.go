@@ -58,7 +58,7 @@ func (w *WebApp) AdminUsers(c echo.Context) error {
 		Users: users,
 		Header: data.HeaderData{
 			Title: "Users",
-			SubTitle: "List of the users",
+			// SubTitle: "List of the users",
 		},
 	})
 }

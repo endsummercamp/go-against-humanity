@@ -5,7 +5,8 @@ import (
 )
 
 type IndexPageData struct {
-	Header HeaderData
-	Flash  FlashData
-	User   models.User
+	Header      HeaderData
+	Flash       FlashData
+	Leaderboard []models.User
+	User        models.User
 }
