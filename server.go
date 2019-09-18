@@ -11,6 +11,7 @@ import (
 	"html/template"
 	"io"
 	"net/http"
+	"os"
 )
 
 type Template struct {
@@ -42,7 +43,11 @@ func main() {
 		templates: template.Must(template.New("").Funcs(utils.FuncMap).ParseGlob("app/views/**/*.html")),
 	}
 
-	e.Use(session.Middleware(sessions.NewCookieStore([]byte("SECRET"))))
+	cookieSecret, found := os.LookupEnv("COOKIE_SECRET")
+	if !found {
+		panic("Please set the environment variable COOKIE_SECRET to a random string.")
+	}
+	e.Use(session.Middleware(sessions.NewCookieStore([]byte(cookieSecret))))
 	e.Renderer = t
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
