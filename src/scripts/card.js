@@ -32,12 +32,16 @@ export default class Card extends Component {
         if (this.props.text.length > 40)
             classes.push("small-text");
 
+        let classes_top = "card-top card-content";
+        if (this.props.total)
+            classes_top += " with-z-index-fix";
+
         let classes_middle = "card-middle";
         if (this.props.total)
             classes_middle += " active";
 
 		return <div className={classes.join(" ")} onClick={this.props.onClick}>
-            <div className="card-top card-content" dangerouslySetInnerHTML={{__html:dashFix(this.props.text)}}></div>
+            <div className={classes_top} dangerouslySetInnerHTML={{__html:dashFix(this.props.text)}}></div>
             <div className={classes_middle}>
                 <div className="card-votes">{this.props.total || ""}</div>
             </div>

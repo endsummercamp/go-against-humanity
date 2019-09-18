@@ -273,7 +273,6 @@ div.card {
         width: 100%;
         align-self: flex-start;
         text-align: left;
-        /* z-index: 1; */
         overflow: hidden;
         word-wrap: break-word;
 
@@ -332,13 +331,17 @@ div.card {
     }
 }
 
+div.card-top.with-z-index-fix {
+    z-index: 1;
+}
+
 .vote-bg {
 	position: absolute;
 	bottom: 0;
 	left: 0;
 	width: 100%;
 	height: 0%;
-	background-color: #a9f16c55;
+	background-color: #a9f16c;
 	z-index: -1;
 }
 
