@@ -15,6 +15,7 @@ import (
 
 func (w *WebApp) Matches(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
+		log.Println("[Matches] Not logged in, redirecting to /login")
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")
 	}
 
@@ -30,17 +31,20 @@ func (w *WebApp) Matches(c echo.Context) error {
 
 func (w *WebApp) JoinLatestMatch(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
+		log.Println("[JoinLatestMatch] Not logged in, redirecting to /login")
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")
 	}
 
 	matches := w.MatchManager.GetMatches()
 	if len(matches) == 0 {
+		log.Println("[JoinLatestMatch] No active match, redirecting to /")
 		return c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
 	matchId := matches[len(matches) - 1].Id
 
 	user := w.GetUserByUsername(utils.GetUsername(c))
 	if !w.MatchManager.IsJoinable(matchId) {
+		log.Println("[JoinLatestMatch] Match is not joinable, redirecting to /matches")
 		return c.Redirect(http.StatusFound, "/matches")
 	}
 
@@ -55,6 +59,7 @@ func (w *WebApp) JoinLatestMatch(c echo.Context) error {
 
 func (w *WebApp) JoinMatch(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
+		log.Println("[JoinMatch] Not logged in, redirecting to /login")
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")
 	}
 
@@ -68,12 +73,14 @@ func (w *WebApp) JoinMatch(c echo.Context) error {
 
 	if !w.MatchManager.UserJoined(matchId, user) {
 		if !w.MatchManager.IsJoinable(matchId) {
+			log.Println("[JoinMatch] Not joined and not joinable, redirecting to /matches")
 			return c.Redirect(http.StatusFound, "/matches")
 		}
 
 		joinResult := w.MatchManager.JoinMatch(matchId, user)
 
 		if !joinResult {
+			log.Println("[JoinMatch] mm.JoinMatch failed, redirecting to /matches")
 			return c.Redirect(http.StatusTemporaryRedirect, "/matches");
 		}
 	}
@@ -88,6 +95,7 @@ func (w *WebApp) JoinMatch(c echo.Context) error {
 
 func (w *WebApp) MatchCards(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
+		log.Println("[MatchCards] Not logged in, redirecting to /login")
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")
 	}
 
@@ -96,6 +104,7 @@ func (w *WebApp) MatchCards(c echo.Context) error {
 
 	// TODO: Check condition!
 	if !w.MatchManager.IsJoinable(matchId) || !w.MatchManager.UserJoined(matchId, user) {
+		log.Println("[MatchCards] Either not joinable or not joined, returning 403")
 		return c.NoContent(http.StatusForbidden)
 	}
 
@@ -106,6 +115,7 @@ func (w *WebApp) MatchCards(c echo.Context) error {
 	match := w.MatchManager.GetMatchByID(matchId)
 	matchPlayer := match.GetPlayerByID(user.Id)
 	if matchPlayer == nil {
+		log.Println("[MatchCards] No such player, returning 500")
 		return c.NoContent(http.StatusInternalServerError)
 	}
 	return c.JSON(http.StatusOK, matchPlayer.Cards)
@@ -113,30 +123,36 @@ func (w *WebApp) MatchCards(c echo.Context) error {
 
 func (w *WebApp) NewBlackCard(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
+		log.Println("[NewBlackCard] Not logged in, redirecting to /login")
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")
 	}
 
 	user := w.GetUserByUsername(utils.GetUsername(c))
 	if user == nil {
+		log.Println("[NewBlackCard] No such user, returning 500")
 		return c.NoContent(http.StatusInternalServerError)
 	}
 
 	if !user.Admin {
+		log.Println("[MatchCards] Not a user, returning 403")
 		return c.NoContent(http.StatusForbidden)
 	}
 
 	matchId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
+		log.Println("[MatchCards] Invalid id")
 		return err
 	}
 
 	match := w.MatchManager.GetMatchByID(matchId)
 	if match == nil {
+		log.Println("[MatchCards] No such match, returning NotAcceptable")
 		return c.NoContent(http.StatusNotAcceptable)
 	}
 
 	if match.State != models.MATCH_SHOW_RESULTS &&
 		match.State != models.MATCH_WAIT_USERS {
+		log.Println("[MatchCards] State doesn't allow dealing a new card")
 		return c.NoContent(http.StatusNotAcceptable);
 	}
 
@@ -190,15 +206,18 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 
 func (w *WebApp) PickCard(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
+		log.Println("[PickCard] Not logged in, redirecting to /login")
 		return c.Redirect(http.StatusTemporaryRedirect, "/login")
 	}
 
 	matchId, err := strconv.Atoi(c.Param("match_id"))
 	if err != nil {
+		log.Println("[PickCard] Invalid param match_id")
 		return err
 	}
 	cardId, err := strconv.Atoi(c.Param("card_id"))
 	if err != nil {
+		log.Println("[PickCard] Invalid param card_id")
 		return err
 	}
 	user := w.GetUserByUsername(utils.GetUsername(c))
@@ -206,20 +225,24 @@ func (w *WebApp) PickCard(c echo.Context) error {
 
 	// TODO: Check condition!
 	if !w.MatchManager.IsJoinable(matchId) || !w.MatchManager.UserJoined(matchId, user) {
+		log.Println("[PickCard] Neither joinable nor joined")
 		return c.NoContent(http.StatusForbidden)
 	}
 
 	match := w.MatchManager.GetMatchByID(matchId)
 	if match == nil {
+		log.Println("[PickCard] No such match")
 		return c.String(http.StatusNotFound, "Match not found.")
 	}
 
 	round := match.GetRound()
 	if round == nil {
+		log.Println("[PickCard] No rounds available")
 		return c.String(http.StatusForbidden, "Can't play this card right now (no rounds available).")
 	}
 
 	if match.State != models.MATCH_PLAYBALE {
+		log.Println("[PickCard] State doesn't allow picking a card")
 		return c.String(http.StatusForbidden, "Can't play this card at this time.")
 	}
 
@@ -236,6 +259,7 @@ func (w *WebApp) PickCard(c echo.Context) error {
 	}
 
 	if card == nil {
+		log.Println("[PickCard] Card not found")
 		return c.String(http.StatusNotFound, "Card not found.")
 	}
 
@@ -258,6 +282,7 @@ func (w *WebApp) PickCard(c echo.Context) error {
 	result := round.AddCard(card)
 
 	if !result {
+		log.Println("[PickCard] Card already played")
 		return c.String(http.StatusForbidden, "Already played")
 	}
 
