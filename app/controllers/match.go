@@ -430,9 +430,13 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 	}
 
 	if winner != nil && winningCard != nil {
-		_, err = w.Db.Query("UPDATE users SET score = score + 1 WHERE user_id = ?", winner.User.Id)
+		winner.User.Score++
+		numUpdated, err := w.Db.Update(winner.User)
 		if err != nil {
-			log.Printf("Failed to update score: %s\n", err)
+			log.Printf("Winner update: %s\n", err)
+		}
+		if numUpdated != 1 {
+			log.Printf("Winner update: expected 1 update, got %d\n", numUpdated)
 		}
 		fmt.Printf("Winner: %s\n", winner.User.Username)
 		w.Ws.BroadcastToRoom(matchId, Event{
