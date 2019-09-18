@@ -1,15 +1,15 @@
 package controllers
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
 
 	"github.com/ESCah/go-against-humanity/app/game"
 	"github.com/ESCah/go-against-humanity/app/models"
 	"github.com/gorilla/websocket"
-	"sync"
+	"github.com/labstack/echo"
 )
 
 type Card struct {
@@ -39,10 +39,13 @@ type SocketServer struct {
 	sync.Mutex
 	mm    *game.MatchManager
 	rooms map[int][]*websocket.Conn
+	e     *echo.Echo
 }
 
-func MakeSocketServer(mm *game.MatchManager) SocketServer {
-	return SocketServer{sync.Mutex{}, mm, map[int][]*websocket.Conn{}}
+var upgrader = websocket.Upgrader{}
+
+func MakeSocketServer(e *echo.Echo, mm *game.MatchManager) SocketServer {
+	return SocketServer{sync.Mutex{}, mm, map[int][]*websocket.Conn{}, e}
 }
 
 func (s *SocketServer) BroadcastToRoom(room int, msg interface{}) {
@@ -89,36 +92,24 @@ func (s *SocketServer) onConnect(conn *websocket.Conn, matchID int) {
 	}
 }
 
-func (s *SocketServer) wsHandler(w http.ResponseWriter, r *http.Request) {
-	matchID := r.URL.Query().Get("match")
-	if matchID == "" {
-		http.Error(w, "The 'match' parameter is required", http.StatusBadRequest)
-		return
+func (s *SocketServer) wsHandler(c echo.Context) error {
+	matchId, err := strconv.Atoi(c.QueryParam("match"))
+	if err != nil {
+		log.Println("Failed to open ws: invalid match param")
+		return c.String(http.StatusBadRequest, "Invalid 'match' parameter")
 	}
 
-	matchIDInt, err := strconv.Atoi(matchID)
+	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
-		http.Error(w, "Invalid 'match' parameter", http.StatusBadRequest)
-		return
+		log.Printf("Failed to open ws: %s\n", err)
+		return c.String(http.StatusBadRequest, "Could not open websocket connection")
 	}
+	// defer ws.Close()
+	go s.onConnect(ws, matchId)
 
-	conn, err := websocket.Upgrade(w, r, w.Header(), 1024, 1024)
-	if err != nil {
-		http.Error(w, "Could not open websocket connection", http.StatusBadRequest)
-		return
-	}
-	go s.onConnect(conn, matchIDInt)
+	return nil
 }
 
-func (s *SocketServer) Start() int {
-	http.HandleFunc("/ws", s.wsHandler)
-	fmt.Println("Websocket server listening on :4430.")
-
-	go func() {
-		err := http.ListenAndServe(":4430", nil)
-		if err != nil {
-			panic(err)
-		}
-	}()
-	return 0
+func (s *SocketServer) Start() {
+	s.e.GET("/ws", s.wsHandler)
 }
