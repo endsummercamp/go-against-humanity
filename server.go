@@ -52,7 +52,7 @@ func main() {
 	e.HTTPErrorHandler = customHTTPErrorHandler
 
 	var mm = new(game.MatchManager)
-	var ws = controllers.MakeSocketServer(mm)
+	var ws = controllers.MakeSocketServer(e, mm)
 
 	w := controllers.WebApp{
 		MatchManager: mm,
@@ -87,5 +87,5 @@ func main() {
 	// The ws start is not blocking, but the echo start is, so ws goes first
 	ws.Start()
 
-	e.Logger.Debug(e.Start(":1323"))
+	e.Logger.Debug(e.Start(":80"))
 }

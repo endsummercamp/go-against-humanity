@@ -4,7 +4,7 @@
 <section class="has-text-centered">
 	<h1 class="title">ESC against Humanity</h1>
 	<img src="public/img/ESC-logo-small.png" style="width: 5em" /> <!-- todo: fix path -->
-	<p><strong>{{ .User.Username }}</strong> - {{ if is_player .User }}Player{{ else }}Juror{{ end }}{{ if is_admin .User }}, admin{{ end }}</p>
+	<p><strong>{{ .User.Username }}</strong> - {{ if is_player .User }}Giocatore{{ else }}Pubblico{{ end }}{{ if is_admin .User }}, admin{{ end }}</p>
 </section>
 
 <br>
@@ -15,7 +15,7 @@
 	<!-- Todo: JS to make the panel work -->
 	{{ if is_admin .User }}
 	<p class="panel-tabs">
-		<a class="is-active">User</a>
+		<a class="is-active">Utente</a>
 		<a href="/admin">Admin tools</a>
 	</p>
 	{{ end }}
@@ -23,7 +23,7 @@
 		<span class="panel-icon">
 			<i class="fa fa-gamepad"></i>
 		</span>
-		Join current match
+		Entra in partita
 	</a>
 	<!--
 	<a href="/matches" class="panel-block">
@@ -37,11 +37,11 @@
 		<span class="panel-icon">
 			<i class="fa fa-times-circle"></i>
 		</span>
-		Log out
+		Logout
 	</a>
 </nav>
 
-<h4 class="title is-4">High scores</h4>
+<h4 class="title is-4">Punteggi migliori</h4>
 <table class="table">
 	{{ range $element := .Leaderboard }}
 		<tr>

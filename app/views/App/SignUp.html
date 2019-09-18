@@ -1,8 +1,8 @@
-{{define "title"}}Sign Up{{end}}
+{{define "title"}}Registrazione{{end}}
 {{template "header.html" .Header}}
 
 <form method="POST" action="/signup" class="form page-centered">
-	<h1 class="title">Registration</h1>
+	<h1 class="title">Registrazione</h1>
 	{{template "flash.html" .Flash}}
 	<div class="field">
 		<label for="inputUsername" class="label">Username</label>
@@ -17,17 +17,16 @@
 		</div>
 	</div>
 	<div class="field">
-		I'm a...
 		<label class="radio">
-			<input type="radio" name="user_type" value="player" checked /> Player
+			<input type="radio" name="user_type" value="player" checked /> Giocatore
 		</label>
 		<label class="radio">
-			<input type="radio" name="user_type" value="juror" /> Juror
+			<input type="radio" name="user_type" value="juror" /> Pubblico
 		</label>
 	</div>
 	<div class="field">
 		<div class="control">
-			<button type="submit" class="button is-link">Sign up</button>
+			<button type="submit" class="button is-link">Registrati</button>
 		</div>
 	</div>
 </form>

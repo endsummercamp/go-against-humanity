@@ -4,7 +4,7 @@ import Navbar from "./navbar"
 import Card from "./card"
 
 if (!window.WebSocket) {
-    alert("Your browser does not support WebSockets!")
+    alert("Il tuo browser non supporta i WebSocket!")
 }
 
 class BlackRow extends Component {
@@ -110,14 +110,14 @@ class AnswersRow extends Component {
 class Game extends Component {
 	constructor(props) {
 		super(props);
-		this.socket = new WebSocket(`ws://${document.location.hostname}:8080/ws?match=${MATCH_ID}`);
+		this.socket = new WebSocket(`ws://${document.location.hostname}/ws?match=${MATCH_ID}`);
 		this.state = {
 			// Navbar state
 			timerState: {
 				enabled: false,
 				expiration: -1
 			},
-			uiStateText: "Connecting...",
+			uiStateText: "Connessione in corso...",
 			// Game UI state
 			blackCard: null,
 			myCards: [],
@@ -125,7 +125,7 @@ class Game extends Component {
 			totals: [],
 		};
 		this.socket.onopen = () => {
-			this.setState(Object.assign(this.state, {uiStateText: "Waiting for a black card..."}));
+			this.setState(Object.assign(this.state, {uiStateText: "In attesa di una carta nera..."}));
 		};
 		this.socket.onmessage = e => {
 			const data = JSON.parse(e.data);
@@ -157,8 +157,8 @@ class Game extends Component {
 						expires: 0
 					},
 					uiStateText: IS_PLAYER
-						? "The jurors are voting..."
-						: "Vote for the best card!",
+						? "Il pubblico sta votando..."
+						: "Vota la carta migliore!",
 					myCards: []
 				}));
 				this.setMatchState(data.State);
@@ -199,7 +199,7 @@ class Game extends Component {
 				this.setMatchState(data.State);
 				break;
 			default:
-				alert("Unknown event " + eventName);
+				alert("Evento sconosciuto: " + eventName);
 			}
 		};
 	}
@@ -217,24 +217,24 @@ class Game extends Component {
 		switch(state){
 			case 0:
 				this.setState(Object.assign(this.state, {
-					uiStateText: 'Waiting for other players to join...'
+					uiStateText: 'In attesa di altri giocatori...'
 				}));
 				break;
 			case 1:
 				this.setState(Object.assign(this.state, {
-					uiStateText: IS_PLAYER ? 'Play your white card!' :
-						'Players are choosing their white cards'
+					uiStateText: IS_PLAYER ? 'Gioca la tua carta bianca!' :
+						'I giocatori stanno scegliendo le carte'
 				}));
 				break;
 			case 2:
 				this.setState(Object.assign(this.state, {
-					uiStateText: IS_PLAYER ? 'Jurors are voting...' :
-						'It\'s your turn - vote the best card!'
+					uiStateText: IS_PLAYER ? 'Il pubblico sta votando...' :
+						'È il tuo turno, vota la carta migliore!'
 				}));
 				break;
 			case 3:
 				this.setState(Object.assign(this.state, {
-					uiStateText: 'Result of this round'
+					uiStateText: 'Risultato'
 				}));
 				break;
 		}
