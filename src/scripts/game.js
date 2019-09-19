@@ -7,8 +7,8 @@ if (!window.WebSocket) {
     alert("Il tuo browser non supporta i WebSocket!")
 }
 
-let canPickCard = false,
-	canVote = false;
+window.canPickCard = false;
+window.canVote = false;
 
 class MyCardsRow extends Component {
 	constructor(props) {
@@ -19,14 +19,14 @@ class MyCardsRow extends Component {
 	}
 
 	submitCard(id) {
-        if (!canPickCard) {
+        if (!window.canPickCard) {
             // alert("You cannot pick a card at this time!");
             return false;
         }
         const req = new XMLHttpRequest();
         req.open("PUT", `/matches/${MATCH_ID}/pick_card/${id}`);
         req.send();
-        canPickCard = false;
+        window.canPickCard = false;
         return true;
 	}
 
@@ -60,14 +60,17 @@ class AnswersRow extends Component {
 	tryVote(id) {
         if (IS_PLAYER) {
             // alert("You're a player, you cannot vote!");
+            console.log("Not a player, can't vote");
             return;
         }
-        if (!canVote)
+        if (!window.canVote) {
+        	console.log("window.canVote is false");
             return;
+        }
         const req = new XMLHttpRequest();
         req.open("PUT", `/matches/${MATCH_ID}/vote_card/${id}`);
         req.send();
-        // canVote = false;
+        // window.canVote = false;
         return true;
     }
 
@@ -141,8 +144,8 @@ class Game extends Component {
 				break;
 			case "voting":
 				// The voting phase has begun.
-				canPickCard = false;
-				canVote = true;
+				window.canPickCard = false;
+				window.canVote = true;
 				this.setState(Object.assign(this.state, {
 					timerState: {
 						enabled: false,
@@ -233,7 +236,7 @@ class Game extends Component {
 	}
 
 	showBlackCard(expiration_ts, text) {
-		canPickCard = true;
+		window.canPickCard = true;
 		this.setState(Object.assign(this.state, {
 			timerState: {
 				enabled: true,

@@ -45,3 +45,4 @@ func (c BlackCard) GetColor() CardColor {
 func (c BlackCard) GetId() int {
 	return c.Id
 }
+
