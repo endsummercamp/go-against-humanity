@@ -1,0 +1,9 @@
+FROM ubuntu:latest
+RUN apt-get update
+RUN apt-get install -y golang git
+RUN mkdir -p /go/src/github.com/ESCah/go-against-humanity
+WORKDIR /go/src/github.com/ESCah/go-against-humanity
+ENV GOPATH=/go
+COPY . /go/src/github.com/ESCah/go-against-humanity
+RUN go get -v
+RUN go build -o server server.go
