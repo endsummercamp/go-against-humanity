@@ -20,7 +20,8 @@ module.exports = {
         game: './src/scripts/game.js'
     },
     output: {
-        path: path.resolve(__dirname, 'public/scripts')
+        path: path.resolve(__dirname, 'public'),
+        publicPath: "/",
     },
     resolve: {
         alias: {
@@ -82,13 +83,27 @@ module.exports = {
                         }
                     }
                 ],
-			}
+            },
+            {
+                test: /\.(woff2?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+                use: [
+                    {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[name].[ext]',
+                            outputPath: 'fonts/',
+                            publicPath: '/public/fonts/'
+                        }
+                    }
+                ]
+            }
         ]
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: "../styles/main.css"
+            filename: "styles/main.css"
         }),
+        /*
         new CopyPlugin([
             {from: 'src/images/', to: 'public/images/'}
         ]),
@@ -104,5 +119,6 @@ module.exports = {
                 ]
             }
         })
+        */
     ]
 };
