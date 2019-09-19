@@ -4,16 +4,6 @@ function dashFix(content){
     return content.replace(/_/g, '<div class="long-dash"></div>')
 }
 
-function getCardText(data) {
-    const {NewCard: { text: cardText }} = data;
-    return cardText
-}
-
-function getCardTotals(data) {
-    const { Totals: _totals } = data;
-    return _totals
-}
-
 export default class Card extends Component {
     render() {
         // https://stackoverflow.com/a/6040258

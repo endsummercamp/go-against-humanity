@@ -7,14 +7,6 @@ if (!window.WebSocket) {
     alert("Il tuo browser non supporta i WebSocket!")
 }
 
-class BlackRow extends Component {
-    render() {
-        return <div className="flex" id="blackrow">
-            {this.props.card || <></>}
-        </div>;
-    }
-}
-
 let canPickCard = false,
 	canVote = false;
 
