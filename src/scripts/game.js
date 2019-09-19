@@ -105,7 +105,7 @@ class AnswersRow extends Component {
 class Game extends Component {
 	constructor(props) {
 		super(props);
-		this.socket = new WebSocket(`${(document.location.protocol == "https:") ? "wss" : "ws"}://${document.location.hostname}/ws?match=${MATCH_ID}`);
+		this.socket = new WebSocket(`${(document.location.protocol == "https:") ? "wss" : "ws"}://${document.location.hostname}:${document.location.port}/ws?match=${MATCH_ID}`);
 		this.state = {
 			// Navbar state
 			timerState: {
