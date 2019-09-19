@@ -81,7 +81,7 @@ func (w *WebApp) JoinMatch(c echo.Context) error {
 
 		if !joinResult {
 			log.Println("[JoinMatch] mm.JoinMatch failed, redirecting to /matches")
-			return c.Redirect(http.StatusTemporaryRedirect, "/matches");
+			return c.Redirect(http.StatusTemporaryRedirect, "/matches")
 		}
 	}
 
@@ -153,7 +153,7 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 	if match.State != models.MATCH_SHOW_RESULTS &&
 		match.State != models.MATCH_WAIT_USERS {
 		log.Println("[MatchCards] State doesn't allow dealing a new card")
-		return c.NoContent(http.StatusNotAcceptable);
+		return c.NoContent(http.StatusNotAcceptable)
 	}
 
 	card := match.NewBlackCard()
@@ -161,8 +161,8 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 		/* ... */
 	}
 
-	duration := 20;
-	expires :=  time.Now().Unix() + int64(duration);
+	duration := 20
+	expires :=  time.Now().Unix() + int64(duration)
 
 	msg := Event{
 		Name:     "new_black",
@@ -367,7 +367,7 @@ func (w *WebApp) VoteCard(c echo.Context) error {
 	// Cast vote
 	round.Wcs[card] = append(round.Wcs[card], *juror)
 
-	totals := []Total{}
+	var totals []Total
 
 	for card, jury := range round.Wcs {
 		totals = append(totals, Total{
