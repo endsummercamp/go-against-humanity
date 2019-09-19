@@ -35,7 +35,6 @@
     "font-awesome": "^4.7.0",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
-    "typeface-open-sans": "0.0.75",
     "url-loader": "^2.1.0"
   }
 }
