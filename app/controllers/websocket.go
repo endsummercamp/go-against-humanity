@@ -23,16 +23,16 @@ type Total struct {
 }
 
 type Event struct {
-	Name    string
-	NewCard models.Card
-	Totals  []Total
-	Duration int
-	Expires int64
-	State models.MatchState
-	InitialBlackCard models.BlackCard
+	Name                      string
+	NewCard                   models.Card
+	Totals                    []Total
+	Duration                  int
+	Expires                   int64
+	State                     models.MatchState
+	InitialBlackCard          models.BlackCard
 	SecondsUntilFinishPicking int
-	WinnerUsername string
-	WinnerText string
+	WinnerUsername            string
+	WinnerText                string
 }
 
 type SocketServer struct {
@@ -73,16 +73,16 @@ func (s *SocketServer) onConnect(conn *websocket.Conn, matchID int) {
 			expires := round.Expires
 			s.Lock()
 			conn.WriteJSON(Event{
-				Name: "join_successful",
+				Name:             "join_successful",
 				InitialBlackCard: card,
-				State: m.State,
-				Expires: expires,
+				State:            m.State,
+				Expires:          expires,
 			})
 			s.Unlock()
 		} else {
 			s.Lock()
 			conn.WriteJSON(Event{
-				Name: "join_successful",
+				Name:  "join_successful",
 				State: m.State,
 			})
 			s.Unlock()

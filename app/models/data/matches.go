@@ -5,9 +5,9 @@ import (
 )
 
 type MatchesPageData struct {
-	Header HeaderData
-	Flash  FlashData
-	User   models.User
+	Header  HeaderData
+	Flash   FlashData
+	User    models.User
 	Matches []*models.Match
 }
 

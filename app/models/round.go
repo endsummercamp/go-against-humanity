@@ -6,12 +6,11 @@ import (
 )
 
 type Round struct {
-	BlackCard      *BlackCard
-	Expires int64
-	Wcs            map[*WhiteCard][]Juror
-	Mutex	  	   sync.Mutex
-	Voters			[]Juror
-
+	BlackCard *BlackCard
+	Expires   int64
+	Wcs       map[*WhiteCard][]Juror
+	Mutex     sync.Mutex
+	Voters    []Juror
 }
 
 func (r *Round) AddCard(card *WhiteCard) bool {

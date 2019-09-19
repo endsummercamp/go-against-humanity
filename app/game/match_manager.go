@@ -6,14 +6,14 @@ import (
 
 type MatchManager struct {
 	matches []*models.Match
-	counter	int
+	counter int
 }
 
-func(mm *MatchManager) GetMatches() []*models.Match {
+func (mm *MatchManager) GetMatches() []*models.Match {
 	return mm.matches
 }
 
-func(mm *MatchManager) NewMatch() *models.Match {
+func (mm *MatchManager) NewMatch() *models.Match {
 	mm.counter++
 
 	newMatch := models.NewMatch(mm.counter, []*models.Player{})
@@ -65,7 +65,7 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 			}
 		}
 
-		juror := models.Juror {
+		juror := models.Juror{
 			User: user,
 		}
 
@@ -75,7 +75,7 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 	return true
 }
 
-func (mm *MatchManager) UserJoined (id int, user *models.User) bool {
+func (mm *MatchManager) UserJoined(id int, user *models.User) bool {
 	match := mm.GetMatchByID(id)
 	if match == nil {
 		return false

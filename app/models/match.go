@@ -140,8 +140,8 @@ func (m *Match) NewBlackCard() *BlackCard {
 	m.Rounds = append(m.Rounds, Round{
 		BlackCard: blackCard,
 		Wcs:       map[*WhiteCard][]Juror{},
-		Mutex: 		sync.Mutex{},
-		Voters: 	[]Juror{},
+		Mutex:     sync.Mutex{},
+		Voters:    []Juror{},
 	})
 
 	return blackCard

@@ -2,6 +2,6 @@ package data
 
 type SignupPageData struct {
 	Header HeaderData
-	Flash FlashData
+	Flash  FlashData
 	Error  string
 }

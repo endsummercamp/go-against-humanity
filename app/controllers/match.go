@@ -23,7 +23,7 @@ func (w *WebApp) Matches(c echo.Context) error {
 		Matches: w.MatchManager.GetMatches(),
 		User:    *w.GetUserByUsername(utils.GetUsername(c)),
 		Header: data.HeaderData{
-			Title: "Matches",
+			Title:    "Matches",
 			SubTitle: "Join a match from the following...",
 		},
 	})
@@ -40,7 +40,7 @@ func (w *WebApp) JoinLatestMatch(c echo.Context) error {
 		log.Println("[JoinLatestMatch] No active match, redirecting to /")
 		return c.Redirect(http.StatusTemporaryRedirect, "/")
 	}
-	matchId := matches[len(matches) - 1].Id
+	matchId := matches[len(matches)-1].Id
 
 	user := w.GetUserByUsername(utils.GetUsername(c))
 	if !w.MatchManager.IsJoinable(matchId) {
@@ -162,20 +162,20 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 	}
 
 	duration := 20
-	expires :=  time.Now().Unix() + int64(duration)
+	expires := time.Now().Unix() + int64(duration)
 
 	msg := Event{
-		Name:     "new_black",
-		NewCard:  card,
+		Name:    "new_black",
+		NewCard: card,
 		Expires: expires,
-		State: match.State,
+		State:   match.State,
 	}
 
 	round := match.GetRound()
 	round.Expires = expires
 
 	go func() {
-		time.Sleep(time.Duration(expires - time.Now().Unix()) *time.Second)
+		time.Sleep(time.Duration(expires-time.Now().Unix()) * time.Second)
 		match.State = models.MATCH_VOTING
 
 		// Removing cards from Player's deck
@@ -186,7 +186,7 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 		}*/
 
 		w.Ws.BroadcastToRoom(matchId, Event{
-			Name: "voting",
+			Name:  "voting",
 			State: match.State,
 		})
 
@@ -195,7 +195,7 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 			w.Ws.BroadcastToRoom(matchId, Event{
 				Name:    "new_white",
 				NewCard: card,
-				State: match.State,
+				State:   match.State,
 			})
 		}
 	}()
@@ -221,7 +221,6 @@ func (w *WebApp) PickCard(c echo.Context) error {
 		return err
 	}
 	user := w.GetUserByUsername(utils.GetUsername(c))
-
 
 	// TODO: Check condition!
 	if !w.MatchManager.IsJoinable(matchId) || !w.MatchManager.UserJoined(matchId, user) {
@@ -264,19 +263,19 @@ func (w *WebApp) PickCard(c echo.Context) error {
 	}
 
 	/*
-	for _, c := range player.Cards {
-		log.Printf("P%d, C: %d\n", player.User.Id, c.Id)
-	}
+		for _, c := range player.Cards {
+			log.Printf("P%d, C: %d\n", player.User.Id, c.Id)
+		}
 	*/
 
 	player.Cards = append(player.Cards[:foundId], player.Cards[foundId+1:]...)
 
 	/*
-	log.Printf("-----------")
+		log.Printf("-----------")
 
-	for _, c := range player.Cards {
-		log.Printf("P%d, C: %d\n", player.User.Id, c.Id)
-	}
+		for _, c := range player.Cards {
+			log.Printf("P%d, C: %d\n", player.User.Id, c.Id)
+		}
 	*/
 
 	result := round.AddCard(card)
@@ -334,9 +333,9 @@ func (w *WebApp) VoteCard(c echo.Context) error {
 
 	// TODO!
 	/*
-	if match.State != models.MATCH_VOTING {
-		return c.Forbidden("Voting disallowed")
-	}
+		if match.State != models.MATCH_VOTING {
+			return c.Forbidden("Voting disallowed")
+		}
 	*/
 
 	var juror *models.Juror = nil
@@ -363,7 +362,6 @@ func (w *WebApp) VoteCard(c echo.Context) error {
 
 	round.Voters = append(round.Voters, *juror)
 
-
 	// Cast vote
 	round.Wcs[card] = append(round.Wcs[card], *juror)
 
@@ -379,7 +377,7 @@ func (w *WebApp) VoteCard(c echo.Context) error {
 	w.Ws.BroadcastToRoom(matchId, Event{
 		Name:   "vote_cast",
 		Totals: totals,
-		State: match.State,
+		State:  match.State,
 	})
 
 	return c.JSON(http.StatusOK, nil)
@@ -398,7 +396,6 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 		return c.NoContent(http.StatusForbidden)
 	}
 
-
 	matchId, err := strconv.Atoi(c.Param("id"))
 
 	if err != nil {
@@ -416,7 +413,7 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 
 	match.EndVote()
 	w.Ws.BroadcastToRoom(matchId, Event{
-		Name: "show_results",
+		Name:  "show_results",
 		State: match.State,
 	})
 
@@ -435,7 +432,7 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 
 	for card, jury := range round.Wcs {
 		totals = append(totals, Total{
-			ID: card.Id,
+			ID:    card.Id,
 			Votes: len(jury),
 		})
 	}
@@ -469,10 +466,10 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 		}
 		fmt.Printf("Winner: %s\n", winner.User.Username)
 		w.Ws.BroadcastToRoom(matchId, Event{
-			Name:   "winner",
-			State: match.State,
+			Name:           "winner",
+			State:          match.State,
 			WinnerUsername: winner.User.Username,
-			WinnerText: winningCard.Text,
+			WinnerText:     winningCard.Text,
 		})
 	}
 

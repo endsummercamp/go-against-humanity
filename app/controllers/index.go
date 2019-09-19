@@ -27,10 +27,10 @@ func (w *WebApp) Index(c echo.Context) error {
 	log.Printf("Leaderboard: %#v\n", leaderboard)
 
 	return c.Render(http.StatusOK, "Index.html", data.IndexPageData{
-		User: *user,
+		User:        *user,
 		Leaderboard: leaderboard,
 		Header: data.HeaderData{
-			Title: "Home",
+			Title:    "Home",
 			SubTitle: "Welcome to Cards Against Humanity",
 		},
 	})

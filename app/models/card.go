@@ -3,23 +3,23 @@ package models
 type Card interface {
 	GetText() string
 	GetColor() CardColor
-	GetId()	int
+	GetId() int
 }
 
 type BlackCard struct {
-	Id		int
-	Deck	string	`json:"deck"`
-	Icon	string	`json:"icon"`
-	Text	string	`json:"text"`
-	Pick int	`json:"pick"`
+	Id   int
+	Deck string `json:"deck"`
+	Icon string `json:"icon"`
+	Text string `json:"text"`
+	Pick int    `json:"pick"`
 }
 
 type WhiteCard struct {
-	Id		int
-	Deck	string	`json:"deck"`
-	Icon	string	`json:"icon"`
-	Text	string	`json:"text"`
-	Owner	*Player `json:"-"`
+	Id    int
+	Deck  string  `json:"deck"`
+	Icon  string  `json:"icon"`
+	Text  string  `json:"text"`
+	Owner *Player `json:"-"`
 }
 
 func (c WhiteCard) GetText() string {

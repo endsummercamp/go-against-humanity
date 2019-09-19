@@ -6,9 +6,9 @@ import (
 )
 
 type Deck struct {
-	Black_cards             	[]BlackCard
-	White_cards             	[]WhiteCard
-	LastExtractedCard 			*Card
+	Black_cards       []BlackCard
+	White_cards       []WhiteCard
+	LastExtractedCard *Card
 }
 
 type DeckMetadata struct {
@@ -19,9 +19,9 @@ type DeckMetadata struct {
 }
 
 type DeckData struct {
-	Black []BlackCard	`json:"black"`
-	White []WhiteCard	`json:"white"`
-	Metadata map[string]DeckMetadata	 `json:"metadata"`
+	Black    []BlackCard             `json:"black"`
+	White    []WhiteCard             `json:"white"`
+	Metadata map[string]DeckMetadata `json:"metadata"`
 }
 
 func RemoveBlackCard(cards []BlackCard, index int) []BlackCard {
@@ -30,7 +30,6 @@ func RemoveBlackCard(cards []BlackCard, index int) []BlackCard {
 	cards = (cards)[:len(cards)-1]
 	return cards
 }
-
 
 func RemoveWhiteCard(cards []WhiteCard, index int) []WhiteCard {
 	//log.Printf("Removing %s...\n", cards[index].GetText())
