@@ -317,6 +317,13 @@ func (w *WebApp) PickCard(c echo.Context) error {
 
 	result := round.AddCard(card)
 
+	w.Ws.BroadcastToRoom(matchId, Event{
+		// The list of players has changed. Update it if you're watching it (i.e. are in projector view)
+		Name:  "hidden_white_card",
+		State: match.State,
+		Username: player.User.Username,
+	})
+
 	if !result {
 		log.Println("[PickCard] Card already played")
 		return c.String(http.StatusForbidden, "Already played")

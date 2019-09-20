@@ -168,7 +168,8 @@ class Game extends Component {
 						uiStateText: IS_PLAYER
 							? "Il pubblico sta votando..."
 							: "Vota la carta migliore!",
-						myCards: []
+						myCards: [],
+						answers: [],
 					}));
 					this.setMatchState(data.State);
 					break;
@@ -176,6 +177,14 @@ class Game extends Component {
 					// A new white card (from the voting phase) was received.
 					this.setState(Object.assign(this.state, {
 						answers: this.state.answers.concat({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id })
+					}));
+					this.setMatchState(data.State);
+					break;
+				case "hidden_white_card":
+					if (IS_PLAYER)
+						break;
+					this.setState(Object.assign(this.state, {
+						answers: this.state.answers.concat({ text: data.Username, total: 0, ID: -1 })
 					}));
 					this.setMatchState(data.State);
 					break;

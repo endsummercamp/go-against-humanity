@@ -35,6 +35,7 @@ type Event struct {
 	WinnerText                string
 	Leaderboard               []models.Player
 	Jury                      []models.Juror
+	Username                  string
 }
 
 type SocketServer struct {
