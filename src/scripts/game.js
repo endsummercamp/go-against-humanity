@@ -110,10 +110,6 @@ class Game extends Component {
 		this.socket = new WebSocket(`${(document.location.protocol == "https:") ? "wss" : "ws"}://${document.location.hostname}:${document.location.port}/ws?match=${MATCH_ID}`);
 		this.state = {
 			// Navbar state
-			timerState: {
-				enabled: false,
-				expiration: -1
-			},
 			uiStateText: "Connessione in corso...",
 			// Game UI state
 			blackCard: null,
@@ -161,10 +157,6 @@ class Game extends Component {
 					window.canPickCard = false;
 					window.canVote = true;
 					this.setState(Object.assign(this.state, {
-						timerState: {
-							enabled: false,
-							expires: 0
-						},
 						uiStateText: IS_PLAYER
 							? "Il pubblico sta votando..."
 							: "Vota la carta migliore!",
@@ -261,10 +253,6 @@ class Game extends Component {
 	showBlackCard(expiration_ts, text) {
 		window.canPickCard = true;
 		this.setState(Object.assign(this.state, {
-			timerState: {
-				enabled: true,
-				expires: expiration_ts
-			},
 			blackCard: <Card text={text} black />
 		}));
 	}
@@ -303,7 +291,7 @@ class Game extends Component {
 
 	render() {
 		return <>
-			<Navbar timerState={this.state.timerState} uiStateText={this.state.uiStateText} />
+			<Navbar uiStateText={this.state.uiStateText} />
 			{/* Middle row */}
 			<div className="flex" id="blackrow">
 				{this.state.blackCard}

@@ -198,44 +198,11 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 		/* ... */
 	}
 
-	duration := 20
-	expires := time.Now().Unix() + int64(duration)
-
 	msg := Event{
 		Name:    "new_black",
 		NewCard: card,
-		Expires: expires,
 		State:   match.State,
 	}
-
-	round := match.GetRound()
-	round.Expires = expires
-
-	go func() {
-		time.Sleep(time.Duration(expires-time.Now().Unix()) * time.Second)
-		match.State = models.MATCH_VOTING
-
-		// Removing cards from Player's deck
-		/*for c, _ := range round.Wcs {
-			for _, p := range match.Players {
-				for _, uc :=
-			}
-		}*/
-
-		w.Ws.BroadcastToRoom(matchId, Event{
-			Name:  "voting",
-			State: match.State,
-		})
-
-		for _, card := range round.GetChoices() {
-			time.Sleep(time.Second)
-			w.Ws.BroadcastToRoom(matchId, Event{
-				Name:    "new_white",
-				NewCard: card,
-				State:   match.State,
-			})
-		}
-	}()
 
 	w.Ws.BroadcastToRoom(matchId, msg)
 	return c.JSON(http.StatusOK, true)
@@ -316,17 +283,43 @@ func (w *WebApp) PickCard(c echo.Context) error {
 	*/
 
 	result := round.AddCard(card)
-
-	w.Ws.BroadcastToRoom(matchId, Event{
-		// The list of players has changed. Update it if you're watching it (i.e. are in projector view)
-		Name:  "hidden_white_card",
-		State: match.State,
-		Username: player.User.Username,
-	})
-
 	if !result {
 		log.Println("[PickCard] Card already played")
 		return c.String(http.StatusForbidden, "Already played")
+	}
+
+	// Show a white card with the player's name if it is not yet done.
+	// Otherwise, go straight to voting.
+	if len(round.Wcs) != len(match.Players) {
+		w.Ws.BroadcastToRoom(matchId, Event{
+			// The list of players has changed. Update it if you're watching it (i.e. are in projector view)
+			Name:  "hidden_white_card",
+			State: match.State,
+			Username: player.User.Username,
+		})
+	} else {
+		match.State = models.MATCH_VOTING
+
+		// Removing cards from Player's deck
+		/*for c, _ := range round.Wcs {
+			for _, p := range match.Players {
+				for _, uc :=
+			}
+		}*/
+
+		w.Ws.BroadcastToRoom(matchId, Event{
+			Name:  "voting",
+			State: match.State,
+		})
+
+		for _, card := range round.GetChoices() {
+			time.Sleep(time.Second)
+			w.Ws.BroadcastToRoom(matchId, Event{
+				Name:    "new_white",
+				NewCard: card,
+				State:   match.State,
+			})
+		}
 	}
 
 	return c.JSON(http.StatusOK, nil)

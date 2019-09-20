@@ -1,6 +1,5 @@
 import React, { PureComponent, Component } from "react"
 import {ProjectorViewBtn, NewBlackCardBtn, EndVotingBtn} from "./admin_buttons";
-import Timer from "./timer"
 
 class UIStateLabel extends PureComponent {
 	render() {
@@ -26,10 +25,7 @@ export default class Navbar extends Component {
 			<a href="/" className="navbar-item">
 				<img src="/public/img/ESC-logo-small.png" />
 			</a>
-			{!window.isProjector
-				? <Timer enabled={this.props.timerState.enabled} expires={this.props.timerState.expires} />
-				: <a className="navbar-item">Projector view</a>
-			}
+			{window.isProjector && <a className="navbar-item">Projector view</a>}
 			{adminButtons}
 			<UIStateLabel text={this.props.uiStateText} />
 		</nav>
