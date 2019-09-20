@@ -13,9 +13,19 @@ class NewBlackCardBtn extends PureComponent {
 class ProjectorViewBtn extends PureComponent {
 	render() {
 		return <button className="button" id="admin-panel-projector-view" onClick={() => {
-			window.isProjector ^= 1;
+			this.props.toggleProjector();
 		}}>Toggle projector view</button>;
 	}
+}
+
+class PublicToggleBtn extends PureComponent {
+/*
+	render() {
+		return <button className="button" id="admin-panel-projector-view" onClick={() => {
+			this.props.toggleProjector();
+		}}>Toggle projector view</button>;
+	}
+*/
 }
 
 class EndVotingBtn extends PureComponent {
@@ -28,4 +38,4 @@ class EndVotingBtn extends PureComponent {
 	}
 }
 
-export {NewBlackCardBtn, ProjectorViewBtn, EndVotingBtn};
+export {NewBlackCardBtn, ProjectorViewBtn, PublicToggleBtn, EndVotingBtn};

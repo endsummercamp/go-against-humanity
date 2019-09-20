@@ -8,10 +8,6 @@ if (!window.WebSocket) {
 	alert("Il tuo browser non supporta i WebSocket!")
 }
 
-window.canPickCard = false;
-window.canVote = false;
-window.isProjector = false;
-
 class MyCardsRow extends Component {
 	constructor(props) {
 		super(props);
@@ -21,14 +17,13 @@ class MyCardsRow extends Component {
 	}
 
 	submitCard(id) {
-		if (!window.canPickCard) {
+		if (!this.props.canPickCard) {
 			// alert("You cannot pick a card at this time!");
 			return false;
 		}
 		const req = new XMLHttpRequest();
 		req.open("PUT", `/matches/${MATCH_ID}/pick_card/${id}`);
 		req.send();
-		window.canPickCard = false;
 		return true;
 	}
 
@@ -41,7 +36,10 @@ class MyCardsRow extends Component {
 				const success = this.submitCard(answer.ID);
 				if (!success)
 					return;
-				this.setState({ selectedCard: answer.ID });
+				this.setState(Object.assign(this.state, {
+					selectedCard: answer.ID,
+				}));
+				this.props.setCanPickCard(false);
 			}}
 			key={answer.ID} />
 		);
@@ -65,8 +63,8 @@ class AnswersRow extends Component {
 			console.log("Not a player, can't vote");
 			return;
 		}
-		if (!window.canVote) {
-			console.log("window.canVote is false");
+		if (!this.props.canVote) {
+			console.log("this.state.canVote is false");
 			return;
 		}
 		const req = new XMLHttpRequest();
@@ -109,6 +107,11 @@ class Game extends Component {
 		super(props);
 		this.socket = new WebSocket(`${(document.location.protocol == "https:") ? "wss" : "ws"}://${document.location.hostname}:${document.location.port}/ws?match=${MATCH_ID}`);
 		this.state = {
+			isProjector: false,
+			
+			canPickCard: false,
+			canVote: false,
+
 			// Navbar state
 			uiStateText: "Connessione in corso...",
 			// Game UI state
@@ -118,7 +121,7 @@ class Game extends Component {
 			totals: [],
 
 			players: [],
-			jury: []
+			jury: [],
 		};
 		this.socket.onopen = () => {
 			this.setState(Object.assign(this.state, { uiStateText: "In attesa di una carta nera..." }));
@@ -130,7 +133,7 @@ class Game extends Component {
 			switch (eventName) {
 				case "players_update":
 					// If we're a projector, refresh the leaderboard
-					if (!window.isProjector)
+					if (!this.state.isProjector)
 						break;
 					this.setState(Object.assign(this.state, {
 						players: data.Leaderboard,
@@ -141,7 +144,7 @@ class Game extends Component {
 					// We joined successfully. Clear the UI.
 					this.resetUI();
 					if (data.InitialBlackCard.Id !== 0) {
-						this.showBlackCard(data.Expires, data.InitialBlackCard.text);
+						this.showBlackCard(data.InitialBlackCard.text);
 					}
 					this.setMatchState(data.State);
 					break;
@@ -149,14 +152,14 @@ class Game extends Component {
 					// A black card was chosen. Show it.
 					// mycardsDiv.style.display = "flex";
 					this.resetUI();
-					this.showBlackCard(data.Expires, data.NewCard.text);
+					this.showBlackCard(data.NewCard.text);
 					this.setMatchState(data.State);
 					break;
 				case "voting":
 					// The voting phase has begun.
-					window.canPickCard = false;
-					window.canVote = true;
 					this.setState(Object.assign(this.state, {
+						canPickCard: false,
+						canVote: true,
 						uiStateText: IS_PLAYER
 							? "Il pubblico sta votando..."
 							: "Vota la carta migliore!",
@@ -214,6 +217,12 @@ class Game extends Component {
 		};
 	}
 
+	toggleProjector() {
+		this.setState(Object.assign(this.state, {
+			isProjector: !this.state.isProjector
+		}));
+	}
+
 	setMatchState(state) {
 		/*
 			const (
@@ -250,9 +259,9 @@ class Game extends Component {
 		}
 	}
 
-	showBlackCard(expiration_ts, text) {
-		window.canPickCard = true;
+	showBlackCard(text) {
 		this.setState(Object.assign(this.state, {
+			canPickCard: true,
 			blackCard: <Card text={text} black />
 		}));
 	}
@@ -289,16 +298,22 @@ class Game extends Component {
 		req.send();
 	}
 
+	setCanPickCard(val) {
+		this.setState(Object.assign(this.state, {
+			canPickCard: val
+		}));
+	}
+
 	render() {
 		return <>
-			<Navbar uiStateText={this.state.uiStateText} />
+			<Navbar uiStateText={this.state.uiStateText} isProjector={this.state.isProjector} toggleProjector={() => this.toggleProjector()} />
 			{/* Middle row */}
 			<div className="flex" id="blackrow">
 				{this.state.blackCard}
-				{window.isProjector && <PlayersList players={this.state.players} jury={this.state.jury} />}
+				{this.state.isProjector && <PlayersList players={this.state.players} jury={this.state.jury} />}
 			</div>
-			<MyCardsRow cards={this.state.myCards} />
-			<AnswersRow answers={this.state.answers} totals={this.state.totals} />
+			<MyCardsRow cards={this.state.myCards} canPickCard={this.state.canPickCard} setCanPickCard={this.setCanPickCard.bind(this)} />
+			<AnswersRow answers={this.state.answers} canVote={this.state.canVote} totals={this.state.totals} />
 		</>;
 	}
 }

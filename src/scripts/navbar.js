@@ -15,7 +15,7 @@ export default class Navbar extends Component {
 		if (IS_ADMIN)
 			adminButtons = <div className="navbar-item">
 				<div className="match-admin-panel">
-					<ProjectorViewBtn />
+					<ProjectorViewBtn isProjector={this.props.isProjector} toggleProjector={this.props.toggleProjector} />
 					<NewBlackCardBtn />
 					<EndVotingBtn />
 				</div>
@@ -25,7 +25,7 @@ export default class Navbar extends Component {
 			<a href="/" className="navbar-item">
 				<img src="/public/img/ESC-logo-small.png" />
 			</a>
-			{window.isProjector && <a className="navbar-item">Projector view</a>}
+			{this.props.isProjector && <a className="navbar-item">Projector view</a>}
 			{adminButtons}
 			<UIStateLabel text={this.props.uiStateText} />
 		</nav>
