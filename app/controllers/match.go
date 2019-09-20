@@ -13,6 +13,27 @@ import (
 	"time"
 )
 
+func (w *WebApp) playersList(match *models.Match) []models.Player {
+	ret := make([]models.Player, len(match.Players))
+	for i, player := range match.Players {
+		ret[i] = *player
+		// Redact sensitive data
+		ret[i].User.PwHash = ""
+		ret[i].Cards = make([]*models.WhiteCard, 0)
+	}
+	return ret
+}
+
+func (w *WebApp) jurorsList(match *models.Match) []models.Juror {
+	ret := make([]models.Juror, len(match.Jury))
+	for i, juror := range match.Jury {
+		ret[i] = *juror
+		// Redact sensitive data
+		ret[i].User.PwHash = ""
+	}
+	return ret
+}
+
 func (w *WebApp) Matches(c echo.Context) error {
 	if !utils.IsLoggedIn(c) {
 		log.Println("[Matches] Not logged in, redirecting to /login")
@@ -51,6 +72,14 @@ func (w *WebApp) JoinLatestMatch(c echo.Context) error {
 	w.MatchManager.JoinMatch(matchId, user)
 	match := w.MatchManager.GetMatchByID(matchId)
 
+	w.Ws.BroadcastToRoom(matchId, Event{
+		// The list of players has changed. Update it if you're watching it (i.e. are in projector view)
+		Name:  "players_update",
+		State: match.State,
+		Leaderboard: w.playersList(match),
+		Jury: w.jurorsList(match),
+	})
+
 	return c.Render(http.StatusOK, "Match.html", data.MatchPageData{
 		Match: *match,
 		User:  *w.GetUserByUsername(utils.GetUsername(c)),
@@ -86,6 +115,14 @@ func (w *WebApp) JoinMatch(c echo.Context) error {
 	}
 
 	match := w.MatchManager.GetMatchByID(matchId)
+
+	w.Ws.BroadcastToRoom(matchId, Event{
+		// The list of players has changed. Update it if you're watching it (i.e. are in projector view)
+		Name:  "players_update",
+		State: match.State,
+		Leaderboard: w.playersList(match),
+		Jury: w.jurorsList(match),
+	})
 
 	return c.Render(http.StatusOK, "Match.html", data.MatchPageData{
 		Match: *match,

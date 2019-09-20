@@ -33,6 +33,8 @@ type Event struct {
 	SecondsUntilFinishPicking int
 	WinnerUsername            string
 	WinnerText                string
+	Leaderboard               []models.Player
+	Jury                      []models.Juror
 }
 
 type SocketServer struct {

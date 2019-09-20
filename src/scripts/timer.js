@@ -7,11 +7,15 @@ export default class Timer extends PureComponent {
 			now: Math.round((new Date()).getTime()/1000)
 		};
 
-		setInterval(() => {
+		this.interval = setInterval(() => {
 			this.setState({
 				now: Math.round((new Date()).getTime()/1000)
 			});
 		}, 1000);
+	}
+
+	componentWillUnmount() {
+		clearInterval(this.interval);
 	}
 
 	render() {

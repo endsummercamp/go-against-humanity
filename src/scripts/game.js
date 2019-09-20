@@ -1,14 +1,16 @@
 import React, { PureComponent, Component } from "react"
 import ReactDOM from "react-dom"
 import Navbar from "./navbar"
+import PlayersList from "./playerslist"
 import Card from "./card"
 
 if (!window.WebSocket) {
-    alert("Il tuo browser non supporta i WebSocket!")
+	alert("Il tuo browser non supporta i WebSocket!")
 }
 
 window.canPickCard = false;
 window.canVote = false;
+window.isProjector = false;
 
 class MyCardsRow extends Component {
 	constructor(props) {
@@ -19,15 +21,15 @@ class MyCardsRow extends Component {
 	}
 
 	submitCard(id) {
-        if (!window.canPickCard) {
-            // alert("You cannot pick a card at this time!");
-            return false;
-        }
-        const req = new XMLHttpRequest();
-        req.open("PUT", `/matches/${MATCH_ID}/pick_card/${id}`);
-        req.send();
-        window.canPickCard = false;
-        return true;
+		if (!window.canPickCard) {
+			// alert("You cannot pick a card at this time!");
+			return false;
+		}
+		const req = new XMLHttpRequest();
+		req.open("PUT", `/matches/${MATCH_ID}/pick_card/${id}`);
+		req.send();
+		window.canPickCard = false;
+		return true;
 	}
 
 	render() {
@@ -39,11 +41,11 @@ class MyCardsRow extends Component {
 				const success = this.submitCard(answer.ID);
 				if (!success)
 					return;
-				this.setState({selectedCard: answer.ID});
+				this.setState({ selectedCard: answer.ID });
 			}}
 			key={answer.ID} />
 		);
-        return <div id="react-mycards">
+		return <div id="react-mycards">
 			{cards}
 		</div>
 	}
@@ -58,29 +60,29 @@ class AnswersRow extends Component {
 	}
 
 	tryVote(id) {
-        if (IS_PLAYER) {
-            // alert("You're a player, you cannot vote!");
-            console.log("Not a player, can't vote");
-            return;
-        }
-        if (!window.canVote) {
-        	console.log("window.canVote is false");
-            return;
-        }
-        const req = new XMLHttpRequest();
-        req.open("PUT", `/matches/${MATCH_ID}/vote_card/${id}`);
-        req.send();
-        // window.canVote = false;
-        return true;
-    }
+		if (IS_PLAYER) {
+			// alert("You're a player, you cannot vote!");
+			console.log("Not a player, can't vote");
+			return;
+		}
+		if (!window.canVote) {
+			console.log("window.canVote is false");
+			return;
+		}
+		const req = new XMLHttpRequest();
+		req.open("PUT", `/matches/${MATCH_ID}/vote_card/${id}`);
+		req.send();
+		// window.canVote = false;
+		return true;
+	}
 
 	render() {
-        // Expects:
-        // * a prop "answers", containing an array of {text, ID};
-        // * a prop "totals", containing an array of {Votes}.
-        let sum = 0;
-        if (this.props.totals) {
-            sum = this.props.totals.reduce((a, b) => a + b.Votes, 0);
+		// Expects:
+		// * a prop "answers", containing an array of {text, ID};
+		// * a prop "totals", containing an array of {Votes}.
+		let sum = 0;
+		if (this.props.totals) {
+			sum = this.props.totals.reduce((a, b) => a + b.Votes, 0);
 		}
 
 		const cards = this.props.answers.map(answer => <Card
@@ -92,14 +94,14 @@ class AnswersRow extends Component {
 			onClick={() => {
 				const success = this.tryVote(answer.ID);
 				if (!success) return;
-				this.setState({votedCard: answer.ID});
+				this.setState({ votedCard: answer.ID });
 			}}
 			key={answer.ID} />);
 
-        return <div className="flex" id="blackrow">
-            {cards}
-        </div>;
-    }
+		return <div className="flex" id="blackrow">
+			{cards}
+		</div>;
+	}
 }
 
 class Game extends Component {
@@ -118,83 +120,95 @@ class Game extends Component {
 			myCards: [],
 			answers: [],
 			totals: [],
+
+			players: [],
+			jury: []
 		};
 		this.socket.onopen = () => {
-			this.setState(Object.assign(this.state, {uiStateText: "In attesa di una carta nera..."}));
+			this.setState(Object.assign(this.state, { uiStateText: "In attesa di una carta nera..." }));
 		};
 		this.socket.onmessage = e => {
 			const data = JSON.parse(e.data);
 			console.log("Received", data);
 			const eventName = data.Name;
 			switch (eventName) {
-			case "join_successful":
-				// We joined successfully. Clear the UI.
-				this.resetUI();
-				if(data.InitialBlackCard.Id !== 0){
-					this.showBlackCard(data.Expires, data.InitialBlackCard.text);
-				}
-				this.setMatchState(data.State);
-				break;
-			case "new_black":
-				// A black card was chosen. Show it.
-				// mycardsDiv.style.display = "flex";
-				this.resetUI();
-				this.showBlackCard(data.Expires, data.NewCard.text);
-				this.setMatchState(data.State);
-				break;
-			case "voting":
-				// The voting phase has begun.
-				window.canPickCard = false;
-				window.canVote = true;
-				this.setState(Object.assign(this.state, {
-					timerState: {
-						enabled: false,
-						expires: 0
-					},
-					uiStateText: IS_PLAYER
-						? "Il pubblico sta votando..."
-						: "Vota la carta migliore!",
-					myCards: []
-				}));
-				this.setMatchState(data.State);
-				break;
-			case "new_white":
-				// A new white card (from the voting phase) was received.
-				this.setState(Object.assign(this.state, {
-					answers: this.state.answers.concat({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id })
-				}));
-				this.setMatchState(data.State);
-				break;
-			case "vote_cast":
-				let totals = data.Totals;
-				let answers = this.state.answers;
-				for (const total of totals) {
-					answers.find(a => a.ID === total.ID).total = total.Votes;
-				}
-
-				this.setState(Object.assign(this.state, {
-					answers: answers,
-					totals: totals,
-				}));
-
-				this.setMatchState(data.State);
-				break;
-			case "show_results":
-				this.setState(Object.assign(this.state, {
-					uiStateText: "", // TODO
-				}));
-				this.setMatchState(data.State);
-				break;
-			case "winner":
-				if (!IS_ADMIN)
+				case "players_update":
+					// If we're a projector, refresh the leaderboard
+					if (!window.isProjector)
+						break;
+					this.setState(Object.assign(this.state, {
+						players: data.Leaderboard,
+						jury: data.Jury
+					}));
 					break;
-				this.setState(Object.assign(this.state, {
-					answers: [{text: data.WinnerText, ID: 0}]
-				}));
-				this.setMatchState(data.State);
-				break;
-			default:
-				alert("Evento sconosciuto: " + eventName);
+				case "join_successful":
+					// We joined successfully. Clear the UI.
+					this.resetUI();
+					if (data.InitialBlackCard.Id !== 0) {
+						this.showBlackCard(data.Expires, data.InitialBlackCard.text);
+					}
+					this.setMatchState(data.State);
+					break;
+				case "new_black":
+					// A black card was chosen. Show it.
+					// mycardsDiv.style.display = "flex";
+					this.resetUI();
+					this.showBlackCard(data.Expires, data.NewCard.text);
+					this.setMatchState(data.State);
+					break;
+				case "voting":
+					// The voting phase has begun.
+					window.canPickCard = false;
+					window.canVote = true;
+					this.setState(Object.assign(this.state, {
+						timerState: {
+							enabled: false,
+							expires: 0
+						},
+						uiStateText: IS_PLAYER
+							? "Il pubblico sta votando..."
+							: "Vota la carta migliore!",
+						myCards: []
+					}));
+					this.setMatchState(data.State);
+					break;
+				case "new_white":
+					// A new white card (from the voting phase) was received.
+					this.setState(Object.assign(this.state, {
+						answers: this.state.answers.concat({ text: data.NewCard.text, total: 0, ID: data.NewCard.Id })
+					}));
+					this.setMatchState(data.State);
+					break;
+				case "vote_cast":
+					let totals = data.Totals;
+					let answers = this.state.answers;
+					for (const total of totals) {
+						answers.find(a => a.ID === total.ID).total = total.Votes;
+					}
+
+					this.setState(Object.assign(this.state, {
+						answers: answers,
+						totals: totals,
+					}));
+
+					this.setMatchState(data.State);
+					break;
+				case "show_results":
+					this.setState(Object.assign(this.state, {
+						uiStateText: "", // TODO
+					}));
+					this.setMatchState(data.State);
+					break;
+				case "winner":
+					if (!IS_ADMIN)
+						break;
+					this.setState(Object.assign(this.state, {
+						answers: [{ text: data.WinnerText, ID: 0 }]
+					}));
+					this.setMatchState(data.State);
+					break;
+				default:
+					alert("Evento sconosciuto: " + eventName);
 			}
 		};
 	}
@@ -209,7 +223,7 @@ class Game extends Component {
 				MATCH_END
 			)
 		*/
-		switch(state){
+		switch (state) {
 			case 0:
 				this.setState(Object.assign(this.state, {
 					uiStateText: 'In attesa di altri giocatori...'
@@ -270,9 +284,9 @@ class Game extends Component {
 		const req = new XMLHttpRequest();
 		req.addEventListener("load", () => {
 			const resp = JSON.parse(req.responseText);
-			const cards = resp.map(item => ({text: item.text, ID: item.Id}));
+			const cards = resp.map(item => ({ text: item.text, ID: item.Id }));
 			console.log("My cards:", cards);
-			this.setState(Object.assign(this.state, {myCards: cards}));
+			this.setState(Object.assign(this.state, { myCards: cards }));
 		});
 		req.open("GET", `/mycards?match_id=${MATCH_ID}`);
 		req.send();
@@ -284,7 +298,7 @@ class Game extends Component {
 			{/* Middle row */}
 			<div className="flex" id="blackrow">
 				{this.state.blackCard}
-				{/* Maybe a table here? */}
+				{window.isProjector && <PlayersList players={this.state.players} jury={this.state.jury} />}
 			</div>
 			<MyCardsRow cards={this.state.myCards} />
 			<AnswersRow answers={this.state.answers} totals={this.state.totals} />
