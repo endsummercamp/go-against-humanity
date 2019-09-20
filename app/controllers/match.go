@@ -18,7 +18,9 @@ func (w *WebApp) playersList(match *models.Match) []models.Player {
 	for i, player := range match.Players {
 		ret[i] = *player
 		// Redact sensitive data
-		ret[i].User.PwHash = ""
+		tmpUser := *(ret[i].User)
+		tmpUser.PwHash = ""
+		ret[i].User = &tmpUser
 		ret[i].Cards = make([]*models.WhiteCard, 0)
 	}
 	return ret
