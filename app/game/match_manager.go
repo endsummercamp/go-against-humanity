@@ -2,26 +2,24 @@ package game
 
 import (
 	"github.com/ESCah/go-against-humanity/app/models"
-	"fmt"
 )
 
 type MatchManager struct {
 	matches []*models.Match
-	counter	int
+	counter int
 }
 
-func(mm *MatchManager) GetMatches() []*models.Match {
+func (mm *MatchManager) GetMatches() []*models.Match {
 	return mm.matches
 }
 
-func(mm *MatchManager) NewMatch() *models.Match {
+func (mm *MatchManager) NewMatch() *models.Match {
 	mm.counter++
 
-	new_match := models.NewMatch(mm.counter, []*models.Player{})
-	new_match.NewDeck()
-	fmt.Printf("NewMatch: deck is %#v\n", new_match.Deck)
-	mm.matches = append(mm.matches, new_match)
-	return new_match
+	newMatch := models.NewMatch(mm.counter, []*models.Player{})
+	newMatch.NewDeck()
+	mm.matches = append(mm.matches, newMatch)
+	return newMatch
 }
 
 func (mm *MatchManager) IsJoinable(id int) bool {
@@ -67,7 +65,7 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 			}
 		}
 
-		juror := models.Juror {
+		juror := models.Juror{
 			User: user,
 		}
 
@@ -77,7 +75,7 @@ func (mm *MatchManager) JoinMatch(id int, user *models.User) bool {
 	return true
 }
 
-func (mm *MatchManager) UserJoined (id int, user *models.User) bool {
+func (mm *MatchManager) UserJoined(id int, user *models.User) bool {
 	match := mm.GetMatchByID(id)
 	if match == nil {
 		return false

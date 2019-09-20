@@ -1,0 +1,21 @@
+<nav class="panel">
+	<!-- Todo: JS to make the panel work? -->
+	{{ if is_admin .User }}
+	<p class="panel-tabs">
+		<a class="is-active">User</a>
+		<a href="/admin">Admin tools</a>
+	</p>
+	{{ end }}
+	<a href="/matches" class="panel-block">
+		<span class="panel-icon">
+			<i class="fa fa-gamepad"></i>
+		</span>
+		Current match
+	</a>
+	<a href="/logout" class="panel-block">
+		<span class="panel-icon">
+			<i class="fa fa-times-circle"></i>
+		</span>
+		Log out
+	</a>
+</nav>

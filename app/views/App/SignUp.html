@@ -1,0 +1,32 @@
+{{define "title"}}Registrazione{{end}}
+{{template "header.html" .Header}}
+
+<form method="POST" action="/signup" class="form page-centered">
+	<h1 class="title">Registrazione</h1>
+	{{template "flash.html" .Flash}}
+	<div class="field">
+		<label for="inputUsername" class="label">Username</label>
+		<div class="control">
+			<input class="input" type="text" id="inputUsername" name="username" required />
+		</div>
+	</div>
+	<div class="field">
+		<label for="inputPassword" class="label">Password</label>
+		<div class="control">
+			<input class="input" type="password" id="inputPassword" name="password" required />
+		</div>
+	</div>
+	<div class="field">
+		<label class="radio">
+			<input type="radio" name="user_type" value="player" checked /> Giocatore
+		</label>
+		<label class="radio">
+			<input type="radio" name="user_type" value="juror" /> Pubblico
+		</label>
+	</div>
+	<div class="field">
+		<div class="control">
+			<button type="submit" class="button is-link">Registrati</button>
+		</div>
+	</div>
+</form>

@@ -1,11 +1,27 @@
-{{set . "title" "User List"}}
-{{template "header.html" .}}
+{{define "title"}}Admin - Users{{end}}
+{{template "header.html" .Header}}
 
-<h1>User List</h1>
-        <ul>
-        {{ range $element := .users }}
-            <li>{{ $element.Username }} - {{ $element.Id }}</li>
-        {{ end }}
-        </ul>
+{{ template "hero.html" .Header }}
+{{template "flash.html" .Flash}}
+
+<table class="table">
+    <thead>
+        <tr>
+            <td>ID</td>
+            <td>Username</td>
+            <td>Score</td>
+        </tr>
+    </thead>
+    {{ range $element := .Users }}
+        <tr>
+            <td>{{ $element.Id }}</td>
+            <td>
+                {{ $element.Username }}
+                [{{ if $element.Admin }}A, {{ end }}{{ if $element.UserType }}J{{ else }}P{{ end }}]
+            </td>
+            <td>{{ $element.Score }}</td>
+        </tr>
+    {{ end }}
+</table>
 
 {{template "footer.html" .}}

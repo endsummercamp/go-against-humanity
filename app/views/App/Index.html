@@ -1,16 +1,54 @@
-{{set . "title" "Home"}}
-{{template "header.html" .}}
-<div style="background-color:#A9F16C">
-  <h1>It works!</h1>
-  <p>{{ if is_player .user }}Player{{ else }}Juror{{ end }}</p>
-</div>
+{{define "title"}}Home{{end}}
+{{template "header.html" .Header}}
 
-{{template "flash.html" .}}
+<section class="has-text-centered">
+	<h1 class="title">ESC against Humanity</h1>
+	<img src="public/img/ESC-logo-small.png" style="width: 5em" /> <!-- todo: fix path -->
+	<p><strong>{{ .User.Username }}</strong> - {{ if is_player .User }}Giocatore{{ else }}Pubblico{{ end }}{{ if is_admin .User }}, admin{{ end }}</p>
+</section>
 
-<ul>
-  {{ if is_admin .user }} <li><a href="/admin">Admin</a></li> {{ end }}
-  <li><a href="/matches">Matches</a></li>
-  <li><a href="/logout">Log out</a></li>
-</ul>
+<br>
+
+{{template "flash.html" .Flash}}
+
+<nav class="panel">
+	<!-- Todo: JS to make the panel work -->
+	{{ if is_admin .User }}
+	<p class="panel-tabs">
+		<a class="is-active">Utente</a>
+		<a href="/admin">Admin tools</a>
+	</p>
+	{{ end }}
+	<a href="/matches/join_latest" class="panel-block">
+		<span class="panel-icon">
+			<i class="fa fa-gamepad"></i>
+		</span>
+		Entra in partita
+	</a>
+	<!--
+	<a href="/matches" class="panel-block">
+	<span class="panel-icon">
+	<i class="fa fa-gamepad"></i>
+	</span>
+	Matches
+	</a>
+	-->
+	<a href="/logout" class="panel-block">
+		<span class="panel-icon">
+			<i class="fa fa-times-circle"></i>
+		</span>
+		Logout
+	</a>
+</nav>
+
+<h4 class="title is-4">Punteggi migliori</h4>
+<table class="table">
+	{{ range $element := .Leaderboard }}
+		<tr>
+			<td>{{ $element.Username }}</td>
+			<td>{{ $element.Score }}</td>
+		</tr>
+	{{ end }}
+</table>
 
 {{template "footer.html" .}}

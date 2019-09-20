@@ -2,11 +2,13 @@ package models
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"sync"
 	"time"
 
+	"github.com/BurntSushi/toml"
 	gc_log "github.com/denysvitali/gc_log"
 )
 
@@ -40,13 +42,13 @@ func NewMatch(id int, players []*Player) *Match {
 	return m
 }
 
+var allowedDecks []string
+
 func deckAllowed(deckName string) bool {
-	// TODO: Allow customization
-	switch deckName {
-	case "ita-original-sfoltita":
-	case "ita-espansione":
-	case "ita-HACK":
-		return true
+	for _, d := range allowedDecks {
+		if d == deckName {
+			return true
+		}
 	}
 	return false
 }
@@ -57,6 +59,15 @@ func (m *Match) NewDeck() {
 	}
 
 	gc_log.Debug("Generating deck...")
+
+	var conf Config
+	if _, err := toml.DecodeFile("./config.toml", &conf); err != nil {
+		gc_log.Fatal(err)
+	}
+
+	gc_log.Debug(fmt.Sprintf("Decks allowed: %s", conf.General.Decks))
+
+	allowedDecks = conf.General.Decks
 
 	f, err := os.OpenFile("./cards/json-against-humanity/full.md.json", os.O_RDONLY, 755)
 	if err != nil {
@@ -129,8 +140,8 @@ func (m *Match) NewBlackCard() *BlackCard {
 	m.Rounds = append(m.Rounds, Round{
 		BlackCard: blackCard,
 		Wcs:       map[*WhiteCard][]Juror{},
-		Mutex: 		sync.Mutex{},
-		Voters: 	[]Juror{},
+		Mutex:     sync.Mutex{},
+		Voters:    []Juror{},
 	})
 
 	return blackCard
@@ -144,6 +155,7 @@ func (m *Match) EndVote() bool {
 	m.State = MATCH_SHOW_RESULTS
 	return true
 }
+
 func (m *Match) RemoveVote(round *Round, card *WhiteCard, juror *Juror) {
 	found := -1
 	for i, j := range round.Wcs[card] {

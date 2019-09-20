@@ -1,5 +1,5 @@
-{{set . "title" "Match"}}
-{{template "header.html" .}}
+{{$title:="Match"}}
+{{template "header.html" .Header}}
 
 <style>
     h1 {
@@ -15,6 +15,9 @@
         justify-content: center;
     }
     #react-mycards {
+        {{ if is_player .User }}
+        display: flex;
+        {{ end }}
         position: fixed;
         bottom: 0;
         left: 0;
@@ -24,15 +27,15 @@
     #react-mycards > .card {
         flex-shrink: 0;
     }
+
+    body {
+        padding-top: 3.25rem !important; /* Accounts for the navbar */
+    }
 </style>
 
-<div class="match-timer"></div>
+<div id="react-game"></div>
 
-{{ if is_admin .user }}<div class="match-admin-panel">
-    <button class="button admin-panel-new-blackcard">New Black Card</button>
-    <button class="button admin-panel-end-voting">End Voting</button>
-</div> {{ end }}
-<h1>Cards against Humanity</h1>
+<!-- <h1>Cards against Humanity</h1> -->
 
 <div id="react-blackrow"></div>
 <div class="flex" id="react-whiterow"></div>
@@ -40,12 +43,13 @@
 <div id="react-mycards" style="display: none;"></div>
 
 <script type="text/javascript">
-    const MATCH_ID = {{ .match_id }};
-    const IS_PLAYER = {{ if is_player .user }} true {{ else }} false {{ end }};
+    const MATCH_ID = {{ .Match.Id }};
+    const IS_PLAYER = {{ if is_player .User }} true {{ else }} false {{ end }};
+    const IS_ADMIN = {{ if is_admin .User }} true {{ else }} false {{ end }};
 </script>
 
-<script src="/public/scripts/react.development.js"></script>
-<script src="/public/scripts/react-dom.development.js"></script>
-<script src="/public/scripts/game.min.js"></script>
+<script src="/public/game.js"></script>
 
+<!--
 {{ template "footer.html" .}}
+-->

@@ -8,41 +8,36 @@ Written in 3 days during the [End Summer Camp](https://www.endsummercamp.org). M
 
 ![Cards Against Humanity](screenshots/1.png)
 
-### Start the web server:
+## Usage
 
-   revel run
+```bash
+git clone --recursive https://github.com/ESCah/go-against-humanity
 
-### Tell the players / jurors to go to http://<your-ip>:9000/ and enjoy the game!
+make compile      # Compile the cards
 
+npm install                    # Install Node.js deps
+node node_modules/.bin/webpack # Compile Web resources
 
-## Based on Revel
-### Code Layout
+go get -v        # Fetch deps
+```
 
-The directory structure of a generated Revel application:
+## Configure the application
+Create a file `config.toml` and add the following:
 
-    conf/             Configuration directory
-        app.conf      Main app configuration file
-        routes        Routes definition file
+```toml
+[General]
+Decks = ['ita-original-sfoltita', 'ita-espansione', 'ita-HACK']
+```
 
-    app/              App sources
-        init.go       Interceptor registration
-        controllers/  App controllers go here
-        views/        Templates directory
-
-    messages/         Message files
-
-    public/           Public static assets
-        css/          CSS files
-        js/           Javascript files
-        images/       Image files
-
-    tests/            Test suites
+where Decks is an array containing the decks you want to use
+([here is the list](https://github.com/ESCah/json-against-humanity/tree/master/src))
 
 
-### Help
+## Running
+```bash
+go run server.go # Start the web server
+```
 
-* The [Getting Started with Revel](http://revel.github.io/tutorial/gettingstarted.html).
-* The [Revel guides](http://revel.github.io/manual/index.html).
-* The [Revel sample apps](http://revel.github.io/examples/index.html).
-* The [API documentation](https://godoc.org/github.com/revel/revel).
+**Tell the players / jurors to go to http://<your-ip>:1323/ and enjoy the game!**
 
+## Based on [Echo](https://echo.labstack.com/)

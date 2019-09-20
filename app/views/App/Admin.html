@@ -1,12 +1,25 @@
-{{set . "title" "Admin"}}
-{{template "header.html" .}}
+{{define "title"}}Admin{{end}}
+{{template "header.html" .Header}}
 
-<h1>Admin</h1>
-        {{ template "flash.html" . }}
-<ul>
-    <li><a href="/admin/match/new">New Match</a></li>
-    <li><a href="/admin/users">Users list</a></li>
-</ul>
+{{ template "flash.html" .Flash }}
 
+<nav class="panel">
+	<p class="panel-tabs">
+		<a href="/">User</a>
+		<a class="is-active">Admin tools</a>
+	</p>
+	<a href="/admin/matches/new" class="panel-block">
+		<span class="panel-icon">
+			<i class="fa fa-plus-square"></i>
+		</span>
+		New match
+	</a>
+	<a href="/admin/users" class="panel-block">
+		<span class="panel-icon">
+			<i class="fa fa-user"></i>
+		</span>
+		User list
+	</a>
+</nav>
 
 {{template "footer.html" .}}

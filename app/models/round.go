@@ -3,16 +3,14 @@ package models
 import (
 	"sort"
 	"sync"
-	"time"
 )
 
 type Round struct {
-	BlackCard      *BlackCard
-	TimeFinishPick time.Time
-	Wcs            map[*WhiteCard][]Juror
-	Mutex	  	   sync.Mutex
-	Voters			[]Juror
-
+	BlackCard *BlackCard
+	Expires   int64
+	Wcs       map[*WhiteCard][]Juror
+	Mutex     sync.Mutex
+	Voters    []Juror
 }
 
 func (r *Round) AddCard(card *WhiteCard) bool {

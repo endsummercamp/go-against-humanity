@@ -1,0 +1,52 @@
+<nav class="navbar is-primary is-spaced is-bold" role="navigation" aria-label="main navigation">
+    <div class="navbar-brand">
+        <a class="navbar-item" href="/">
+            <img src="/public/img/logo.png" height="28">
+        </a>
+
+        <a role="button" class="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
+    </div>
+
+    <div id="navbarBasicExample" class="navbar-menu">
+        <div class="navbar-start">
+            <a class="navbar-item" href="/">
+                Home
+            </a>
+
+            {{ if is_admin .User }}
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-item" href="/admin">Admin</a>
+
+                <div class="navbar-dropdown">
+                    <a class="navbar-item" href="/admin/matches/new">
+                        New Match
+                    </a>
+
+                    <a class="navbar-item" href="/admin/users">
+                        Users List
+                    </a>
+                </div>
+            </div>
+            {{ end }}
+
+
+            <a class="navbar-item" href="/matches">
+                Matches
+            </a>
+        </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    <a class="button is-light" href="/logout">
+                        Log Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,15 +1,14 @@
 package models
 
 import (
-	"log"
 	"math/rand"
 	"time"
 )
 
 type Deck struct {
-	Black_cards             	[]BlackCard
-	White_cards             	[]WhiteCard
-	LastExtractedCard 			*Card
+	Black_cards       []BlackCard
+	White_cards       []WhiteCard
+	LastExtractedCard *Card
 }
 
 type DeckMetadata struct {
@@ -20,21 +19,20 @@ type DeckMetadata struct {
 }
 
 type DeckData struct {
-	Black []BlackCard	`json:"black"`
-	White []WhiteCard	`json:"white"`
-	Metadata map[string]DeckMetadata	 `json:"metadata"`
+	Black    []BlackCard             `json:"black"`
+	White    []WhiteCard             `json:"white"`
+	Metadata map[string]DeckMetadata `json:"metadata"`
 }
 
 func RemoveBlackCard(cards []BlackCard, index int) []BlackCard {
-	log.Printf("Removing %s...\n", cards[index].GetText())
+	//log.Printf("Removing %s...\n", cards[index].GetText())
 	cards[len(cards)-1], (cards)[index] = (cards)[index], cards[len(cards)-1]
 	cards = (cards)[:len(cards)-1]
 	return cards
 }
 
-
 func RemoveWhiteCard(cards []WhiteCard, index int) []WhiteCard {
-	log.Printf("Removing %s...\n", cards[index].GetText())
+	//log.Printf("Removing %s...\n", cards[index].GetText())
 	cards[len(cards)-1], (cards)[index] = (cards)[index], cards[len(cards)-1]
 	cards = (cards)[:len(cards)-1]
 	return cards
@@ -58,7 +56,7 @@ func (deck *Deck) NewRandomBlackCard() *BlackCard {
 	rand.Seed(time.Now().Unix())
 	i := rand.Intn(len(deck.Black_cards))
 	card := deck.Black_cards[i]
-	log.Printf("Removing card %s\n", card)
+	//log.Printf("Removing card %s\n", card)
 	deck.Black_cards = RemoveBlackCard(deck.Black_cards, i)
 	return &card
 }
