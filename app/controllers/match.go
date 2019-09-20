@@ -13,25 +13,22 @@ import (
 	"time"
 )
 
-func (w *WebApp) playersList(match *models.Match) []models.Player {
-	ret := make([]models.Player, len(match.Players))
+func (w *WebApp) playersList(match *models.Match) []models.User {
+	ret := make([]models.User, len(match.Players))
 	for i, player := range match.Players {
-		ret[i] = *player
+		ret[i] = *player.User
 		// Redact sensitive data
-		tmpUser := *(ret[i].User)
-		tmpUser.PwHash = ""
-		ret[i].User = &tmpUser
-		ret[i].Cards = make([]*models.WhiteCard, 0)
+		ret[i].PwHash = ""
 	}
 	return ret
 }
 
-func (w *WebApp) jurorsList(match *models.Match) []models.Juror {
-	ret := make([]models.Juror, len(match.Jury))
+func (w *WebApp) jurorsList(match *models.Match) []models.User {
+	ret := make([]models.User, len(match.Jury))
 	for i, juror := range match.Jury {
-		ret[i] = *juror
+		ret[i] = *juror.User
 		// Redact sensitive data
-		ret[i].User.PwHash = ""
+		ret[i].PwHash = ""
 	}
 	return ret
 }
@@ -76,10 +73,10 @@ func (w *WebApp) JoinLatestMatch(c echo.Context) error {
 
 	w.Ws.BroadcastToRoom(matchId, Event{
 		// The list of players has changed. Update it if you're watching it (i.e. are in projector view)
-		Name:  "players_update",
-		State: match.State,
+		Name:        "players_update",
+		State:       match.State,
 		Leaderboard: w.playersList(match),
-		Jury: w.jurorsList(match),
+		Jury:        w.jurorsList(match),
 	})
 
 	return c.Render(http.StatusOK, "Match.html", data.MatchPageData{
@@ -112,7 +109,7 @@ func (w *WebApp) JoinMatch(c echo.Context) error {
 
 		if !joinResult {
 			log.Println("[JoinMatch] mm.JoinMatch failed, redirecting to /matches")
-			return c.Redirect(http.StatusTemporaryRedirect, "/matches");
+			return c.Redirect(http.StatusTemporaryRedirect, "/matches")
 		}
 	}
 
@@ -120,10 +117,10 @@ func (w *WebApp) JoinMatch(c echo.Context) error {
 
 	w.Ws.BroadcastToRoom(matchId, Event{
 		// The list of players has changed. Update it if you're watching it (i.e. are in projector view)
-		Name:  "players_update",
-		State: match.State,
+		Name:        "players_update",
+		State:       match.State,
 		Leaderboard: w.playersList(match),
-		Jury: w.jurorsList(match),
+		Jury:        w.jurorsList(match),
 	})
 
 	return c.Render(http.StatusOK, "Match.html", data.MatchPageData{
@@ -192,7 +189,7 @@ func (w *WebApp) NewBlackCard(c echo.Context) error {
 	if match.State != models.MATCH_SHOW_RESULTS &&
 		match.State != models.MATCH_WAIT_USERS {
 		log.Println("[MatchCards] State doesn't allow dealing a new card")
-		return c.NoContent(http.StatusNotAcceptable);
+		return c.NoContent(http.StatusNotAcceptable)
 	}
 
 	card := match.NewBlackCard()
@@ -295,8 +292,8 @@ func (w *WebApp) PickCard(c echo.Context) error {
 	if len(round.Wcs) != len(match.Players) {
 		w.Ws.BroadcastToRoom(matchId, Event{
 			// The list of players has changed. Update it if you're watching it (i.e. are in projector view)
-			Name:  "hidden_white_card",
-			State: match.State,
+			Name:     "hidden_white_card",
+			State:    match.State,
 			Username: player.User.Username,
 		})
 	} else {
@@ -509,6 +506,11 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 			State:          match.State,
 			WinnerUsername: winner.User.Username,
 			WinnerText:     winningCard.Text,
+		})
+		w.Ws.BroadcastToRoom(matchId, Event{
+			Name:        "players_update",
+			Leaderboard: w.playersList(match),
+			Jury:        w.jurorsList(match),
 		})
 	}
 

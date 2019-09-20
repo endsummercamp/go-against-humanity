@@ -27,7 +27,7 @@
                         {{ else }}
                         <ul>
                         {{ range $element.Players }}
-                            <li>{{ .User.Username }} ({{ .Points }})</li>
+                            <li>{{ .User.Username }} ({{ .User.Score }})</li>
                         {{ end }}
                         </ul>
                         {{ end }}

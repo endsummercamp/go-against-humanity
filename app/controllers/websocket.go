@@ -30,8 +30,8 @@ type Event struct {
 	InitialBlackCard models.BlackCard
 	WinnerUsername   string
 	WinnerText       string
-	Leaderboard      []models.Player
-	Jury             []models.Juror
+	Leaderboard      []models.User
+	Jury             []models.User
 	Username         string
 }
 
