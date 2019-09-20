@@ -477,7 +477,7 @@ func (w *WebApp) EndVoting(c echo.Context) error {
 	}
 
 	sort.Slice(totals, func(i, j int) bool {
-		return totals[i].Votes < totals[j].Votes
+		return totals[i].Votes > totals[j].Votes
 	})
 
 	var winner *models.Player
