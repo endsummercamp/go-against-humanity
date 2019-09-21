@@ -11,6 +11,8 @@ Written in 3 days during the [End Summer Camp](https://www.endsummercamp.org). M
 ## Usage
 
 ```bash
+export GOPATH=~/gopath # If you have an existing gopath, use that instead
+mkdir -p $GOPATH/src/github.com/ESCah
 git clone --recursive https://github.com/ESCah/go-against-humanity
 
 make compile      # Compile the cards
