@@ -424,10 +424,21 @@ div.match-admin-panel {
     margin: 10px;
     z-index: 500;
 
-    button#admin-panel-new-blackcard{
+    button#admin-panel-new-blackcard {
         .BoxShadowHelper(2);
         margin-top: 0;
         background-color: #000;
+        color: @white;
+
+        &:active {
+            .BoxShadowHelper(1);
+        }
+    }
+
+    button#admin-panel-projector-view {
+        .BoxShadowHelper(2);
+        margin-top: 0;
+        background-color: #4153af;
         color: @white;
 
         &:active {
@@ -444,6 +455,10 @@ div.match-admin-panel {
             .BoxShadowHelper(1);
         }
     }
+}
+
+div.playersList {
+	padding: 2em;
 }
 
 div.match-timer {
