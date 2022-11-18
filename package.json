@@ -27,7 +27,7 @@
     "postcss-preset-env": "^6.7.0",
     "style-loader": "^1.0.0",
     "webpack": "^4.40.2",
-    "webpack-cli": "^3.3.8"
+    "webpack-cli": "^3.3.12"
   },
   "dependencies": {
     "bulma": "^0.7.5",
