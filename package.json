@@ -19,7 +19,7 @@
     "imagemin-jpegtran": "^6.0.0",
     "imagemin-optipng": "^7.0.0",
     "imagemin-svgo": "^10.0.1",
-    "imagemin-webpack": "^5.1.0",
+    "imagemin-webpack": "^5.1.1",
     "less": "^3.10.3",
     "less-loader": "^5.0.0",
     "mini-css-extract-plugin": "^0.8.0",
